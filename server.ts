@@ -3,10 +3,29 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import dotenv from 'dotenv';
+import pg from 'pg';
 
+dotenv.config({ path: '.env.local' });
 dotenv.config();
 
-const port = 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false });
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS podcasts (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      transcript TEXT,
+      vocabulary TEXT,
+      audio_data TEXT,
+      level TEXT,
+      host_count TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+}
 
 // Shared Gemini client defined on the server side
 // We set 'User-Agent' header to 'aistudio-build' in httpOptions for telemetry.
@@ -20,8 +39,55 @@ const ai = new GoogleGenAI({
 });
 
 async function startServer() {
+  await initDb();
+
   const app = express();
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '100mb' }));
+
+  // Save a podcast
+  app.post('/api/podcasts', async (req, res) => {
+    try {
+      const { title, transcript, vocabulary, audioData, level, hostCount } = req.body;
+      const result = await pool.query(
+        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, title, level, host_count, created_at',
+        [title, transcript, vocabulary, audioData, level, hostCount]
+      );
+      res.json(result.rows[0]);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // List all podcasts
+  app.get('/api/podcasts', async (_req, res) => {
+    try {
+      const result = await pool.query('SELECT id, title, level, host_count, created_at FROM podcasts ORDER BY created_at DESC');
+      res.json(result.rows);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get a single podcast (with audio)
+  app.get('/api/podcasts/:id', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM podcasts WHERE id = $1', [req.params.id]);
+      if (!result.rows[0]) return res.status(404).json({ error: 'Not found' });
+      res.json(result.rows[0]);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete a podcast
+  app.delete('/api/podcasts/:id', async (req, res) => {
+    try {
+      await pool.query('DELETE FROM podcasts WHERE id = $1', [req.params.id]);
+      res.json({ ok: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // API Route for generating the script
   app.post('/api/generate-script', async (req, res) => {
