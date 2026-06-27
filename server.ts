@@ -8,6 +8,34 @@ import pg from 'pg';
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
+// Global Gemini rate-limit queue: enforces minimum 7s gap between API calls (~8 RPM max)
+let lastGeminiCall = 0;
+const GEMINI_MIN_GAP_MS = 7000;
+const geminiQueue: Array<() => void> = [];
+let queueRunning = false;
+
+async function geminiCall<T>(fn: () => Promise<T>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    geminiQueue.push(async () => {
+      const now = Date.now();
+      const wait = Math.max(0, lastGeminiCall + GEMINI_MIN_GAP_MS - now);
+      if (wait > 0) await new Promise(r => setTimeout(r, wait));
+      lastGeminiCall = Date.now();
+      try { resolve(await fn()); } catch (e) { reject(e); }
+    });
+    if (!queueRunning) runQueue();
+  });
+}
+
+async function runQueue() {
+  queueRunning = true;
+  while (geminiQueue.length > 0) {
+    const task = geminiQueue.shift()!;
+    await task();
+  }
+  queueRunning = false;
+}
+
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false });
@@ -177,7 +205,7 @@ async function startServer() {
       
       while (scriptRetryCount <= maxScriptRetries) {
         try {
-          scriptResponse = await ai.models.generateContent({
+          scriptResponse = await geminiCall(() => ai.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
@@ -207,7 +235,7 @@ async function startServer() {
               temperature: 0.7,
               tools: tools.length > 0 ? tools : undefined,
             }
-          });
+          }));
           break;
         } catch (error: any) {
           if ((error?.message?.includes('429') || error?.status === 429) && scriptRetryCount < maxScriptRetries) {
@@ -270,18 +298,17 @@ async function startServer() {
       const pcmParts: Buffer[] = [];
 
       for (let i = 0; i < chunks.length; i++) {
-        if (i > 0) await sleep(3000); // 3s between chunks — well under rate limits
 
         const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunks[i]}`;
 
         let attempt = 0;
         while (true) {
           try {
-            const ttsResponse = await ai.models.generateContent({
+            const ttsResponse = await geminiCall(() => ai.models.generateContent({
               model: 'gemini-2.5-flash-preview-tts',
               contents: [{ parts: [{ text: promptText }] }],
               config: { responseModalities: [Modality.AUDIO], speechConfig },
-            });
+            }));
             const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
             if (audioPart?.inlineData?.data) {
               pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
@@ -329,14 +356,14 @@ async function startServer() {
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      const ttsResponse = await ai.models.generateContent({
+      const ttsResponse = await geminiCall(() => ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: promptText }] }],
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig,
         },
-      });
+      }));
 
       const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
       const base64Audio = audioPart?.inlineData?.data || null;
