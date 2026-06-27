@@ -37,7 +37,7 @@ async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 2, retryWai
   throw new Error('Max retries exceeded');
 }
 
-// TTS serial queue: 22s gap between calls to stay within ~3 RPM TTS preview limit
+// TTS serial queue: 22s gap between calls stays within ~3 RPM TTS preview limit
 let ttsLast = 0;
 const ttsQueue: Array<() => void> = [];
 let ttsRunning = false;
@@ -58,11 +58,6 @@ function ttsCall<T>(fn: () => Promise<T>): Promise<T> {
       })();
     }
   });
-}
-
-// Script generation: no queue needed (different model, higher quota), just retry once
-async function scriptCall<T>(fn: () => Promise<T>): Promise<T> {
-  return geminiWithRetry(fn, 2, 15000);
 }
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
@@ -226,7 +221,7 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const scriptResponse = await scriptCall(() => ai.models.generateContent({
+      const scriptResponse = await ai.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
@@ -256,7 +251,7 @@ async function startServer() {
               temperature: 0.7,
               tools: tools.length > 0 ? tools : undefined,
             }
-          }));
+          });
 
       const fullText = scriptResponse.text || '';
       res.json({ fullText });
