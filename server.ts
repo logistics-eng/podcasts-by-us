@@ -25,6 +25,7 @@ async function initDb() {
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS description TEXT`);
 }
 
 // Shared Gemini client defined on the server side
@@ -61,8 +62,23 @@ async function startServer() {
   // List all podcasts
   app.get('/api/podcasts', async (_req, res) => {
     try {
-      const result = await pool.query('SELECT id, title, level, host_count, created_at FROM podcasts ORDER BY created_at DESC');
+      const result = await pool.query('SELECT id, title, description, level, host_count, created_at FROM podcasts ORDER BY created_at DESC');
       res.json(result.rows);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update podcast title and description
+  app.put('/api/podcasts/:id', async (req, res) => {
+    try {
+      const { title, description } = req.body;
+      const result = await pool.query(
+        'UPDATE podcasts SET title = $1, description = $2 WHERE id = $3 RETURNING id, title, description, level, host_count, created_at',
+        [title, description, req.params.id]
+      );
+      if (!result.rows[0]) return res.status(404).json({ error: 'Not found' });
+      res.json(result.rows[0]);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

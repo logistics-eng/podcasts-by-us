@@ -23,6 +23,8 @@ import {
   Trash2,
   ArrowLeft,
   FileText,
+  Pencil,
+  X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -43,6 +45,7 @@ const LEVELS = [
 interface SavedPodcast {
   id: number;
   title: string;
+  description?: string;
   level: string;
   host_count: string;
   created_at: string;
@@ -99,6 +102,10 @@ export default function App() {
   // Library state
   const [library, setLibrary] = useState<SavedPodcast[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState<SavedPodcast | null>(null);
   const [detailAudioUrl, setDetailAudioUrl] = useState<string | null>(null);
   const [detailIsPlaying, setDetailIsPlaying] = useState(false);
@@ -166,6 +173,36 @@ export default function App() {
   const handleDeletePodcast = async (id: number) => {
     await fetch(`/api/podcasts/${id}`, { method: 'DELETE' });
     setLibrary(prev => prev.filter(p => p.id !== id));
+  };
+
+  const startEdit = (podcast: SavedPodcast, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(podcast.id);
+    setEditTitle(podcast.title);
+    setEditDescription(podcast.description || '');
+  };
+
+  const cancelEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(null);
+  };
+
+  const saveEdit = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!editTitle.trim()) return;
+    setIsSavingEdit(true);
+    try {
+      const res = await fetch(`/api/podcasts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editTitle, description: editDescription }),
+      });
+      const updated = await res.json();
+      setLibrary(prev => prev.map(p => p.id === id ? { ...p, title: updated.title, description: updated.description } : p));
+      setEditingId(null);
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
   // Shared audio generation: chunks script → TTS → WAV
@@ -464,19 +501,52 @@ export default function App() {
           ) : (
             <div className="space-y-3">
               {library.map(podcast => (
-                <div key={podcast.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4 hover:border-indigo-200 transition-all cursor-pointer" onClick={() => handleOpenPodcast(podcast)}>
-                  <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
-                    <Volume2 size={18} className="text-indigo-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{podcast.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button onClick={e => { e.stopPropagation(); handleDeletePodcast(podcast.id); }} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                    <Trash2 size={16} />
-                  </button>
+                <div key={podcast.id} className={`bg-white rounded-2xl border shadow-sm p-5 transition-all ${editingId === podcast.id ? 'border-indigo-300' : 'border-gray-100 hover:border-indigo-200 cursor-pointer'}`}
+                  onClick={() => editingId !== podcast.id && handleOpenPodcast(podcast)}>
+                  {editingId === podcast.id ? (
+                    <div className="space-y-3" onClick={e => e.stopPropagation()}>
+                      <input
+                        autoFocus
+                        className="w-full px-3 py-2 rounded-xl border border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-semibold text-gray-900"
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        placeholder="Title"
+                      />
+                      <textarea
+                        className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm text-gray-600 resize-none min-h-[64px]"
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                        placeholder="Add a description (optional)..."
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={cancelEdit} className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-all flex items-center gap-1">
+                          <X size={13} /> Cancel
+                        </button>
+                        <button onClick={e => saveEdit(podcast.id, e)} disabled={isSavingEdit || !editTitle.trim()} className="px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center gap-1">
+                          {isSavingEdit ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
+                        <Volume2 size={18} className="text-indigo-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{podcast.title}</p>
+                        {podcast.description && <p className="text-xs text-gray-500 mt-0.5 truncate">{podcast.description}</p>}
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button onClick={e => startEdit(podcast, e)} className="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all">
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); handleDeletePodcast(podcast.id); }} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
