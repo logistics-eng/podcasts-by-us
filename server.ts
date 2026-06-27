@@ -8,6 +8,8 @@ import pg from 'pg';
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
 // Detect Gemini rate-limit errors regardless of SDK error shape
 const isRateLimit = (e: any) =>
   e?.status === 429 ||
@@ -17,54 +19,51 @@ const isRateLimit = (e: any) =>
   String(e?.message).includes('RESOURCE_EXHAUSTED') ||
   String(e?.status).includes('RESOURCE_EXHAUSTED');
 
-// Serial queue with enforced minimum gap between calls.
-// Script model (gemini-3-flash-preview) and TTS model have separate quotas — separate queues.
-function makeQueue(minGapMs: number) {
-  let last = 0;
-  const q: Array<() => void> = [];
-  let running = false;
-
-  async function run() {
-    running = true;
-    while (q.length > 0) {
-      const task = q.shift()!;
-      await task();
+// Call Gemini with automatic retry on rate limit.
+// maxWaitMs caps total retry time to stay within Railway's request timeout.
+async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 2, retryWaitMs = 20000): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (e: any) {
+      if (isRateLimit(e) && attempt < maxRetries) {
+        console.log(`Rate limit hit, waiting ${retryWaitMs / 1000}s (attempt ${attempt + 1})...`);
+        await sleep(retryWaitMs);
+      } else {
+        throw e;
+      }
     }
-    running = false;
   }
-
-  return function queue<T>(fn: () => Promise<T>): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      q.push(async () => {
-        const wait = Math.max(0, last + minGapMs - Date.now());
-        if (wait > 0) await new Promise(r => setTimeout(r, wait));
-        last = Date.now();
-        for (let attempt = 0; attempt <= 5; attempt++) {
-          try {
-            resolve(await fn());
-            return;
-          } catch (e: any) {
-            if (isRateLimit(e) && attempt < 5) {
-              const delay = 65000;
-              console.log(`Rate limit hit, waiting ${delay / 1000}s (attempt ${attempt + 1})...`);
-              await new Promise(r => setTimeout(r, delay));
-              last = Date.now();
-            } else {
-              reject(e);
-              return;
-            }
-          }
-        }
-      });
-      if (!running) run();
-    });
-  };
+  throw new Error('Max retries exceeded');
 }
 
-// Script model: ~15 RPM — 5s gap is safe
-const scriptCall = makeQueue(5000);
-// TTS model: ~3 RPM — 22s gap is safe
-const ttsCall = makeQueue(22000);
+// TTS serial queue: 22s gap between calls to stay within ~3 RPM TTS preview limit
+let ttsLast = 0;
+const ttsQueue: Array<() => void> = [];
+let ttsRunning = false;
+
+function ttsCall<T>(fn: () => Promise<T>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    ttsQueue.push(async () => {
+      const wait = Math.max(0, ttsLast + 22000 - Date.now());
+      if (wait > 0) await sleep(wait);
+      ttsLast = Date.now();
+      try { resolve(await geminiWithRetry(fn, 2, 25000)); } catch (e) { reject(e); }
+    });
+    if (!ttsRunning) {
+      ttsRunning = true;
+      (async () => {
+        while (ttsQueue.length > 0) await ttsQueue.shift()!();
+        ttsRunning = false;
+      })();
+    }
+  });
+}
+
+// Script generation: no queue needed (different model, higher quota), just retry once
+async function scriptCall<T>(fn: () => Promise<T>): Promise<T> {
+  return geminiWithRetry(fn, 2, 15000);
+}
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 

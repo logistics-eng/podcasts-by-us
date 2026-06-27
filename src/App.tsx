@@ -769,7 +769,7 @@ export default function App() {
                   disabled={isGenerating || (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim()))}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating... {formatTime(genElapsed)}</>) : (<><Volume2 size={20} />Generate Podcast</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatTime(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Generate Podcast</>)}
                 </button>
               </section>
             ) : (
@@ -835,7 +835,7 @@ export default function App() {
                   disabled={isGenerating || !scriptTitle.trim() || !scriptText.trim()}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating... {formatTime(genElapsed)}</>) : (<><Volume2 size={20} />Read My Script</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatTime(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Read My Script</>)}
                 </button>
               </section>
             )}
@@ -865,7 +865,7 @@ export default function App() {
                   {isGenerating && transcript && !audioUrl && (
                     <div className="bg-indigo-50 border border-indigo-100 rounded-2xl px-5 py-4 flex items-center gap-3 text-indigo-700 text-sm font-medium">
                       <Loader2 size={16} className="animate-spin shrink-0" />
-                      <span>Recording audio... {formatTime(genElapsed)}</span>
+                      <span>Recording audio...{genElapsed > 0 ? ` ${formatTime(genElapsed)}` : ''}</span>
                     </div>
                   )}
                   {audioUrl && (
@@ -921,7 +921,7 @@ export default function App() {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium mb-4">
                             <Loader2 size={15} className="animate-spin shrink-0" />
-                            <span>Writing script... {formatTime(genElapsed)}</span>
+                            <span>Writing script...{genElapsed > 0 ? ` ${formatTime(genElapsed)}` : ''}</span>
                           </div>
                           <div className="space-y-3 animate-pulse">
                             <div className="h-4 bg-gray-100 rounded w-3/4"></div>
