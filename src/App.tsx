@@ -22,6 +22,7 @@ import {
   Library,
   Trash2,
   ArrowLeft,
+  FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -47,6 +48,9 @@ interface SavedPodcast {
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
+  const [mode, setMode] = useState<'generate' | 'script'>('generate');
+
+  // Generate mode state
   const [subject, setSubject] = useState('');
   const [sourceType, setSourceType] = useState<'subject' | 'article'>('subject');
   const [articleSourceType, setArticleSourceType] = useState<'text' | 'url'>('text');
@@ -59,13 +63,21 @@ export default function App() {
   const [length, setLength] = useState(4);
   const [level, setLevel] = useState('B2');
   const [hostCount, setHostCount] = useState<'one' | 'two'>('two');
+
+  // My Script mode state
+  const [scriptTitle, setScriptTitle] = useState('');
+  const [scriptText, setScriptText] = useState('');
+  const [scriptHostCount, setScriptHostCount] = useState<'one' | 'two'>('two');
+  const [scriptSpeed, setScriptSpeed] = useState(100);
+
+  // Shared output state
   const [isGenerating, setIsGenerating] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [vocabularyChart, setVocabularyChart] = useState('');
   const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary'>('transcript');
   const [generatedTitle, setGeneratedTitle] = useState('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [audioData, setAudioData] = useState<string | null>(null); // base64 for saving
+  const [audioData, setAudioData] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [vocabCopied, setVocabCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,7 +86,6 @@ export default function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
   const [isSharing, setIsSharing] = useState(false);
 
   // Library state
@@ -115,8 +126,8 @@ export default function App() {
           transcript,
           vocabulary: vocabularyChart,
           audioData,
-          level,
-          hostCount,
+          level: mode === 'script' ? '—' : level,
+          hostCount: mode === 'script' ? scriptHostCount : hostCount,
         }),
       });
       const data = await res.json();
@@ -147,6 +158,125 @@ export default function App() {
   const handleDeletePodcast = async (id: number) => {
     await fetch(`/api/podcasts/${id}`, { method: 'DELETE' });
     setLibrary(prev => prev.filter(p => p.id !== id));
+  };
+
+  // Shared audio generation: chunks script → TTS → WAV
+  const generateAudio = async (
+    script: string,
+    hCount: 'one' | 'two',
+    speed: number,
+    lvl: string,
+    readAsWritten: boolean
+  ) => {
+    const lines = script.split('\n');
+    const chunks: string[] = [];
+    let currentChunk = '';
+    let currentSpeaker = 'Alex';
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      let processedLine = line.trim();
+      if (processedLine.startsWith('Alex:')) currentSpeaker = 'Alex';
+      else if (processedLine.startsWith('Sam:')) currentSpeaker = 'Sam';
+      else if (hCount === 'two') processedLine = `${currentSpeaker}: ${processedLine}`;
+
+      if ((currentChunk.length + processedLine.length) > 2500) {
+        if (currentChunk) chunks.push(currentChunk.trim());
+        currentChunk = processedLine + '\n';
+      } else {
+        currentChunk += processedLine + '\n';
+      }
+    }
+    if (currentChunk) chunks.push(currentChunk.trim());
+
+    const allPcmData: Uint8Array[] = [];
+    let totalPcmLength = 0;
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      let retryCount = 0;
+      const maxRetries = 7;
+      let success = false;
+
+      while (retryCount <= maxRetries && !success) {
+        try {
+          if (i > 0 && retryCount === 0) await sleep(3000);
+          const ttsResponse = await fetch('/api/generate-tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten }),
+          });
+          if (!ttsResponse.ok) {
+            const errData = await ttsResponse.json();
+            throw new Error(errData.error || `HTTP ${ttsResponse.status}`);
+          }
+          const ttsData = await ttsResponse.json();
+          const base64Audio = ttsData.base64Audio;
+          const mimeType = ttsData.mimeType || 'audio/pcm';
+          if (!base64Audio) throw new Error("No audio data received from the model");
+
+          if (mimeType.includes('pcm') || mimeType.includes('l16')) {
+            const base64Standard = base64Audio.replace(/-/g, '+').replace(/_/g, '/');
+            const binaryString = atob(base64Standard);
+            const pcmData = new Uint8Array(binaryString.length);
+            for (let j = 0; j < binaryString.length; j++) pcmData[j] = binaryString.charCodeAt(j);
+            allPcmData.push(pcmData);
+            totalPcmLength += pcmData.length;
+            success = true;
+          } else {
+            const audioBlob = await fetch(`data:${mimeType};base64,${base64Audio}`).then(res => res.blob());
+            if (allPcmData.length === 0) {
+              setAudioUrl(URL.createObjectURL(audioBlob));
+              return;
+            }
+            success = true;
+          }
+        } catch (error: any) {
+          if ((error?.message?.includes('429') || error?.status === 429) && retryCount < maxRetries) {
+            retryCount++;
+            await sleep(Math.pow(2, retryCount) * 1000);
+          } else {
+            throw error;
+          }
+        }
+      }
+      if (!success) throw new Error("Failed to generate audio after multiple retries due to rate limits.");
+    }
+
+    if (allPcmData.length > 0) {
+      const combinedPcm = new Uint8Array(totalPcmLength);
+      let offset = 0;
+      for (const pcm of allPcmData) { combinedPcm.set(pcm, offset); offset += pcm.length; }
+
+      const header = new ArrayBuffer(44);
+      const dv = new DataView(header);
+      const sampleRate = 24000;
+      dv.setUint32(0, 0x52494646, false);
+      dv.setUint32(4, 36 + totalPcmLength, true);
+      dv.setUint32(8, 0x57415645, false);
+      dv.setUint32(12, 0x666d7420, false);
+      dv.setUint32(16, 16, true);
+      dv.setUint16(20, 1, true);
+      dv.setUint16(22, 1, true);
+      dv.setUint32(24, sampleRate, true);
+      dv.setUint32(28, sampleRate * 2, true);
+      dv.setUint16(32, 2, true);
+      dv.setUint16(34, 16, true);
+      dv.setUint32(36, 0x64617461, false);
+      dv.setUint32(40, totalPcmLength, true);
+
+      const wavData = new Uint8Array(44 + totalPcmLength);
+      wavData.set(new Uint8Array(header), 0);
+      wavData.set(combinedPcm, 44);
+
+      const audioBlob = new Blob([wavData], { type: 'audio/wav' });
+      setAudioUrl(URL.createObjectURL(audioBlob));
+
+      let binary = '';
+      for (let i = 0; i < wavData.length; i++) binary += String.fromCharCode(wavData[i]);
+      setAudioData(btoa(binary));
+    }
   };
 
   const handleGenerate = async () => {
@@ -204,118 +334,7 @@ export default function App() {
       setTranscript(script);
       setVocabularyChart(vocab);
 
-      const lines = script.split('\n');
-      const chunks: string[] = [];
-      let currentChunk = '';
-      let currentSpeaker = 'Alex';
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        let processedLine = line.trim();
-        if (processedLine.startsWith('Alex:')) currentSpeaker = 'Alex';
-        else if (processedLine.startsWith('Sam:')) currentSpeaker = 'Sam';
-        else if (hostCount === 'two') processedLine = `${currentSpeaker}: ${processedLine}`;
-
-        if ((currentChunk.length + processedLine.length) > 2500) {
-          if (currentChunk) chunks.push(currentChunk.trim());
-          currentChunk = processedLine + '\n';
-        } else {
-          currentChunk += processedLine + '\n';
-        }
-      }
-      if (currentChunk) chunks.push(currentChunk.trim());
-
-      const allPcmData: Uint8Array[] = [];
-      let totalPcmLength = 0;
-      const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        let retryCount = 0;
-        const maxRetries = 7;
-        let success = false;
-
-        while (retryCount <= maxRetries && !success) {
-          try {
-            if (i > 0 && retryCount === 0) await sleep(3000);
-            const ttsResponse = await fetch('/api/generate-tts', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ chunk, speechSpeed, level, hostCount }),
-            });
-            if (!ttsResponse.ok) {
-              const errData = await ttsResponse.json();
-              throw new Error(errData.error || `HTTP ${ttsResponse.status}`);
-            }
-            const ttsData = await ttsResponse.json();
-            const base64Audio = ttsData.base64Audio;
-            const mimeType = ttsData.mimeType || 'audio/pcm';
-            if (!base64Audio) throw new Error("No audio data received from the model");
-
-            if (mimeType.includes('pcm') || mimeType.includes('l16')) {
-              const base64Standard = base64Audio.replace(/-/g, '+').replace(/_/g, '/');
-              const binaryString = atob(base64Standard);
-              const pcmData = new Uint8Array(binaryString.length);
-              for (let j = 0; j < binaryString.length; j++) pcmData[j] = binaryString.charCodeAt(j);
-              allPcmData.push(pcmData);
-              totalPcmLength += pcmData.length;
-              success = true;
-            } else {
-              const audioBlob = await fetch(`data:${mimeType};base64,${base64Audio}`).then(res => res.blob());
-              if (allPcmData.length === 0) {
-                const url = URL.createObjectURL(audioBlob);
-                setAudioUrl(url);
-                return;
-              }
-              success = true;
-            }
-          } catch (error: any) {
-            if ((error?.message?.includes('429') || error?.status === 429) && retryCount < maxRetries) {
-              retryCount++;
-              await sleep(Math.pow(2, retryCount) * 1000);
-            } else {
-              throw error;
-            }
-          }
-        }
-        if (!success) throw new Error("Failed to generate audio after multiple retries due to rate limits.");
-      }
-
-      if (allPcmData.length > 0) {
-        const combinedPcm = new Uint8Array(totalPcmLength);
-        let offset = 0;
-        for (const pcm of allPcmData) { combinedPcm.set(pcm, offset); offset += pcm.length; }
-
-        const header = new ArrayBuffer(44);
-        const view = new DataView(header);
-        const sampleRate = 24000;
-        view.setUint32(0, 0x52494646, false);
-        view.setUint32(4, 36 + totalPcmLength, true);
-        view.setUint32(8, 0x57415645, false);
-        view.setUint32(12, 0x666d7420, false);
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, 1, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * 2, true);
-        view.setUint16(32, 2, true);
-        view.setUint16(34, 16, true);
-        view.setUint32(36, 0x64617461, false);
-        view.setUint32(40, totalPcmLength, true);
-
-        const wavData = new Uint8Array(44 + totalPcmLength);
-        wavData.set(new Uint8Array(header), 0);
-        wavData.set(combinedPcm, 44);
-
-        const audioBlob = new Blob([wavData], { type: 'audio/wav' });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
-
-        // Store base64 for saving
-        let binary = '';
-        for (let i = 0; i < wavData.length; i++) binary += String.fromCharCode(wavData[i]);
-        setAudioData(btoa(binary));
-      }
+      await generateAudio(script, hostCount, speechSpeed, level, false);
 
     } catch (error: any) {
       console.error("Generation failed:", error);
@@ -323,6 +342,34 @@ export default function App() {
         alert("The AI is currently receiving too many requests. Please wait a minute and try again.");
       } else {
         alert("Failed to generate podcast: " + (error?.message || error));
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleScriptGenerate = async () => {
+    if (!scriptTitle.trim() || !scriptText.trim()) return;
+
+    setIsGenerating(true);
+    setTranscript('');
+    setVocabularyChart('');
+    setActiveTab('transcript');
+    setAudioUrl(null);
+    setAudioData(null);
+    setSavedId(null);
+
+    setGeneratedTitle(scriptTitle);
+    setTranscript(scriptText);
+
+    try {
+      await generateAudio(scriptText, scriptHostCount, scriptSpeed, 'B2', true);
+    } catch (error: any) {
+      console.error("Generation failed:", error);
+      if (error?.message?.includes('429') || error?.status === 429) {
+        alert("The AI is currently receiving too many requests. Please wait a minute and try again.");
+      } else {
+        alert("Failed to generate audio: " + (error?.message || error));
       }
     } finally {
       setIsGenerating(false);
@@ -410,7 +457,7 @@ export default function App() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 truncate">{podcast.title}</p>
                     <p className="text-xs text-gray-400 mt-0.5">
-                      Level {podcast.level} · {podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
+                      {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <button onClick={e => { e.stopPropagation(); handleDeletePodcast(podcast.id); }} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
@@ -465,7 +512,9 @@ export default function App() {
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[600px]">
             <div className="p-2 border-b border-gray-100 flex items-center bg-gray-50/50">
               <button onClick={() => setDetailActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
-              <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+              {selectedPodcast.vocabulary && (
+                <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+              )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
               {detailActiveTab === 'transcript' ? (
@@ -511,110 +560,196 @@ export default function App() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
+
+        {/* Mode toggle */}
+        <div className="flex p-1 bg-white border border-gray-100 rounded-2xl shadow-sm mb-8 w-fit">
+          <button
+            onClick={() => { setMode('generate'); setTranscript(''); setAudioUrl(null); setAudioData(null); setSavedId(null); }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'generate' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <Volume2 size={15} /> Generate
+          </button>
+          <button
+            onClick={() => { setMode('script'); setTranscript(''); setAudioUrl(null); setAudioData(null); setSavedId(null); }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'script' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <FileText size={15} /> My Script
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
 
           {/* Left Column: Controls */}
           <div className="md:col-span-5 space-y-8">
-            <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <BookOpen size={18} className="text-indigo-600" />
-                Configure Podcast
-              </h2>
 
-              <div className="space-y-4">
-                <div className="flex p-1 bg-gray-100 rounded-xl">
-                  <button onClick={() => setSourceType('subject')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'subject' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Subject</button>
-                  <button onClick={() => setSourceType('article')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'article' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Article</button>
+            {mode === 'generate' ? (
+              <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <BookOpen size={18} className="text-indigo-600" />
+                  Configure Podcast
+                </h2>
+
+                <div className="space-y-4">
+                  <div className="flex p-1 bg-gray-100 rounded-xl">
+                    <button onClick={() => setSourceType('subject')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'subject' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Subject</button>
+                    <button onClick={() => setSourceType('article')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'article' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Article</button>
+                  </div>
+
+                  {sourceType === 'subject' ? (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-600">Subject</label>
+                      <input type="text" placeholder="e.g. The history of jazz, Quantum computing..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <button onClick={() => setArticleSourceType('text')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'text' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Paste Text</button>
+                        <button onClick={() => setArticleSourceType('url')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'url' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Article URL</button>
+                      </div>
+                      {articleSourceType === 'text' ? (
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-600">Article 1 Text</label>
+                            <textarea placeholder="Paste your first article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText} onChange={(e) => setArticleText(e.target.value)} />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-600">Article 2 Text (Optional)</label>
+                            <textarea placeholder="Paste your second article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText2} onChange={(e) => setArticleText2(e.target.value)} />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-600">Article 1 URL</label>
+                            <input type="url" placeholder="https://example.com/article-1" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl} onChange={(e) => setArticleUrl(e.target.value)} />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-600">Article 2 URL (Optional)</label>
+                            <input type="url" placeholder="https://example.com/article-2" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl2} onChange={(e) => setArticleUrl2(e.target.value)} />
+                          </div>
+                          <p className="text-[10px] text-gray-400 italic px-1">Tip: Use direct links instead of shortened "share" links for better results.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-600">Include specific words (optional)</label>
+                    <input type="text" placeholder="e.g. innovation, synergy, paradigm shift..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={specificWords} onChange={(e) => setSpecificWords(e.target.value)} />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
+                      <span className="text-xs font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{speechSpeed}%</span>
+                    </div>
+                    <input type="range" min="80" max="100" step="5" value={speechSpeed} onChange={(e) => setSpeechSpeed(parseInt(e.target.value))} className="w-full accent-indigo-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                    <div className="flex justify-between mt-1.5 text-[10px] text-gray-400 font-medium px-1">
+                      <span>80%</span><span>85%</span><span>90%</span><span>95%</span><span>100%</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Narrators</label>
+                    <div className="flex bg-gray-100 rounded-xl p-1">
+                      <button onClick={() => setHostCount('one')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'one' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>One Host</button>
+                      <button onClick={() => setHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Hosts</button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Clock size={14} /> Length</label>
+                      <span className="text-sm font-bold text-indigo-600">{length} min</span>
+                    </div>
+                    <input type="range" min="1" max="6" step="1" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" value={length} onChange={(e) => setLength(parseInt(e.target.value))} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> English Level</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {LEVELS.map((l) => (
+                        <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {sourceType === 'subject' ? (
+                <button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim()))}
+                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
+                >
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating...</>) : (<><Volume2 size={20} />Generate Podcast</>)}
+                </button>
+              </section>
+            ) : (
+              <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <FileText size={18} className="text-indigo-600" />
+                  My Script
+                </h2>
+
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Subject</label>
-                    <input type="text" placeholder="e.g. The history of jazz, Quantum computing..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                    <label className="text-sm font-medium text-gray-600">Title</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. My roleplay conversation..."
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                      value={scriptTitle}
+                      onChange={(e) => setScriptTitle(e.target.value)}
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex gap-2">
-                      <button onClick={() => setArticleSourceType('text')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'text' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Paste Text</button>
-                      <button onClick={() => setArticleSourceType('url')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'url' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Article URL</button>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Speakers</label>
+                    <div className="flex bg-gray-100 rounded-xl p-1">
+                      <button onClick={() => setScriptHostCount('one')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${scriptHostCount === 'one' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>One Speaker</button>
+                      <button onClick={() => setScriptHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${scriptHostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Speakers</button>
                     </div>
-                    {articleSourceType === 'text' ? (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-600">Article 1 Text</label>
-                          <textarea placeholder="Paste your first article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText} onChange={(e) => setArticleText(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-600">Article 2 Text (Optional)</label>
-                          <textarea placeholder="Paste your second article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText2} onChange={(e) => setArticleText2(e.target.value)} />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-600">Article 1 URL</label>
-                          <input type="url" placeholder="https://example.com/article-1" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl} onChange={(e) => setArticleUrl(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-600">Article 2 URL (Optional)</label>
-                          <input type="url" placeholder="https://example.com/article-2" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl2} onChange={(e) => setArticleUrl2(e.target.value)} />
-                        </div>
-                        <p className="text-[10px] text-gray-400 italic px-1">Tip: Use direct links instead of shortened "share" links for better results.</p>
-                      </div>
+                    {scriptHostCount === 'two' && (
+                      <p className="text-[10px] text-gray-400 bg-gray-50 rounded-xl px-3 py-2 leading-relaxed">
+                        Format each line with the speaker name:<br />
+                        <span className="font-mono text-indigo-500">Alex: Hello, how are you?</span><br />
+                        <span className="font-mono text-indigo-500">Sam: I'm doing great, thanks!</span>
+                      </p>
                     )}
                   </div>
-                )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-600">Include specific words (optional)</label>
-                  <input type="text" placeholder="e.g. innovation, synergy, paradigm shift..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={specificWords} onChange={(e) => setSpecificWords(e.target.value)} />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Gauge size={14} /> Generator Speech Speed</label>
-                    <span className="text-xs font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{speechSpeed}%</span>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-600">Paste your script</label>
+                    <textarea
+                      placeholder={scriptHostCount === 'two'
+                        ? "Alex: Welcome to the show!\nSam: Thanks for having me.\nAlex: Today we're talking about..."
+                        : "Paste your transcript here..."}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[200px] resize-none font-mono text-sm"
+                      value={scriptText}
+                      onChange={(e) => setScriptText(e.target.value)}
+                    />
                   </div>
-                  <input type="range" min="80" max="100" step="5" value={speechSpeed} onChange={(e) => setSpeechSpeed(parseInt(e.target.value))} className="w-full accent-indigo-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-                  <div className="flex justify-between mt-1.5 text-[10px] text-gray-400 font-medium px-1">
-                    <span>80%</span><span>85%</span><span>90%</span><span>95%</span><span>100%</span>
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Narrators</label>
-                  <div className="flex bg-gray-100 rounded-xl p-1">
-                    <button onClick={() => setHostCount('one')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'one' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>One Host</button>
-                    <button onClick={() => setHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Hosts</button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Clock size={14} /> Length</label>
-                    <span className="text-sm font-bold text-indigo-600">{length} min</span>
-                  </div>
-                  <input type="range" min="1" max="6" step="1" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" value={length} onChange={(e) => setLength(parseInt(e.target.value))} />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> English Level</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {LEVELS.map((l) => (
-                      <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
-                    ))}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
+                      <span className="text-xs font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{scriptSpeed}%</span>
+                    </div>
+                    <input type="range" min="80" max="100" step="5" value={scriptSpeed} onChange={(e) => setScriptSpeed(parseInt(e.target.value))} className="w-full accent-indigo-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                    <div className="flex justify-between mt-1.5 text-[10px] text-gray-400 font-medium px-1">
+                      <span>80%</span><span>85%</span><span>90%</span><span>95%</span><span>100%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating || (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim()))}
-                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
-              >
-                {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating...</>) : (<><Volume2 size={20} />Generate Podcast</>)}
-              </button>
-            </section>
+                <button
+                  onClick={handleScriptGenerate}
+                  disabled={isGenerating || !scriptTitle.trim() || !scriptText.trim()}
+                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
+                >
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating Audio...</>) : (<><Volume2 size={20} />Read My Script</>)}
+                </button>
+              </section>
+            )}
           </div>
 
           {/* Right Column: Output */}
@@ -622,9 +757,19 @@ export default function App() {
             <AnimatePresence mode="wait">
               {!transcript && !isGenerating ? (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-gray-200 rounded-3xl text-gray-400">
-                  <Mic size={48} className="mb-4 text-pink-200" />
-                  <p className="text-lg font-medium">Your podcast will appear here</p>
-                  <p className="text-sm">Enter a subject and click generate to start</p>
+                  {mode === 'generate' ? (
+                    <>
+                      <Mic size={48} className="mb-4 text-pink-200" />
+                      <p className="text-lg font-medium">Your podcast will appear here</p>
+                      <p className="text-sm">Enter a subject and click generate to start</p>
+                    </>
+                  ) : (
+                    <>
+                      <FileText size={48} className="mb-4 text-indigo-200" />
+                      <p className="text-lg font-medium">Audio will appear here</p>
+                      <p className="text-sm">Paste your script and click Read My Script</p>
+                    </>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
@@ -636,7 +781,7 @@ export default function App() {
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex justify-between items-center gap-2">
                           <p className="text-sm font-bold text-gray-900 truncate">{generatedTitle}</p>
-                          <p className="text-[10px] font-medium text-gray-400 whitespace-nowrap">Level {LEVELS.find(l => l.id === level)?.label}</p>
+                          {mode === 'generate' && <p className="text-[10px] font-medium text-gray-400 whitespace-nowrap">Level {LEVELS.find(l => l.id === level)?.label}</p>}
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] text-gray-400 w-7 tabular-nums">{formatTime(currentTime)}</span>
@@ -655,7 +800,7 @@ export default function App() {
                             </svg>
                           )}
                         </button>
-                        <a href={audioUrl} download={`Podcast-${generatedTitle.replace(/\s+/g, '-')}.wav`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Download Podcast">
+                        <a href={audioUrl} download={`Podcast-${generatedTitle.replace(/\s+/g, '-')}.wav`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Download">
                           <Download size={18} />
                         </a>
                       </div>
@@ -667,7 +812,9 @@ export default function App() {
                     <div className="p-2 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                       <div className="flex gap-1">
                         <button onClick={() => setActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
-                        <button onClick={() => setActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+                        {vocabularyChart && (
+                          <button onClick={() => setActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+                        )}
                       </div>
                       <button onClick={activeTab === 'transcript' ? copyToClipboard : copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
                         {activeTab === 'transcript' ? (copied ? <Check size={14} /> : <Copy size={14} />) : (vocabCopied ? <Check size={14} /> : <Copy size={14} />)}

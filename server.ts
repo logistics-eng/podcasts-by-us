@@ -210,10 +210,12 @@ async function startServer() {
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {
-      const { chunk, speechSpeed, level, hostCount } = req.body;
+      const { chunk, speechSpeed, level, hostCount, readAsWritten } = req.body;
 
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
-      const promptText = `${speedInstruction}${(level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : ''}TTS the following ${hostCount === 'two' ? 'conversation between Alex and Sam' : 'monologue by Alex'}:\n\n${chunk}`;
+      const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
+      const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following ${hostCount === 'two' ? 'conversation between Alex and Sam' : 'monologue by Alex'}:\n\n${chunk}`;
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-pro-preview-tts",
