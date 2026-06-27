@@ -214,44 +214,75 @@ export default function App() {
     readAsWritten: boolean,
     names: { host1: string; host2: string }
   ) => {
-    const lines = script.split('\n');
-    const chunks: string[] = [];
-    let currentChunk = '';
-    let currentSpeaker = names.host1;
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    for (const line of lines) {
-      if (!line.trim()) continue;
-      let processedLine = line.trim();
-      if (processedLine.startsWith(`${names.host1}:`)) currentSpeaker = names.host1;
-      else if (processedLine.startsWith(`${names.host2}:`)) currentSpeaker = names.host2;
-      else if (hCount === 'two') processedLine = `${currentSpeaker}: ${processedLine}`;
+    // For two-host mode: split by speaker turns so each call uses one dedicated voice
+    // For one-host or readAsWritten: split by character chunks as before
+    type TurnChunk = { chunk: string; speaker?: 'host1' | 'host2' };
+    let requests: TurnChunk[] = [];
 
-      if ((currentChunk.length + processedLine.length) > 1200) {
-        if (currentChunk) chunks.push(currentChunk.trim());
-        currentChunk = processedLine + '\n';
-      } else {
-        currentChunk += processedLine + '\n';
+    if (hCount === 'two') {
+      // Parse into speaker turns
+      const turns: TurnChunk[] = [];
+      let currentSpeaker: 'host1' | 'host2' = 'host1';
+      let currentLines: string[] = [];
+
+      for (const line of script.split('\n')) {
+        if (!line.trim()) continue;
+        const trimmed = line.trim();
+        if (trimmed.startsWith(`${names.host1}:`)) {
+          if (currentSpeaker === 'host2' && currentLines.length) {
+            turns.push({ chunk: currentLines.join('\n'), speaker: 'host2' });
+            currentLines = [];
+          }
+          currentSpeaker = 'host1';
+          currentLines.push(trimmed.slice(names.host1.length + 1).trim());
+        } else if (trimmed.startsWith(`${names.host2}:`)) {
+          if (currentSpeaker === 'host1' && currentLines.length) {
+            turns.push({ chunk: currentLines.join('\n'), speaker: 'host1' });
+            currentLines = [];
+          }
+          currentSpeaker = 'host2';
+          currentLines.push(trimmed.slice(names.host2.length + 1).trim());
+        } else {
+          currentLines.push(trimmed);
+        }
       }
+      if (currentLines.length) turns.push({ chunk: currentLines.join('\n'), speaker: currentSpeaker });
+      requests = turns;
+    } else {
+      // Single host: split by character chunks
+      const lines = script.split('\n');
+      let currentChunk = '';
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const trimmed = line.trim();
+        if ((currentChunk.length + trimmed.length) > 1200) {
+          if (currentChunk) requests.push({ chunk: currentChunk.trim() });
+          currentChunk = trimmed + '\n';
+        } else {
+          currentChunk += trimmed + '\n';
+        }
+      }
+      if (currentChunk) requests.push({ chunk: currentChunk.trim() });
     }
-    if (currentChunk) chunks.push(currentChunk.trim());
 
     const allPcmData: Uint8Array[] = [];
     let totalPcmLength = 0;
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
+    for (let i = 0; i < requests.length; i++) {
+      const { chunk, speaker } = requests[i];
       let retryCount = 0;
       const maxRetries = 7;
       let success = false;
 
       while (retryCount <= maxRetries && !success) {
         try {
-          if (i > 0 && retryCount === 0) await sleep(3000);
+          if (i > 0 && retryCount === 0) await sleep(1000);
           const ttsResponse = await fetch('/api/generate-tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
+            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names, speaker }),
           });
           if (!ttsResponse.ok) {
             const errData = await ttsResponse.json();
@@ -271,7 +302,7 @@ export default function App() {
             totalPcmLength += pcmData.length;
             success = true;
           } else {
-            const audioBlob = await fetch(`data:${mimeType};base64,${base64Audio}`).then(res => res.blob());
+            const audioBlob = await fetch(`data:${mimeType};base64,${base64Audio}`).then(r => r.blob());
             if (allPcmData.length === 0) {
               setAudioUrl(URL.createObjectURL(audioBlob));
               return;

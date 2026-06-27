@@ -231,45 +231,25 @@ async function startServer() {
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {
-      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
+      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames, speaker } = req.body;
       const host1 = speakerNames?.host1 || 'Alex';
       const host2 = speakerNames?.host2 || 'Sam';
 
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
       const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
       const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
-      const speakerSetup = hostCount === 'two'
-        ? `${host1} is a WOMAN and must be read in a clearly female voice. ${host2} is a MAN and must be read in a clearly male voice. `
-        : `${host1} is a WOMAN and must be read in a clearly female voice. `;
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}${speakerSetup}TTS the following ${hostCount === 'two' ? `conversation between ${host1} and ${host2}` : `monologue by ${host1}`}:\n\n${chunk}`;
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
+
+      // Per-speaker mode: single voice call for one speaker's turn
+      const voiceName = speaker === 'host1' ? 'Kore' : speaker === 'host2' ? 'Fenrir' : hostCount === 'two' ? 'Kore' : 'Kore';
+      const speechConfig = { voiceConfig: { prebuiltVoiceConfig: { voiceName } } };
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-pro-preview-tts",
         contents: [{ parts: [{ text: promptText }] }],
         config: {
           responseModalities: [Modality.AUDIO],
-          speechConfig: hostCount === 'two' ? {
-            multiSpeakerVoiceConfig: {
-              speakerVoiceConfigs: [
-                {
-                  speaker: host1,
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Kore' }, // Female
-                  }
-                },
-                {
-                  speaker: host2,
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Fenrir' }, // Male
-                  }
-                }
-              ]
-            }
-          } : {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Zephyr' }, // Female
-            }
-          },
+          speechConfig,
         },
       });
 
