@@ -216,63 +216,31 @@ export default function App() {
   ) => {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // Build request list: per-speaker turns for two-host, character chunks for one-host
-    type TurnReq = { chunk: string; voiceName: string };
+    // Build character-based chunks (1200 chars each) for both modes
+    type TurnReq = { chunk: string };
     const requests: TurnReq[] = [];
-
-    if (hCount === 'two') {
-      let currentSpeaker: 'host1' | 'host2' = 'host1';
-      let currentLines: string[] = [];
-
-      const flushTurn = () => {
-        if (!currentLines.length) return;
-        requests.push({
-          chunk: currentLines.join('\n'),
-          voiceName: currentSpeaker === 'host1' ? 'Kore' : 'Fenrir',
-        });
-        currentLines = [];
-      };
-
-      for (const line of script.split('\n')) {
-        if (!line.trim()) continue;
-        const trimmed = line.trim();
-        if (trimmed.startsWith(`${names.host1}:`)) {
-          if (currentSpeaker === 'host2') flushTurn();
-          currentSpeaker = 'host1';
-          currentLines.push(trimmed.slice(names.host1.length + 1).trim());
-        } else if (trimmed.startsWith(`${names.host2}:`)) {
-          if (currentSpeaker === 'host1') flushTurn();
-          currentSpeaker = 'host2';
-          currentLines.push(trimmed.slice(names.host2.length + 1).trim());
-        } else {
-          currentLines.push(trimmed);
-        }
+    let currentChunk = '';
+    for (const line of script.split('\n')) {
+      if (!line.trim()) continue;
+      const trimmed = line.trim();
+      if ((currentChunk.length + trimmed.length) > 1200) {
+        if (currentChunk) requests.push({ chunk: currentChunk.trim() });
+        currentChunk = trimmed + '\n';
+      } else {
+        currentChunk += trimmed + '\n';
       }
-      flushTurn();
-    } else {
-      let currentChunk = '';
-      for (const line of script.split('\n')) {
-        if (!line.trim()) continue;
-        const trimmed = line.trim();
-        if ((currentChunk.length + trimmed.length) > 1200) {
-          if (currentChunk) requests.push({ chunk: currentChunk.trim(), voiceName: 'Kore' });
-          currentChunk = trimmed + '\n';
-        } else {
-          currentChunk += trimmed + '\n';
-        }
-      }
-      if (currentChunk) requests.push({ chunk: currentChunk.trim(), voiceName: 'Kore' });
     }
+    if (currentChunk) requests.push({ chunk: currentChunk.trim() });
 
     // Fetch one TTS chunk with retry
-    const fetchTurn = async ({ chunk, voiceName }: TurnReq): Promise<Uint8Array | null> => {
+    const fetchTurn = async ({ chunk }: TurnReq): Promise<Uint8Array | null> => {
       const maxRetries = 5;
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const res = await fetch('/api/generate-tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names, voiceName }),
+            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
           });
           if (!res.ok) {
             const err = await res.json();
@@ -296,17 +264,12 @@ export default function App() {
       return null;
     };
 
-    // 2 concurrent TTS calls with stagger to stay within rate limits
-    const results: (Uint8Array | null)[] = new Array(requests.length).fill(null);
-    const queue = requests.map((req, i) => ({ req, i }));
-    await Promise.all(Array.from({ length: 2 }, async (_, workerIdx) => {
-      if (workerIdx > 0) await sleep(1500); // stagger workers
-      while (queue.length > 0) {
-        const item = queue.shift();
-        if (!item) return;
-        results[item.i] = await fetchTurn(item.req);
-      }
-    }));
+    // Sequential TTS calls with 2s gap to avoid rate limits (4-6 calls total vs 18-20)
+    const results: (Uint8Array | null)[] = [];
+    for (let i = 0; i < requests.length; i++) {
+      if (i > 0) await sleep(2000);
+      results.push(await fetchTurn(requests[i]));
+    }
 
     const allPcmData: Uint8Array[] = results.filter((r): r is Uint8Array => r !== null);
     let totalPcmLength = allPcmData.reduce((sum, p) => sum + p.length, 0);

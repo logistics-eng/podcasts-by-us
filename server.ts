@@ -232,14 +232,25 @@ async function startServer() {
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {
-      const { chunk, speechSpeed, level, hostCount, readAsWritten, voiceName } = req.body;
+      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
 
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
       const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
       const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
       const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
 
-      const speechConfig = { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName || 'Kore' } } };
+      const host1Name = speakerNames?.host1 || 'Alex';
+      const host2Name = speakerNames?.host2 || 'Sam';
+      const speechConfig = hostCount === 'two'
+        ? {
+            multiSpeakerVoiceConfig: {
+              speakerVoiceConfigs: [
+                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
+              ],
+            },
+          }
+        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
