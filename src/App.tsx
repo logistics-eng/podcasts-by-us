@@ -81,6 +81,22 @@ export default function App() {
   // Speaker names (randomized per podcast)
   const [speakerNames, setSpeakerNames] = useState({ host1: 'Emma', host2: 'James' });
 
+  // Generation timer
+  const [genStartTime, setGenStartTime] = useState<number | null>(null);
+  const [genElapsed, setGenElapsed] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTimer = () => {
+    const t = Date.now();
+    setGenStartTime(t);
+    setGenElapsed(0);
+    timerRef.current = setInterval(() => setGenElapsed(Math.floor((Date.now() - t) / 1000)), 500);
+  };
+  const stopTimer = () => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+  };
+  const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
   // Shared output state
   const [isGenerating, setIsGenerating] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -318,6 +334,7 @@ export default function App() {
     setSpeakerNames(names);
 
     setIsGenerating(true);
+    startTimer();
     setTranscript('');
     setVocabularyChart('');
     setActiveTab('transcript');
@@ -374,6 +391,7 @@ export default function App() {
         alert("Failed to generate podcast: " + (error?.message || error));
       }
     } finally {
+      stopTimer();
       setIsGenerating(false);
     }
   };
@@ -382,6 +400,7 @@ export default function App() {
     if (!scriptTitle.trim() || !scriptText.trim()) return;
 
     setIsGenerating(true);
+    startTimer();
     setTranscript('');
     setVocabularyChart('');
     setActiveTab('transcript');
@@ -402,6 +421,7 @@ export default function App() {
         alert("Failed to generate audio: " + (error?.message || error));
       }
     } finally {
+      stopTimer();
       setIsGenerating(false);
     }
   };
@@ -749,7 +769,7 @@ export default function App() {
                   disabled={isGenerating || (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim()))}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating...</>) : (<><Volume2 size={20} />Generate Podcast</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating... {formatTime(genElapsed)}</>) : (<><Volume2 size={20} />Generate Podcast</>)}
                 </button>
               </section>
             ) : (
@@ -815,7 +835,7 @@ export default function App() {
                   disabled={isGenerating || !scriptTitle.trim() || !scriptText.trim()}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating Audio...</>) : (<><Volume2 size={20} />Read My Script</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} />Generating... {formatTime(genElapsed)}</>) : (<><Volume2 size={20} />Read My Script</>)}
                 </button>
               </section>
             )}
@@ -842,6 +862,12 @@ export default function App() {
                 </motion.div>
               ) : (
                 <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+                  {isGenerating && transcript && !audioUrl && (
+                    <div className="bg-indigo-50 border border-indigo-100 rounded-2xl px-5 py-4 flex items-center gap-3 text-indigo-700 text-sm font-medium">
+                      <Loader2 size={16} className="animate-spin shrink-0" />
+                      <span>Recording audio... {formatTime(genElapsed)}</span>
+                    </div>
+                  )}
                   {audioUrl && (
                     <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
                       <button onClick={togglePlay} className="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 shrink-0">
@@ -892,11 +918,17 @@ export default function App() {
                     </div>
                     <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
                       {isGenerating && !transcript ? (
-                        <div className="space-y-4 animate-pulse">
-                          <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-                          <div className="h-4 bg-gray-100 rounded w-full"></div>
-                          <div className="h-4 bg-gray-100 rounded w-5/6"></div>
-                          <div className="h-4 bg-gray-100 rounded w-2/3"></div>
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium mb-4">
+                            <Loader2 size={15} className="animate-spin shrink-0" />
+                            <span>Writing script... {formatTime(genElapsed)}</span>
+                          </div>
+                          <div className="space-y-3 animate-pulse">
+                            <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                            <div className="h-4 bg-gray-100 rounded w-full"></div>
+                            <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+                            <div className="h-4 bg-gray-100 rounded w-2/3"></div>
+                          </div>
                         </div>
                       ) : activeTab === 'transcript' ? (
                         <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{transcript}</p>

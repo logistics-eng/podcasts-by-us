@@ -8,49 +8,63 @@ import pg from 'pg';
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
-// Global Gemini rate-limit queue: enforces minimum 20s gap between API calls (~3 RPM max)
-// TTS preview model is limited to ~3 RPM; 20s gap keeps us safely within limits.
-let lastGeminiCall = 0;
-const GEMINI_MIN_GAP_MS = 20000;
-const geminiQueue: Array<() => void> = [];
-let queueRunning = false;
+// Detect Gemini rate-limit errors regardless of SDK error shape
+const isRateLimit = (e: any) =>
+  e?.status === 429 ||
+  e?.code === 429 ||
+  Number(e?.status) === 429 ||
+  String(e?.message).includes('429') ||
+  String(e?.message).includes('RESOURCE_EXHAUSTED') ||
+  String(e?.status).includes('RESOURCE_EXHAUSTED');
 
-async function geminiCall<T>(fn: () => Promise<T>): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    geminiQueue.push(async () => {
-      const now = Date.now();
-      const wait = Math.max(0, lastGeminiCall + GEMINI_MIN_GAP_MS - now);
-      if (wait > 0) await new Promise(r => setTimeout(r, wait));
-      lastGeminiCall = Date.now();
-      // Retry on 429 with a 65s wait (full rate-limit window + buffer)
-      for (let attempt = 0; attempt <= 4; attempt++) {
-        try {
-          resolve(await fn());
-          return;
-        } catch (e: any) {
-          if ((e?.status === 429 || e?.message?.includes('429')) && attempt < 4) {
-            console.log(`429 received, waiting 65s before retry ${attempt + 1}...`);
-            await new Promise(r => setTimeout(r, 65000));
-            lastGeminiCall = Date.now(); // reset gap after the long wait
-          } else {
-            reject(e);
+// Serial queue with enforced minimum gap between calls.
+// Script model (gemini-3-flash-preview) and TTS model have separate quotas — separate queues.
+function makeQueue(minGapMs: number) {
+  let last = 0;
+  const q: Array<() => void> = [];
+  let running = false;
+
+  async function run() {
+    running = true;
+    while (q.length > 0) {
+      const task = q.shift()!;
+      await task();
+    }
+    running = false;
+  }
+
+  return function queue<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      q.push(async () => {
+        const wait = Math.max(0, last + minGapMs - Date.now());
+        if (wait > 0) await new Promise(r => setTimeout(r, wait));
+        last = Date.now();
+        for (let attempt = 0; attempt <= 5; attempt++) {
+          try {
+            resolve(await fn());
             return;
+          } catch (e: any) {
+            if (isRateLimit(e) && attempt < 5) {
+              const delay = 65000;
+              console.log(`Rate limit hit, waiting ${delay / 1000}s (attempt ${attempt + 1})...`);
+              await new Promise(r => setTimeout(r, delay));
+              last = Date.now();
+            } else {
+              reject(e);
+              return;
+            }
           }
         }
-      }
+      });
+      if (!running) run();
     });
-    if (!queueRunning) runQueue();
-  });
+  };
 }
 
-async function runQueue() {
-  queueRunning = true;
-  while (geminiQueue.length > 0) {
-    const task = geminiQueue.shift()!;
-    await task();
-  }
-  queueRunning = false;
-}
+// Script model: ~15 RPM — 5s gap is safe
+const scriptCall = makeQueue(5000);
+// TTS model: ~3 RPM — 22s gap is safe
+const ttsCall = makeQueue(22000);
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -213,7 +227,7 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const scriptResponse = await geminiCall(() => ai.models.generateContent({
+      const scriptResponse = await scriptCall(() => ai.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
@@ -297,7 +311,7 @@ async function startServer() {
 
         const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunks[i]}`;
 
-        const ttsResponse = await geminiCall(() => ai.models.generateContent({
+        const ttsResponse = await ttsCall(() => ai.models.generateContent({
           model: 'gemini-2.5-flash-preview-tts',
           contents: [{ parts: [{ text: promptText }] }],
           config: { responseModalities: [Modality.AUDIO], speechConfig },
