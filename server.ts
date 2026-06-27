@@ -251,7 +251,7 @@ async function startServer() {
                 {
                   speaker: host1,
                   voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Aoede' }, // Female
+                    prebuiltVoiceConfig: { voiceName: 'Zephyr' }, // Female
                   }
                 },
                 {
@@ -264,7 +264,7 @@ async function startServer() {
             }
           } : {
             voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Aoede' }, // Female
+              prebuiltVoiceConfig: { voiceName: 'Zephyr' }, // Female
             }
           },
         },
