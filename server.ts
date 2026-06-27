@@ -228,20 +228,20 @@ async function startServer() {
                 {
                   speaker: 'Alex',
                   voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Ursa' }, // Female
+                    prebuiltVoiceConfig: { voiceName: 'Aoede' }, // Female
                   }
                 },
                 {
                   speaker: 'Sam',
                   voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Orion' }, // Male
+                    prebuiltVoiceConfig: { voiceName: 'Puck' }, // Male
                   }
                 }
               ]
             }
           } : {
             voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Ursa' }, // Female
+              prebuiltVoiceConfig: { voiceName: 'Aoede' }, // Female
             }
           },
         },
