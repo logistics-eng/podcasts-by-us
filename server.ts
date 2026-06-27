@@ -181,7 +181,7 @@ async function startServer() {
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
-            Target Length: approximately ${length} minutes (around ${length * 150} words).
+            Target Length: EXACTLY ${length} minutes of spoken audio. This means you MUST write at least ${length * 170} words of actual dialogue (not counting labels like "Alex:"). Do NOT end early — fill the full ${length} minutes with detailed, engaging content. If the topic allows, go deeper into sub-topics, examples, and discussion rather than wrapping up quickly.
             English Level: ${level} (CEFR).
             ${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
 
