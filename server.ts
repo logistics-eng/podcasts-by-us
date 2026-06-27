@@ -100,11 +100,15 @@ async function startServer() {
         articleText2, 
         articleUrl, 
         articleUrl2, 
-        specificWords, 
-        length, 
-        level, 
-        hostCount 
+        specificWords,
+        length,
+        level,
+        hostCount,
+        speakerNames,
       } = req.body;
+
+      const host1 = speakerNames?.host1 || 'Alex';
+      const host2 = speakerNames?.host2 || 'Sam';
 
       const isSubjectMode = sourceType === 'subject';
       let prompt = '';
@@ -162,17 +166,17 @@ async function startServer() {
             
             Target Length: approximately ${length} minutes (around ${length * 150} words).
             English Level: ${level} (CEFR).
-            ${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: Alex (Female) and Sam (Male).` : `The script MUST be a monologue by a single host: Alex (Female).`}
-            
-            IMPORTANT: 
+            ${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
+
+            IMPORTANT:
             1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".
             2. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
             3. For each vocabulary item, provide a simple explanation/definition in the format: "Word/Phrase = Explanation".
-            
-            Format: 
+
+            Format:
             TITLE: [Short Title]
-            Alex: [Text]
-            ${hostCount === 'two' ? 'Sam: [Text]' : ''}
+            ${host1}: [Text]
+            ${hostCount === 'two' ? `${host2}: [Text]` : ''}
             ...
             
             VOCABULARY CHART
@@ -210,12 +214,14 @@ async function startServer() {
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {
-      const { chunk, speechSpeed, level, hostCount, readAsWritten } = req.body;
+      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
+      const host1 = speakerNames?.host1 || 'Alex';
+      const host2 = speakerNames?.host2 || 'Sam';
 
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
       const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
       const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following ${hostCount === 'two' ? 'conversation between Alex and Sam' : 'monologue by Alex'}:\n\n${chunk}`;
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following ${hostCount === 'two' ? `conversation between ${host1} and ${host2}` : `monologue by ${host1}`}:\n\n${chunk}`;
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-pro-preview-tts",
@@ -226,13 +232,13 @@ async function startServer() {
             multiSpeakerVoiceConfig: {
               speakerVoiceConfigs: [
                 {
-                  speaker: 'Alex',
+                  speaker: host1,
                   voiceConfig: {
                     prebuiltVoiceConfig: { voiceName: 'Aoede' }, // Female
                   }
                 },
                 {
-                  speaker: 'Sam',
+                  speaker: host2,
                   voiceConfig: {
                     prebuiltVoiceConfig: { voiceName: 'Puck' }, // Male
                   }

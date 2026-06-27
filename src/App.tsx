@@ -26,6 +26,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+const FEMALE_NAMES = ['Emma', 'Sophie', 'Maya', 'Claire', 'Rachel', 'Nina', 'Grace', 'Lily', 'Zoe', 'Hannah'];
+const MALE_NAMES = ['James', 'David', 'Marcus', 'Ryan', 'Lucas', 'Noah', 'Ethan', 'Oliver', 'Jack', 'Leo'];
+
+const pickRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+
 const LEVELS = [
   { id: 'A1', label: 'A1' },
   { id: 'A2', label: 'A2' },
@@ -69,6 +74,9 @@ export default function App() {
   const [scriptText, setScriptText] = useState('');
   const [scriptHostCount, setScriptHostCount] = useState<'one' | 'two'>('two');
   const [scriptSpeed, setScriptSpeed] = useState(100);
+
+  // Speaker names (randomized per podcast)
+  const [speakerNames, setSpeakerNames] = useState({ host1: 'Emma', host2: 'James' });
 
   // Shared output state
   const [isGenerating, setIsGenerating] = useState(false);
@@ -166,18 +174,19 @@ export default function App() {
     hCount: 'one' | 'two',
     speed: number,
     lvl: string,
-    readAsWritten: boolean
+    readAsWritten: boolean,
+    names: { host1: string; host2: string }
   ) => {
     const lines = script.split('\n');
     const chunks: string[] = [];
     let currentChunk = '';
-    let currentSpeaker = 'Alex';
+    let currentSpeaker = names.host1;
 
     for (const line of lines) {
       if (!line.trim()) continue;
       let processedLine = line.trim();
-      if (processedLine.startsWith('Alex:')) currentSpeaker = 'Alex';
-      else if (processedLine.startsWith('Sam:')) currentSpeaker = 'Sam';
+      if (processedLine.startsWith(`${names.host1}:`)) currentSpeaker = names.host1;
+      else if (processedLine.startsWith(`${names.host2}:`)) currentSpeaker = names.host2;
       else if (hCount === 'two') processedLine = `${currentSpeaker}: ${processedLine}`;
 
       if ((currentChunk.length + processedLine.length) > 2500) {
@@ -205,7 +214,7 @@ export default function App() {
           const ttsResponse = await fetch('/api/generate-tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten }),
+            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
           });
           if (!ttsResponse.ok) {
             const errData = await ttsResponse.json();
@@ -287,6 +296,11 @@ export default function App() {
     if (!isSubjectMode && articleSourceType === 'text' && !articleText.trim()) return;
     if (isArticleUrlMode && !articleUrl.trim()) return;
 
+    const names = hostCount === 'two'
+      ? { host1: pickRandom(FEMALE_NAMES), host2: pickRandom(MALE_NAMES) }
+      : { host1: pickRandom(FEMALE_NAMES), host2: '' };
+    setSpeakerNames(names);
+
     setIsGenerating(true);
     setTranscript('');
     setVocabularyChart('');
@@ -301,7 +315,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           subject, sourceType, articleSourceType, articleText, articleText2,
-          articleUrl, articleUrl2, specificWords, length, level, hostCount,
+          articleUrl, articleUrl2, specificWords, length, level, hostCount, speakerNames: names,
         }),
       });
 
@@ -334,7 +348,7 @@ export default function App() {
       setTranscript(script);
       setVocabularyChart(vocab);
 
-      await generateAudio(script, hostCount, speechSpeed, level, false);
+      await generateAudio(script, hostCount, speechSpeed, level, false, names);
 
     } catch (error: any) {
       console.error("Generation failed:", error);
@@ -363,7 +377,7 @@ export default function App() {
     setTranscript(scriptText);
 
     try {
-      await generateAudio(scriptText, scriptHostCount, scriptSpeed, 'B2', true);
+      await generateAudio(scriptText, scriptHostCount, scriptSpeed, 'B2', true, { host1: 'Alex', host2: 'Sam' });
     } catch (error: any) {
       console.error("Generation failed:", error);
       if (error?.message?.includes('429') || error?.status === 429) {
