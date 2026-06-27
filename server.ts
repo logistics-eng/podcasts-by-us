@@ -254,13 +254,13 @@ async function startServer() {
                 {
                   speaker: host1,
                   voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Zephyr' }, // Female
+                    prebuiltVoiceConfig: { voiceName: 'Kore' }, // Female
                   }
                 },
                 {
                   speaker: host2,
                   voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Puck' }, // Male
+                    prebuiltVoiceConfig: { voiceName: 'Fenrir' }, // Male
                   }
                 }
               ]
