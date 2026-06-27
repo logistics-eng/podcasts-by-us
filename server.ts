@@ -231,18 +231,14 @@ async function startServer() {
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {
-      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames, speaker } = req.body;
-      const host1 = speakerNames?.host1 || 'Alex';
-      const host2 = speakerNames?.host2 || 'Sam';
+      const { chunk, speechSpeed, level, hostCount, readAsWritten, voiceName } = req.body;
 
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
       const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
       const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
       const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
 
-      // Per-speaker mode: single voice call for one speaker's turn
-      const voiceName = speaker === 'host1' ? 'Kore' : speaker === 'host2' ? 'Fenrir' : hostCount === 'two' ? 'Kore' : 'Kore';
-      const speechConfig = { voiceConfig: { prebuiltVoiceConfig: { voiceName } } };
+      const speechConfig = { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName || 'Kore' } } };
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-pro-preview-tts",
