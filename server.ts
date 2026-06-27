@@ -229,6 +229,83 @@ async function startServer() {
     }
   });
 
+  // All-in-one audio generation: chunks script, runs TTS sequentially, returns combined PCM
+  app.post('/api/generate-audio', async (req, res) => {
+    try {
+      const { script, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
+      const host1Name = speakerNames?.host1 || 'Alex';
+      const host2Name = speakerNames?.host2 || 'Sam';
+
+      const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
+      const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
+      const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
+
+      const speechConfig = hostCount === 'two'
+        ? {
+            multiSpeakerVoiceConfig: {
+              speakerVoiceConfigs: [
+                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
+              ],
+            },
+          }
+        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
+
+      // Split script into 1200-char chunks
+      const chunks: string[] = [];
+      let current = '';
+      for (const line of script.split('\n')) {
+        if (!line.trim()) continue;
+        const trimmed = line.trim();
+        if (current.length + trimmed.length > 1200) {
+          if (current) chunks.push(current.trim());
+          current = trimmed + '\n';
+        } else {
+          current += trimmed + '\n';
+        }
+      }
+      if (current) chunks.push(current.trim());
+
+      const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+      const pcmParts: Buffer[] = [];
+
+      for (let i = 0; i < chunks.length; i++) {
+        if (i > 0) await sleep(3000); // 3s between chunks — well under rate limits
+
+        const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunks[i]}`;
+
+        let attempt = 0;
+        while (true) {
+          try {
+            const ttsResponse = await ai.models.generateContent({
+              model: 'gemini-2.5-flash-preview-tts',
+              contents: [{ parts: [{ text: promptText }] }],
+              config: { responseModalities: [Modality.AUDIO], speechConfig },
+            });
+            const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+            if (audioPart?.inlineData?.data) {
+              pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
+            }
+            break;
+          } catch (err: any) {
+            if ((err?.status === 429 || err?.message?.includes('429')) && attempt < 5) {
+              attempt++;
+              await sleep(Math.pow(2, attempt) * 3000);
+            } else {
+              throw err;
+            }
+          }
+        }
+      }
+
+      const combined = Buffer.concat(pcmParts);
+      res.json({ base64Pcm: combined.toString('base64') });
+    } catch (error: any) {
+      console.error('Audio generation failed:', error);
+      res.status(error?.status || 500).json({ error: error?.message || String(error) });
+    }
+  });
+
   // API Route for generating a TTS chunk
   app.post('/api/generate-tts', async (req, res) => {
     try {

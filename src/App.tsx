@@ -175,6 +175,49 @@ export default function App() {
     setLibrary(prev => prev.filter(p => p.id !== id));
   };
 
+  const getAudioBlob = async (podcast: SavedPodcast): Promise<{ blob: Blob; filename: string } | null> => {
+    const res = await fetch(`/api/podcasts/${podcast.id}`);
+    const data = await res.json();
+    if (!data.audio_data) return null;
+    const binary = atob(data.audio_data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'audio/wav' });
+    const filename = `${podcast.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.wav`;
+    return { blob, filename };
+  };
+
+  const handleDownloadPodcast = async (podcast: SavedPodcast, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const result = await getAudioBlob(podcast);
+    if (!result) return;
+    const url = URL.createObjectURL(result.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = result.filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShareWhatsApp = async (podcast: SavedPodcast, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const result = await getAudioBlob(podcast);
+    if (!result) return;
+    const file = new File([result.blob], result.filename, { type: 'audio/wav' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: podcast.title });
+    } else {
+      // Desktop fallback: download the file then open WhatsApp Web
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      setTimeout(() => window.open('https://web.whatsapp.com', '_blank'), 500);
+    }
+  };
+
   const startEdit = (podcast: SavedPodcast, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingId(podcast.id);
@@ -205,7 +248,7 @@ export default function App() {
     }
   };
 
-  // Shared audio generation: chunks script → TTS → WAV
+  // Shared audio generation: one server call handles all TTS chunks with rate-limit-safe spacing
   const generateAudio = async (
     script: string,
     hCount: 'one' | 'two',
@@ -214,99 +257,51 @@ export default function App() {
     readAsWritten: boolean,
     names: { host1: string; host2: string }
   ) => {
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-    // Build character-based chunks (1200 chars each) for both modes
-    type TurnReq = { chunk: string };
-    const requests: TurnReq[] = [];
-    let currentChunk = '';
-    for (const line of script.split('\n')) {
-      if (!line.trim()) continue;
-      const trimmed = line.trim();
-      if ((currentChunk.length + trimmed.length) > 1200) {
-        if (currentChunk) requests.push({ chunk: currentChunk.trim() });
-        currentChunk = trimmed + '\n';
-      } else {
-        currentChunk += trimmed + '\n';
-      }
+    const res = await fetch('/api/generate-audio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ script, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || `HTTP ${res.status}`);
     }
-    if (currentChunk) requests.push({ chunk: currentChunk.trim() });
+    const data = await res.json();
+    if (!data.base64Pcm) throw new Error('No audio data');
 
-    // Fetch one TTS chunk with retry
-    const fetchTurn = async ({ chunk }: TurnReq): Promise<Uint8Array | null> => {
-      const maxRetries = 5;
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-          const res = await fetch('/api/generate-tts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chunk, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
-          });
-          if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || `HTTP ${res.status}`);
-          }
-          const data = await res.json();
-          if (!data.base64Audio) throw new Error('No audio data');
-          const base64 = data.base64Audio.replace(/-/g, '+').replace(/_/g, '/');
-          const binary = atob(base64);
-          const pcm = new Uint8Array(binary.length);
-          for (let j = 0; j < binary.length; j++) pcm[j] = binary.charCodeAt(j);
-          return pcm;
-        } catch (err: any) {
-          if ((err?.message?.includes('429') || err?.status === 429) && attempt < maxRetries) {
-            await sleep(Math.pow(2, attempt + 1) * 1000);
-          } else {
-            throw err;
-          }
-        }
-      }
-      return null;
-    };
+    const base64 = data.base64Pcm.replace(/-/g, '+').replace(/_/g, '/');
+    const binary = atob(base64);
+    const combinedPcm = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) combinedPcm[i] = binary.charCodeAt(i);
+    const totalPcmLength = combinedPcm.length;
 
-    // Sequential TTS calls with 2s gap to avoid rate limits (4-6 calls total vs 18-20)
-    const results: (Uint8Array | null)[] = [];
-    for (let i = 0; i < requests.length; i++) {
-      if (i > 0) await sleep(2000);
-      results.push(await fetchTurn(requests[i]));
-    }
+    const header = new ArrayBuffer(44);
+    const dv = new DataView(header);
+    const sampleRate = 24000;
+    dv.setUint32(0, 0x52494646, false);
+    dv.setUint32(4, 36 + totalPcmLength, true);
+    dv.setUint32(8, 0x57415645, false);
+    dv.setUint32(12, 0x666d7420, false);
+    dv.setUint32(16, 16, true);
+    dv.setUint16(20, 1, true);
+    dv.setUint16(22, 1, true);
+    dv.setUint32(24, sampleRate, true);
+    dv.setUint32(28, sampleRate * 2, true);
+    dv.setUint16(32, 2, true);
+    dv.setUint16(34, 16, true);
+    dv.setUint32(36, 0x64617461, false);
+    dv.setUint32(40, totalPcmLength, true);
 
-    const allPcmData: Uint8Array[] = results.filter((r): r is Uint8Array => r !== null);
-    let totalPcmLength = allPcmData.reduce((sum, p) => sum + p.length, 0);
+    const wavData = new Uint8Array(44 + totalPcmLength);
+    wavData.set(new Uint8Array(header), 0);
+    wavData.set(combinedPcm, 44);
 
-    if (allPcmData.length > 0) {
-      const combinedPcm = new Uint8Array(totalPcmLength);
-      let offset = 0;
-      for (const pcm of allPcmData) { combinedPcm.set(pcm, offset); offset += pcm.length; }
+    const audioBlob = new Blob([wavData], { type: 'audio/wav' });
+    setAudioUrl(URL.createObjectURL(audioBlob));
 
-      const header = new ArrayBuffer(44);
-      const dv = new DataView(header);
-      const sampleRate = 24000;
-      dv.setUint32(0, 0x52494646, false);
-      dv.setUint32(4, 36 + totalPcmLength, true);
-      dv.setUint32(8, 0x57415645, false);
-      dv.setUint32(12, 0x666d7420, false);
-      dv.setUint32(16, 16, true);
-      dv.setUint16(20, 1, true);
-      dv.setUint16(22, 1, true);
-      dv.setUint32(24, sampleRate, true);
-      dv.setUint32(28, sampleRate * 2, true);
-      dv.setUint16(32, 2, true);
-      dv.setUint16(34, 16, true);
-      dv.setUint32(36, 0x64617461, false);
-      dv.setUint32(40, totalPcmLength, true);
-
-      const wavData = new Uint8Array(44 + totalPcmLength);
-      wavData.set(new Uint8Array(header), 0);
-      wavData.set(combinedPcm, 44);
-
-      const audioBlob = new Blob([wavData], { type: 'audio/wav' });
-      setAudioUrl(URL.createObjectURL(audioBlob));
-
-      let binary = '';
-      for (let i = 0; i < wavData.length; i++) binary += String.fromCharCode(wavData[i]);
-      setAudioData(btoa(binary));
-    }
+    let bin = '';
+    for (let i = 0; i < wavData.length; i++) bin += String.fromCharCode(wavData[i]);
+    setAudioData(btoa(bin));
   };
 
   const handleGenerate = async () => {
@@ -523,10 +518,16 @@ export default function App() {
                           {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <button onClick={e => startEdit(podcast, e)} className="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all">
+                      <button onClick={e => startEdit(podcast, e)} className="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all" title="Edit">
                         <Pencil size={15} />
                       </button>
-                      <button onClick={e => { e.stopPropagation(); handleDeletePodcast(podcast.id); }} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                      <button onClick={e => handleDownloadPodcast(podcast, e)} className="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all" title="Download">
+                        <Download size={15} />
+                      </button>
+                      <button onClick={e => handleShareWhatsApp(podcast, e)} className="p-2 text-gray-300 hover:text-green-500 hover:bg-green-50 rounded-xl transition-all" title="Share on WhatsApp">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); handleDeletePodcast(podcast.id); }} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Delete">
                         <Trash2 size={16} />
                       </button>
                     </div>
