@@ -238,7 +238,10 @@ async function startServer() {
       const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
       const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
       const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following ${hostCount === 'two' ? `conversation between ${host1} and ${host2}` : `monologue by ${host1}`}:\n\n${chunk}`;
+      const speakerSetup = hostCount === 'two'
+        ? `${host1} is a WOMAN and must be read in a clearly female voice. ${host2} is a MAN and must be read in a clearly male voice. `
+        : `${host1} is a WOMAN and must be read in a clearly female voice. `;
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}${speakerSetup}TTS the following ${hostCount === 'two' ? `conversation between ${host1} and ${host2}` : `monologue by ${host1}`}:\n\n${chunk}`;
 
       const ttsResponse = await ai.models.generateContent({
         model: "gemini-2.5-pro-preview-tts",
