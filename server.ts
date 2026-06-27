@@ -181,7 +181,7 @@ async function startServer() {
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
-            Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming.
+            Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
             Target Length: EXACTLY ${length} minutes of spoken audio. Write between ${length * 150} and ${length * 165} words of actual dialogue (not counting speaker labels). Do not write fewer OR more words than this range.
             English Level: ${level} (CEFR).
             ${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
