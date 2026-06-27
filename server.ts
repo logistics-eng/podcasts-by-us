@@ -241,7 +241,7 @@ async function startServer() {
       const speechConfig = { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName || 'Kore' } } };
 
       const ttsResponse = await ai.models.generateContent({
-        model: "gemini-2.5-pro-preview-tts",
+        model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: promptText }] }],
         config: {
           responseModalities: [Modality.AUDIO],

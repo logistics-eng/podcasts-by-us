@@ -296,10 +296,11 @@ export default function App() {
       return null;
     };
 
-    // Sequential TTS calls — preview model has very low rate limits
+    // Sequential TTS calls with pause to respect rate limits
     const results: (Uint8Array | null)[] = [];
-    for (const req of requests) {
-      results.push(await fetchTurn(req));
+    for (let i = 0; i < requests.length; i++) {
+      if (i > 0) await sleep(2000);
+      results.push(await fetchTurn(requests[i]));
     }
 
     const allPcmData: Uint8Array[] = results.filter((r): r is Uint8Array => r !== null);
