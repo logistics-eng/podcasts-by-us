@@ -296,12 +296,17 @@ export default function App() {
       return null;
     };
 
-    // Sequential TTS calls with pause to respect rate limits
-    const results: (Uint8Array | null)[] = [];
-    for (let i = 0; i < requests.length; i++) {
-      if (i > 0) await sleep(2000);
-      results.push(await fetchTurn(requests[i]));
-    }
+    // 2 concurrent TTS calls with stagger to stay within rate limits
+    const results: (Uint8Array | null)[] = new Array(requests.length).fill(null);
+    const queue = requests.map((req, i) => ({ req, i }));
+    await Promise.all(Array.from({ length: 2 }, async (_, workerIdx) => {
+      if (workerIdx > 0) await sleep(1500); // stagger workers
+      while (queue.length > 0) {
+        const item = queue.shift();
+        if (!item) return;
+        results[item.i] = await fetchTurn(item.req);
+      }
+    }));
 
     const allPcmData: Uint8Array[] = results.filter((r): r is Uint8Array => r !== null);
     let totalPcmLength = allPcmData.reduce((sum, p) => sum + p.length, 0);
