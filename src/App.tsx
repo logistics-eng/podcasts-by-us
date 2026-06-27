@@ -226,7 +226,7 @@ export default function App() {
       else if (processedLine.startsWith(`${names.host2}:`)) currentSpeaker = names.host2;
       else if (hCount === 'two') processedLine = `${currentSpeaker}: ${processedLine}`;
 
-      if ((currentChunk.length + processedLine.length) > 2500) {
+      if ((currentChunk.length + processedLine.length) > 1200) {
         if (currentChunk) chunks.push(currentChunk.trim());
         currentChunk = processedLine + '\n';
       } else {
