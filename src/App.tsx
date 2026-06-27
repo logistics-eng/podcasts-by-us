@@ -296,18 +296,11 @@ export default function App() {
       return null;
     };
 
-    // Run TTS calls with concurrency limit to avoid rate limits
-    const CONCURRENCY = 3;
-    const results: (Uint8Array | null)[] = new Array(requests.length).fill(null);
-    const queue = requests.map((req, i) => ({ req, i }));
-
-    await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
-      while (queue.length > 0) {
-        const item = queue.shift();
-        if (!item) return;
-        results[item.i] = await fetchTurn(item.req);
-      }
-    }));
+    // Sequential TTS calls — preview model has very low rate limits
+    const results: (Uint8Array | null)[] = [];
+    for (const req of requests) {
+      results.push(await fetchTurn(req));
+    }
 
     const allPcmData: Uint8Array[] = results.filter((r): r is Uint8Array => r !== null);
     let totalPcmLength = allPcmData.reduce((sum, p) => sum + p.length, 0);
