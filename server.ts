@@ -8,9 +8,10 @@ import pg from 'pg';
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
-// Global Gemini rate-limit queue: enforces minimum 7s gap between API calls (~8 RPM max)
+// Global Gemini rate-limit queue: enforces minimum 20s gap between API calls (~3 RPM max)
+// TTS preview model is limited to ~3 RPM; 20s gap keeps us safely within limits.
 let lastGeminiCall = 0;
-const GEMINI_MIN_GAP_MS = 7000;
+const GEMINI_MIN_GAP_MS = 20000;
 const geminiQueue: Array<() => void> = [];
 let queueRunning = false;
 
@@ -21,7 +22,22 @@ async function geminiCall<T>(fn: () => Promise<T>): Promise<T> {
       const wait = Math.max(0, lastGeminiCall + GEMINI_MIN_GAP_MS - now);
       if (wait > 0) await new Promise(r => setTimeout(r, wait));
       lastGeminiCall = Date.now();
-      try { resolve(await fn()); } catch (e) { reject(e); }
+      // Retry on 429 with a 65s wait (full rate-limit window + buffer)
+      for (let attempt = 0; attempt <= 4; attempt++) {
+        try {
+          resolve(await fn());
+          return;
+        } catch (e: any) {
+          if ((e?.status === 429 || e?.message?.includes('429')) && attempt < 4) {
+            console.log(`429 received, waiting 65s before retry ${attempt + 1}...`);
+            await new Promise(r => setTimeout(r, 65000));
+            lastGeminiCall = Date.now(); // reset gap after the long wait
+          } else {
+            reject(e);
+            return;
+          }
+        }
+      }
     });
     if (!queueRunning) runQueue();
   });
@@ -197,15 +213,7 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-      
-      let scriptResponse;
-      let scriptRetryCount = 0;
-      const maxScriptRetries = 3;
-      
-      while (scriptRetryCount <= maxScriptRetries) {
-        try {
-          scriptResponse = await geminiCall(() => ai.models.generateContent({
+      const scriptResponse = await geminiCall(() => ai.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: `${prompt}
             
@@ -236,18 +244,6 @@ async function startServer() {
               tools: tools.length > 0 ? tools : undefined,
             }
           }));
-          break;
-        } catch (error: any) {
-          if ((error?.message?.includes('429') || error?.status === 429) && scriptRetryCount < maxScriptRetries) {
-            scriptRetryCount++;
-            await sleep(Math.pow(2, scriptRetryCount) * 2000);
-          } else {
-            throw error;
-          }
-        }
-      }
-
-      if (!scriptResponse) throw new Error("Failed to generate script.");
 
       const fullText = scriptResponse.text || '';
       res.json({ fullText });
@@ -301,27 +297,14 @@ async function startServer() {
 
         const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunks[i]}`;
 
-        let attempt = 0;
-        while (true) {
-          try {
-            const ttsResponse = await geminiCall(() => ai.models.generateContent({
-              model: 'gemini-2.5-flash-preview-tts',
-              contents: [{ parts: [{ text: promptText }] }],
-              config: { responseModalities: [Modality.AUDIO], speechConfig },
-            }));
-            const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-            if (audioPart?.inlineData?.data) {
-              pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
-            }
-            break;
-          } catch (err: any) {
-            if ((err?.status === 429 || err?.message?.includes('429')) && attempt < 5) {
-              attempt++;
-              await sleep(Math.pow(2, attempt) * 3000);
-            } else {
-              throw err;
-            }
-          }
+        const ttsResponse = await geminiCall(() => ai.models.generateContent({
+          model: 'gemini-2.5-flash-preview-tts',
+          contents: [{ parts: [{ text: promptText }] }],
+          config: { responseModalities: [Modality.AUDIO], speechConfig },
+        }));
+        const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+        if (audioPart?.inlineData?.data) {
+          pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
         }
       }
 
