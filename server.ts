@@ -216,7 +216,7 @@ async function startServer() {
       const promptText = `${speedInstruction}${(level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : ''}TTS the following ${hostCount === 'two' ? 'conversation between Alex and Sam' : 'monologue by Alex'}:\n\n${chunk}`;
 
       const ttsResponse = await ai.models.generateContent({
-        model: "gemini-3.1-flash-tts-preview",
+        model: "gemini-2.5-pro-preview-tts",
         contents: [{ parts: [{ text: promptText }] }],
         config: {
           responseModalities: [Modality.AUDIO],
