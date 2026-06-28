@@ -46,7 +46,7 @@ let ttsRunning = false;
 function ttsCall<T>(fn: () => Promise<T>): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     ttsQueue.push(async () => {
-      const wait = Math.max(0, ttsLast + 22000 - Date.now());
+      const wait = Math.max(0, ttsLast + 25000 - Date.now());
       if (wait > 0) await sleep(wait);
       ttsLast = Date.now();
       try { resolve(await geminiWithRetry(fn, 2, 25000)); } catch (e) { reject(e); }
