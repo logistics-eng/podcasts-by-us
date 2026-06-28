@@ -297,7 +297,7 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${dialogueOnly}`;
 
       const ttsResponse = await geminiWithRetry(() => ai.models.generateContent({
-        model: 'gemini-2.5-flash-tts',
+        model: 'gemini-2.5-flash-preview-tts',
         contents: [{ parts: [{ text: promptText }] }],
         config: { responseModalities: [Modality.AUDIO], speechConfig },
       }), 2, 10000);
