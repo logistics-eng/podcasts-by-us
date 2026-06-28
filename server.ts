@@ -3,6 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import pg from 'pg';
 
@@ -84,6 +85,7 @@ async function initDb() {
 // Shared Gemini client defined on the server side
 // We set 'User-Agent' header to 'aistudio-build' in httpOptions for telemetry.
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -285,18 +287,41 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      // Send entire script in one TTS call — avoids rate limit issues from chunking
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${script}`;
+      const voice1 = 'nova';  // female
+      const voice2 = 'onyx';  // male
+      const ttsSpeed = Math.max(0.25, Math.min(4.0, speechSpeed / 100));
 
-      const ttsResponse = await ttsCall(() => ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-tts',
-        contents: [{ parts: [{ text: promptText }] }],
-        config: { responseModalities: [Modality.AUDIO], speechConfig },
-      }));
-      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-      const pcm = audioPart?.inlineData?.data ? Buffer.from(audioPart.inlineData.data, 'base64') : Buffer.alloc(0);
+      // Parse script into speaker segments, grouping consecutive lines by same speaker
+      const dialogueLines = script.split('\n').filter(l => l.trim() && !l.startsWith('VOCABULARY'));
+      type Segment = { speaker: string; text: string };
+      const segments: Segment[] = [];
+      for (const line of dialogueLines) {
+        const match = line.match(/^([^:]+):\s*(.+)/);
+        if (!match) continue;
+        const [, speaker, text] = match;
+        const last = segments[segments.length - 1];
+        if (last && last.speaker === speaker) {
+          last.text += ' ' + text;
+        } else {
+          segments.push({ speaker, text });
+        }
+      }
 
-      res.json({ base64Pcm: pcm.toString('base64') });
+      const pcmParts: Buffer[] = [];
+      for (const seg of segments) {
+        const voice = (hostCount === 'two' && seg.speaker === host2Name) ? voice2 : voice1;
+        const resp = await openai.audio.speech.create({
+          model: 'tts-1',
+          voice,
+          input: seg.text,
+          response_format: 'pcm',
+          speed: ttsSpeed,
+        });
+        pcmParts.push(Buffer.from(await resp.arrayBuffer()));
+      }
+
+      const combined = Buffer.concat(pcmParts);
+      res.json({ base64Pcm: combined.toString('base64') });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
