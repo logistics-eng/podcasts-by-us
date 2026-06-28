@@ -285,13 +285,14 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      // Split script into 1200-char chunks
+      // Split script into chunks — larger chunks = fewer TTS calls = fewer 429s
+      const CHUNK_SIZE = 2500;
       const chunks: string[] = [];
       let current = '';
       for (const line of script.split('\n')) {
         if (!line.trim()) continue;
         const trimmed = line.trim();
-        if (current.length + trimmed.length > 1200) {
+        if (current.length + trimmed.length > CHUNK_SIZE) {
           if (current) chunks.push(current.trim());
           current = trimmed + '\n';
         } else {
