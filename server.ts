@@ -21,7 +21,7 @@ const isRateLimit = (e: any) =>
 
 // Call Gemini with automatic retry on rate limit.
 // maxWaitMs caps total retry time to stay within Railway's request timeout.
-async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 2, retryWaitMs = 20000): Promise<T> {
+async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 4, retryWaitMs = 35000): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
