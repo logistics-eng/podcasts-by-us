@@ -288,17 +288,41 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${script}`;
+      // Split script into dialogue-only lines (skip VOCABULARY CHART), chunk by ~2000 chars
+      const dialogueOnly = script.split('\n')
+        .filter(l => l.trim() && !l.startsWith('VOCABULARY') && !/^\d+\./.test(l.trim()))
+        .join('\n');
 
-      const ttsResponse = await ttsCall(() => ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-tts',
-        contents: [{ parts: [{ text: promptText }] }],
-        config: { responseModalities: [Modality.AUDIO], speechConfig },
-      }));
-      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-      const pcm = audioPart?.inlineData?.data ? Buffer.from(audioPart.inlineData.data, 'base64') : Buffer.alloc(0);
+      const CHUNK_SIZE = 2000;
+      const chunks: string[] = [];
+      let current = '';
+      for (const line of dialogueOnly.split('\n')) {
+        if (!line.trim()) continue;
+        if (current.length + line.length > CHUNK_SIZE) {
+          if (current) chunks.push(current.trim());
+          current = line + '\n';
+        } else {
+          current += line + '\n';
+        }
+      }
+      if (current.trim()) chunks.push(current.trim());
 
-      res.json({ base64Pcm: pcm.toString('base64') });
+      const pcmParts: Buffer[] = [];
+      for (const chunk of chunks) {
+        const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
+        const ttsResponse = await ttsCall(() => ai.models.generateContent({
+          model: 'gemini-2.5-flash-preview-tts',
+          contents: [{ parts: [{ text: promptText }] }],
+          config: { responseModalities: [Modality.AUDIO], speechConfig },
+        }));
+        const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+        if (audioPart?.inlineData?.data) {
+          pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
+        }
+      }
+
+      const combined = Buffer.concat(pcmParts);
+      res.json({ base64Pcm: combined.toString('base64') });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
