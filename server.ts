@@ -183,8 +183,8 @@ async function startServer() {
       let tools: any[] = [];
 
       if (isSubjectMode) {
-        prompt = `Generate a podcast script about "${subject}". Use Google Search to find the most up-to-date and accurate information on this topic before writing the script.`;
-        tools = [{ googleSearch: {} }];
+        prompt = `Generate a podcast script about "${subject}".`;
+        tools = [];
       } else if (articleSourceType === 'url') {
         prompt = `I am providing URLs to articles: 
         Article 1: ${articleUrl}
