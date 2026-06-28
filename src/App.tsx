@@ -751,7 +751,7 @@ export default function App() {
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <BookOpen size={18} className="text-indigo-600" />
-                  Configure Podcast
+                  Configure
                 </h2>
 
                 <div className="space-y-4">
