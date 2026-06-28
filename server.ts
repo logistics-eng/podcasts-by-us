@@ -311,16 +311,16 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         return t && !t.startsWith('VOCABULARY') && !/^\d+\.\s/.test(t) && t.includes(':');
       });
 
-      const audioBuffers: Buffer[] = [];
-      for (const line of lines) {
-        const colonIdx = line.indexOf(':');
-        const speaker = line.substring(0, colonIdx).trim();
-        const text = line.substring(colonIdx + 1).trim();
-        if (!text) continue;
-        const buf = await edgeTtsLine(getVoice(speaker), text);
-        audioBuffers.push(buf);
-      }
+      const tasks = lines
+        .map((line: string) => {
+          const colonIdx = line.indexOf(':');
+          const speaker = line.substring(0, colonIdx).trim();
+          const text = line.substring(colonIdx + 1).trim();
+          return text ? { voice: getVoice(speaker), text } : null;
+        })
+        .filter(Boolean) as { voice: string; text: string }[];
 
+      const audioBuffers = await Promise.all(tasks.map(t => edgeTtsLine(t.voice, t.text)));
       const combined = Buffer.concat(audioBuffers);
       res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
