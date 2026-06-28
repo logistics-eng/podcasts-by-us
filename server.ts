@@ -167,14 +167,15 @@ async function startServer() {
   // API Route for generating the script
   app.post('/api/generate-script', async (req, res) => {
     try {
-      const { 
-        subject, 
-        sourceType, 
-        articleSourceType, 
-        articleText, 
-        articleText2, 
-        articleUrl, 
-        articleUrl2, 
+      const {
+        subject,
+        sourceType,
+        contentMode,
+        articleSourceType,
+        articleText,
+        articleText2,
+        articleUrl,
+        articleUrl2,
         specificWords,
         length,
         level,
@@ -189,7 +190,10 @@ async function startServer() {
       let prompt = '';
       let tools: any[] = [];
 
-      if (isSubjectMode) {
+      if (contentMode === 'roleplay') {
+        prompt = `Create a role play script between two speakers: ${host1} (Female) and ${host2} (Male).\n\nScenario: ${subject}`;
+        tools = [];
+      } else if (isSubjectMode) {
         prompt = `Generate a podcast script about "${subject}".`;
         tools = [];
       } else if (articleSourceType === 'url') {
@@ -230,10 +234,15 @@ async function startServer() {
 
       const userPrompt = `${prompt}
 
-Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
 Target Length: EXACTLY ${length} minutes of spoken audio. Write between ${length * 150} and ${length * 165} words of actual dialogue (not counting speaker labels). Do not write fewer OR more words than this range.
 English Level: ${level} (CEFR).
-${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
+${contentMode === 'roleplay'
+  ? `The script MUST be a role play dialogue between ${host1} (Female) and ${host2} (Male). They should act out the scenario naturally and conversationally.`
+  : hostCount === 'two'
+    ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).`
+    : `The script MUST be a monologue by a single host: ${host1} (Female).`
+}
+${contentMode !== 'roleplay' ? `Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.` : ''}
 
 IMPORTANT:
 1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".

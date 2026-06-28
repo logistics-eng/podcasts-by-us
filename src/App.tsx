@@ -60,6 +60,7 @@ export default function App() {
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
   // Generate mode state
+  const [contentMode, setContentMode] = useState<'podcast' | 'roleplay'>('podcast');
   const [subject, setSubject] = useState('');
   const [sourceType, setSourceType] = useState<'subject' | 'article'>('subject');
   const [articleSourceType, setArticleSourceType] = useState<'text' | 'url'>('text');
@@ -348,8 +349,10 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subject, sourceType, articleSourceType, articleText, articleText2,
-          articleUrl, articleUrl2, specificWords, length, level, hostCount, speakerNames: names,
+          subject, sourceType: contentMode === 'roleplay' ? 'subject' : sourceType,
+          contentMode, articleSourceType, articleText, articleText2,
+          articleUrl, articleUrl2, specificWords, length, level,
+          hostCount: contentMode === 'roleplay' ? 'two' : hostCount, speakerNames: names,
         }),
       });
 
@@ -657,7 +660,7 @@ export default function App() {
             onClick={() => { setMode('generate'); setTranscript(''); setAudioUrl(null); setAudioData(null); setSavedId(null); }}
             className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'generate' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
           >
-            <Volume2 size={15} /> Generate
+            <Volume2 size={15} /> Create with AI
           </button>
           <button
             onClick={() => { setMode('script'); setTranscript(''); setAudioUrl(null); setAudioData(null); setSavedId(null); }}
@@ -680,6 +683,19 @@ export default function App() {
                 </h2>
 
                 <div className="space-y-4">
+                  {/* Podcast / Role Play toggle */}
+                  <div className="flex p-1 bg-gray-100 rounded-xl">
+                    <button onClick={() => { setContentMode('podcast'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'podcast' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎙 Podcast</button>
+                    <button onClick={() => { setContentMode('roleplay'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'roleplay' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎭 Role Play</button>
+                  </div>
+
+                  {contentMode === 'roleplay' ? (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-600">Scenario</label>
+                      <textarea autoFocus placeholder="e.g. A job interview at a tech company. One speaker is the interviewer, the other is a nervous candidate applying for their first job..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[100px] resize-none" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                    </div>
+                  ) : (
+                  <>
                   <div className="flex p-1 bg-gray-100 rounded-xl">
                     <button onClick={() => setSourceType('subject')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'subject' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Subject</button>
                     <button onClick={() => setSourceType('article')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${sourceType === 'article' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Article</button>
@@ -722,6 +738,8 @@ export default function App() {
                       )}
                     </div>
                   )}
+                  </>
+                  )}
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-600">Include specific words (optional)</label>
@@ -739,6 +757,7 @@ export default function App() {
                     </div>
                   </div>
 
+                  {contentMode === 'podcast' && (
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Narrators</label>
                     <div className="flex bg-gray-100 rounded-xl p-1">
@@ -746,6 +765,7 @@ export default function App() {
                       <button onClick={() => setHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Hosts</button>
                     </div>
                   </div>
+                  )}
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -767,10 +787,10 @@ export default function App() {
 
                 <button
                   onClick={handleGenerate}
-                  disabled={isGenerating || (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim()))}
+                  disabled={isGenerating || (contentMode === 'roleplay' ? !subject.trim() : (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim())))}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Generate Podcast</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />{contentMode === 'roleplay' ? 'Create Role Play' : 'Create Podcast'}</>)}
                 </button>
               </section>
             ) : (
