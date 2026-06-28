@@ -276,42 +276,33 @@ Keep the conversation natural and engaging. Do not include any stage directions 
     }
   });
 
-  // Audio generation via Google Cloud Text-to-Speech (Studio voices)
+  // Audio generation via Microsoft Edge TTS (neural voices)
   app.post('/api/generate-audio', async (req, res) => {
     try {
       const { script, speechSpeed, level, hostCount, speakerNames } = req.body;
       const host1Name = speakerNames?.host1 || 'Alex';
-      const host2Name = speakerNames?.host2 || 'Sam';
 
-      const speakingRate = (level === 'A1' || level === 'A2')
-        ? Math.min((speechSpeed ?? 100) / 100, 0.8)
-        : (speechSpeed ?? 100) / 100;
-
-      const VOICE_FEMALE = 'en-US-Studio-O';
-      const VOICE_MALE   = 'en-US-Studio-Q';
+      // Best available Edge TTS neural voices
+      const VOICE_FEMALE = 'en-US-EmmaMultilingualNeural';
+      const VOICE_MALE   = 'en-US-AndrewMultilingualNeural';
 
       const getVoice = (speaker: string) =>
         (hostCount === 'one' || speaker === host1Name) ? VOICE_FEMALE : VOICE_MALE;
 
-      const gcTtsLine = async (voiceName: string, text: string): Promise<Buffer> => {
-        const response = await fetch(
-          `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_TTS_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              input: { text },
-              voice: { languageCode: 'en-US', name: voiceName },
-              audioConfig: { audioEncoding: 'MP3', speakingRate },
-            }),
-          }
-        );
-        if (!response.ok) {
-          const err = await response.text();
-          throw new Error(`Google TTS error ${response.status}: ${err}`);
-        }
-        const data = await response.json() as { audioContent: string };
-        return Buffer.from(data.audioContent, 'base64');
+      // Speaking rate: 90% speed → 0.9, A1/A2 capped at 0.8
+      const baseRate = (speechSpeed ?? 100) / 100;
+      const rate = (level === 'A1' || level === 'A2') ? Math.min(baseRate, 0.8) : baseRate;
+
+      const edgeTtsLine = async (voice: string, text: string): Promise<Buffer> => {
+        const tts = new MsEdgeTTS();
+        await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+        const { audioStream } = await tts.toStream(text, { rate });
+        return new Promise((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
+          audioStream.on('end', () => resolve(Buffer.concat(chunks)));
+          audioStream.on('error', reject);
+        });
       };
 
       // Strip VOCABULARY CHART and split into speaker lines
@@ -326,7 +317,7 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         const speaker = line.substring(0, colonIdx).trim();
         const text = line.substring(colonIdx + 1).trim();
         if (!text) continue;
-        const buf = await gcTtsLine(getVoice(speaker), text);
+        const buf = await edgeTtsLine(getVoice(speaker), text);
         audioBuffers.push(buf);
       }
 
