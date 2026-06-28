@@ -221,7 +221,7 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const scriptResponse = await ai.models.generateContent({
+      const scriptResponse = await geminiWithRetry(() => ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: `${prompt}
             
@@ -251,7 +251,7 @@ async function startServer() {
               temperature: 0.7,
               tools: tools.length > 0 ? tools : undefined,
             }
-          });
+          }));
 
       const fullText = scriptResponse.text || '';
       res.json({ fullText });
