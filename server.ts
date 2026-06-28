@@ -287,41 +287,28 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      const voice1 = 'nova';  // female
-      const voice2 = 'onyx';  // male
-      const ttsSpeed = Math.max(0.25, Math.min(4.0, speechSpeed / 100));
+      const speechConfig = hostCount === 'two'
+        ? {
+            multiSpeakerVoiceConfig: {
+              speakerVoiceConfigs: [
+                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
+              ],
+            },
+          }
+        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      // Parse script into speaker segments, grouping consecutive lines by same speaker
-      const dialogueLines = script.split('\n').filter(l => l.trim() && !l.startsWith('VOCABULARY'));
-      type Segment = { speaker: string; text: string };
-      const segments: Segment[] = [];
-      for (const line of dialogueLines) {
-        const match = line.match(/^([^:]+):\s*(.+)/);
-        if (!match) continue;
-        const [, speaker, text] = match;
-        const last = segments[segments.length - 1];
-        if (last && last.speaker === speaker) {
-          last.text += ' ' + text;
-        } else {
-          segments.push({ speaker, text });
-        }
-      }
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${script}`;
 
-      const pcmParts: Buffer[] = [];
-      for (const seg of segments) {
-        const voice = (hostCount === 'two' && seg.speaker === host2Name) ? voice2 : voice1;
-        const resp = await openai.audio.speech.create({
-          model: 'tts-1',
-          voice,
-          input: seg.text,
-          response_format: 'pcm',
-          speed: ttsSpeed,
-        });
-        pcmParts.push(Buffer.from(await resp.arrayBuffer()));
-      }
+      const ttsResponse = await ttsCall(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-tts',
+        contents: [{ parts: [{ text: promptText }] }],
+        config: { responseModalities: [Modality.AUDIO], speechConfig },
+      }));
+      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+      const pcm = audioPart?.inlineData?.data ? Buffer.from(audioPart.inlineData.data, 'base64') : Buffer.alloc(0);
 
-      const combined = Buffer.concat(pcmParts);
-      res.json({ base64Pcm: combined.toString('base64') });
+      res.json({ base64Pcm: pcm.toString('base64') });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
