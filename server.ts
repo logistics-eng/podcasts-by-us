@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
+import Anthropic from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
 import pg from 'pg';
 
@@ -82,6 +83,8 @@ async function initDb() {
 
 // Shared Gemini client defined on the server side
 // We set 'User-Agent' header to 'aistudio-build' in httpOptions for telemetry.
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
@@ -221,39 +224,38 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const scriptResponse = await geminiWithRetry(() => ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: `${prompt}
-            
-            Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
-            Target Length: EXACTLY ${length} minutes of spoken audio. Write between ${length * 150} and ${length * 165} words of actual dialogue (not counting speaker labels). Do not write fewer OR more words than this range.
-            English Level: ${level} (CEFR).
-            ${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
+      const userPrompt = `${prompt}
 
-            IMPORTANT:
-            1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".
-            2. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
-            3. For each vocabulary item, provide a simple explanation/definition in the format: "Word/Phrase = Explanation".
+Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
+Target Length: EXACTLY ${length} minutes of spoken audio. Write between ${length * 150} and ${length * 165} words of actual dialogue (not counting speaker labels). Do not write fewer OR more words than this range.
+English Level: ${level} (CEFR).
+${hostCount === 'two' ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).` : `The script MUST be a monologue by a single host: ${host1} (Female).`}
 
-            Format:
-            TITLE: [Short Title]
-            ${host1}: [Text]
-            ${hostCount === 'two' ? `${host2}: [Text]` : ''}
-            ...
-            
-            VOCABULARY CHART
-            1. Word/Phrase = Explanation
-            2. Word/Phrase = Explanation
-            ...
-            
-            Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`,
-            config: {
-              temperature: 0.7,
-              tools: tools.length > 0 ? tools : undefined,
-            }
-          }), 1, 15000);
+IMPORTANT:
+1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".
+2. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
+3. For each vocabulary item, provide a simple explanation/definition in the format: "Word/Phrase = Explanation".
 
-      const fullText = scriptResponse.text || '';
+Format:
+TITLE: [Short Title]
+${host1}: [Text]
+${hostCount === 'two' ? `${host2}: [Text]` : ''}
+...
+
+VOCABULARY CHART
+1. Word/Phrase = Explanation
+2. Word/Phrase = Explanation
+...
+
+Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`;
+
+      const scriptMsg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 4096,
+        temperature: 0.7,
+        messages: [{ role: 'user', content: userPrompt }],
+      });
+      const fullText = (scriptMsg.content[0] as { type: string; text: string }).text || '';
       res.json({ fullText });
     } catch (error: any) {
       console.error("Script generation failed on server:", error);
