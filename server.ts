@@ -222,7 +222,7 @@ async function startServer() {
       }
 
       const scriptResponse = await geminiWithRetry(() => ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.0-flash-lite",
             contents: `${prompt}
             
             Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
