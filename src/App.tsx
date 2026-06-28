@@ -175,6 +175,7 @@ export default function App() {
   const [vocabularyChart, setVocabularyChart] = useState('');
   const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary'>('transcript');
   const [generatedTitle, setGeneratedTitle] = useState('');
+  const [generatedDescription, setGeneratedDescription] = useState('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioData, setAudioData] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -226,6 +227,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: generatedTitle,
+          description: generatedDescription || undefined,
           transcript,
           vocabulary: vocabularyChart,
           audioData,
@@ -442,18 +444,23 @@ export default function App() {
         return;
       }
 
-      const titleMatch = fullText.match(/^TITLE:\s*(.*)/i);
+      const titleMatch = fullText.match(/^TITLE:\s*(.*)/im);
       const title = titleMatch ? titleMatch[1].trim() : (isSubjectMode ? subject : 'Podcast Episode');
+
+      const descMatch = fullText.match(/^DESCRIPTION:\s*(.*)/im);
+      const description = descMatch ? descMatch[1].trim() : '';
 
       const vocabMatch = fullText.match(/VOCABULARY CHART[\s\S]*/i);
       const vocab = vocabMatch ? vocabMatch[0].replace(/VOCABULARY CHART/i, '').trim() : '';
 
       const script = fullText
-        .replace(/^TITLE:.*\n?/i, '')
+        .replace(/^TITLE:.*\n?/im, '')
+        .replace(/^DESCRIPTION:.*\n?/im, '')
         .replace(/VOCABULARY CHART[\s\S]*/i, '')
         .trim();
 
       setGeneratedTitle(title);
+      setGeneratedDescription(description);
       setTranscript(script);
       setVocabularyChart(vocab);
 
