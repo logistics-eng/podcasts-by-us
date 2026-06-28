@@ -267,53 +267,44 @@ Keep the conversation natural and engaging. Do not include any stage directions 
     }
   });
 
-  // Audio generation via Microsoft Edge TTS — free, no rate limits, neural voices
+  // Audio generation via Gemini 2.5 Flash TTS (paid tier, 100 RPM)
   app.post('/api/generate-audio', async (req, res) => {
     try {
-      const { script, speechSpeed, hostCount, speakerNames } = req.body;
+      const { script, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
+      const host1Name = speakerNames?.host1 || 'Alex';
       const host2Name = speakerNames?.host2 || 'Sam';
 
-      const voice1 = 'en-US-AriaNeural';   // female
-      const voice2 = 'en-US-GuyNeural';    // male
-      const ttsRate = speechSpeed && speechSpeed !== 100 ? `${speechSpeed - 100}%` : '0%';
+      const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
+      const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
+      const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
 
-      // Parse dialogue lines only (skip VOCABULARY CHART section)
-      type Segment = { voice: string; text: string };
-      const segments: Segment[] = [];
-      let inVocab = false;
-      for (const raw of script.split('\n')) {
-        const line = raw.trim();
-        if (!line) continue;
-        if (line.startsWith('VOCABULARY')) { inVocab = true; continue; }
-        if (inVocab) continue;
-        const match = line.match(/^([^:]+):\s*(.+)/);
-        if (!match) continue;
-        const [, speaker, text] = match;
-        const voice = (hostCount === 'two' && speaker.trim() === host2Name) ? voice2 : voice1;
-        const last = segments[segments.length - 1];
-        if (last && last.voice === voice) {
-          last.text += ' ' + text;
-        } else {
-          segments.push({ voice, text });
-        }
-      }
+      const speechConfig = hostCount === 'two'
+        ? {
+            multiSpeakerVoiceConfig: {
+              speakerVoiceConfigs: [
+                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
+              ],
+            },
+          }
+        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      const mp3Parts: Buffer[] = [];
-      for (const seg of segments) {
-        const tts = new MsEdgeTTS();
-        await tts.setMetadata(seg.voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3, undefined, { rate: ttsRate });
-        const readable = tts.toStream(seg.text);
-        const chunks: Buffer[] = [];
-        await new Promise<void>((resolve, reject) => {
-          readable.on('data', (chunk: Buffer) => chunks.push(chunk));
-          readable.on('end', resolve);
-          readable.on('error', reject);
-        });
-        mp3Parts.push(Buffer.concat(chunks));
-      }
+      // Dialogue only — strip VOCABULARY CHART
+      const dialogueOnly = script.split('\n')
+        .filter(l => l.trim() && !l.startsWith('VOCABULARY') && !/^\d+\.\s/.test(l.trim()))
+        .join('\n');
 
-      const combined = Buffer.concat(mp3Parts);
-      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${dialogueOnly}`;
+
+      const ttsResponse = await geminiWithRetry(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash-tts',
+        contents: [{ parts: [{ text: promptText }] }],
+        config: { responseModalities: [Modality.AUDIO], speechConfig },
+      }), 2, 10000);
+
+      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+      const pcm = audioPart?.inlineData?.data ? Buffer.from(audioPart.inlineData.data, 'base64') : Buffer.alloc(0);
+      res.json({ base64Pcm: pcm.toString('base64') });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
