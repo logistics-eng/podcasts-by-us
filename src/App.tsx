@@ -608,7 +608,7 @@ export default function App() {
                         <Volume2 size={18} className="text-indigo-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{podcast.title}</p>
+                        <p className="font-semibold text-gray-900">{podcast.title}</p>
                         {podcast.description && <p className="text-xs text-gray-500 mt-0.5 truncate">{podcast.description}</p>}
                         <p className="text-xs text-gray-400 mt-0.5">
                           {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'}{podcast.speech_speed && podcast.speech_speed !== 100 ? ` · ${podcast.speech_speed}%` : ''} · {new Date(podcast.created_at).toLocaleDateString()}
