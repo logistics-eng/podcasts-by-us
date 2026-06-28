@@ -329,48 +329,6 @@ Keep the conversation natural and engaging. Do not include any stage directions 
     }
   });
 
-  // API Route for generating a TTS chunk
-  app.post('/api/generate-tts', async (req, res) => {
-    try {
-      const { chunk, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
-
-      const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
-      const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
-      const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
-      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
-
-      const host1Name = speakerNames?.host1 || 'Alex';
-      const host2Name = speakerNames?.host2 || 'Sam';
-      const speechConfig = hostCount === 'two'
-        ? {
-            multiSpeakerVoiceConfig: {
-              speakerVoiceConfigs: [
-                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
-                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
-              ],
-            },
-          }
-        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
-
-      const ttsResponse = await geminiCall(() => ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
-        contents: [{ parts: [{ text: promptText }] }],
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig,
-        },
-      }));
-
-      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-      const base64Audio = audioPart?.inlineData?.data || null;
-      const mimeType = audioPart?.inlineData?.mimeType || 'audio/pcm';
-
-      res.json({ base64Audio, mimeType });
-    } catch (error: any) {
-      console.error("TTS generation failed on server:", error);
-      res.status(error?.status || 500).json({ error: error?.message || String(error) });
-    }
-  });
 
   // Vite development vs production middleware setup
   if (process.env.NODE_ENV !== 'production') {
