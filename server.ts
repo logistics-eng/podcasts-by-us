@@ -288,17 +288,6 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      const speechConfig = hostCount === 'two'
-        ? {
-            multiSpeakerVoiceConfig: {
-              speakerVoiceConfigs: [
-                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
-                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
-              ],
-            },
-          }
-        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
-
       const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${script}`;
 
       const ttsResponse = await ttsCall(() => ai.models.generateContent({
