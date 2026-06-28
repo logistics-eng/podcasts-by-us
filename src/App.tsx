@@ -48,6 +48,7 @@ interface SavedPodcast {
   description?: string;
   level: string;
   host_count: string;
+  speech_speed?: number;
   created_at: string;
   transcript?: string;
   vocabulary?: string;
@@ -157,6 +158,7 @@ export default function App() {
           audioData,
           level: mode === 'script' ? '—' : level,
           hostCount: mode === 'script' ? scriptHostCount : hostCount,
+          speechSpeed: mode === 'script' ? undefined : speechSpeed,
         }),
       });
       const data = await res.json();
@@ -533,7 +535,7 @@ export default function App() {
                         <p className="font-semibold text-gray-900 truncate">{podcast.title}</p>
                         {podcast.description && <p className="text-xs text-gray-500 mt-0.5 truncate">{podcast.description}</p>}
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'} · {new Date(podcast.created_at).toLocaleDateString()}
+                          {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'}{podcast.speech_speed && podcast.speech_speed !== 100 ? ` · ${podcast.speech_speed}%` : ''} · {new Date(podcast.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <button onClick={e => startEdit(podcast, e)} className="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all" title="Edit">
