@@ -285,42 +285,18 @@ Keep the conversation natural and engaging. Do not include any stage directions 
           }
         : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
 
-      // Split script into chunks — larger chunks = fewer TTS calls = fewer 429s
-      const CHUNK_SIZE = 2500;
-      const chunks: string[] = [];
-      let current = '';
-      for (const line of script.split('\n')) {
-        if (!line.trim()) continue;
-        const trimmed = line.trim();
-        if (current.length + trimmed.length > CHUNK_SIZE) {
-          if (current) chunks.push(current.trim());
-          current = trimmed + '\n';
-        } else {
-          current += trimmed + '\n';
-        }
-      }
-      if (current) chunks.push(current.trim());
+      // Send entire script in one TTS call — avoids rate limit issues from chunking
+      const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${script}`;
 
-      const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-      const pcmParts: Buffer[] = [];
+      const ttsResponse = await ttsCall(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-tts',
+        contents: [{ parts: [{ text: promptText }] }],
+        config: { responseModalities: [Modality.AUDIO], speechConfig },
+      }));
+      const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+      const pcm = audioPart?.inlineData?.data ? Buffer.from(audioPart.inlineData.data, 'base64') : Buffer.alloc(0);
 
-      for (let i = 0; i < chunks.length; i++) {
-
-        const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunks[i]}`;
-
-        const ttsResponse = await ttsCall(() => ai.models.generateContent({
-          model: 'gemini-2.5-flash-preview-tts',
-          contents: [{ parts: [{ text: promptText }] }],
-          config: { responseModalities: [Modality.AUDIO], speechConfig },
-        }));
-        const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-        if (audioPart?.inlineData?.data) {
-          pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
-        }
-      }
-
-      const combined = Buffer.concat(pcmParts);
-      res.json({ base64Pcm: combined.toString('base64') });
+      res.json({ base64Pcm: pcm.toString('base64') });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
