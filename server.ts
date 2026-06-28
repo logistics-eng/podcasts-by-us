@@ -288,19 +288,17 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         (hostCount === 'one' || speaker === host1Name) ? VOICE_FEMALE : VOICE_MALE;
 
       // Call Edge TTS for a single text line; returns MP3 buffer
-      const edgeTtsLine = (voice: string, text: string): Promise<Buffer> =>
-        new Promise((resolve, reject) => {
-          const tts = new MsEdgeTTS();
-          tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
-            .then(() => {
-              const chunks: Buffer[] = [];
-              const readable = tts.toStream(text, clarityRate);
-              readable.on('data', (chunk: Buffer) => chunks.push(chunk));
-              readable.on('end', () => resolve(Buffer.concat(chunks)));
-              readable.on('error', reject);
-            })
-            .catch(reject);
+      const edgeTtsLine = async (voice: string, text: string): Promise<Buffer> => {
+        const tts = new MsEdgeTTS();
+        await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+        const { audioStream } = await tts.toStream(text, { rate: (speechSpeed ?? 100) / 100 });
+        return new Promise((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
+          audioStream.on('end', () => resolve(Buffer.concat(chunks)));
+          audioStream.on('error', reject);
         });
+      };
 
       // Strip VOCABULARY CHART and split into speaker lines
       const lines = script.split('\n').filter(l => {
