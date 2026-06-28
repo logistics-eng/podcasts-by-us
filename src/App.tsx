@@ -33,6 +33,78 @@ const MALE_NAMES = ['James', 'David', 'Marcus', 'Ryan', 'Lucas', 'Noah', 'Ethan'
 
 const pickRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
+const ROLEPLAY_SCENARIOS = [
+  // Work & Career
+  "A job interview at a tech startup. One speaker is the interviewer, the other is a nervous candidate applying for their first job.",
+  "An employee asks their boss for a salary raise after two years with no increase.",
+  "Two colleagues disagree about how to handle a difficult client — one wants to be flexible, the other wants to stick to the contract.",
+  "A manager gives a performance review to an employee who thinks they deserve a promotion.",
+  "Two coworkers discuss whether to report a colleague they suspect of taking credit for others' work.",
+  "A new employee on their first day is being shown around by a senior team member who gives very confusing instructions.",
+  "An employee tells their boss they are resigning to start their own business.",
+  "Two freelancers negotiate the price for a joint project and can't agree on how to split the payment.",
+  // Social & Relationships
+  "Two old friends meet after five years apart and try to catch up without admitting their lives didn't go as planned.",
+  "A first date at a coffee shop where both people are clearly nervous but trying to seem confident.",
+  "Two roommates have a conflict over house chores and finally decide to talk about it.",
+  "Someone tries to return an item to a store without a receipt, and the cashier refuses.",
+  "Two neighbors argue politely about a noise complaint, then find common ground.",
+  "A person tries to cancel a gym membership but the sales rep won't make it easy.",
+  "Two friends argue about who forgot whose birthday and both are convinced the other is wrong.",
+  "Someone confesses to a friend that they borrowed money from them years ago and never paid it back.",
+  // Family
+  "A teenager tells their parents they want to drop out of university to become a YouTuber.",
+  "Two siblings argue about who should be responsible for taking care of their aging parent.",
+  "A parent tries to explain to their child why they need to limit screen time — the child disagrees strongly.",
+  "An adult child tells their traditional parent they are moving abroad for a job opportunity.",
+  "Two parents disagree about how strict to be with their teenage child's curfew.",
+  "A grandparent tries to understand what their grandchild does for work in tech, and the grandchild tries to explain it simply.",
+  // Health & Medical
+  "A doctor delivers test results to a patient who is in denial and keeps making excuses.",
+  "A patient argues with their insurance company representative about a claim that was denied.",
+  "A personal trainer pushes a client who wants to give up during a tough workout.",
+  "Someone visits a therapist for the first time and isn't sure they believe therapy will help them.",
+  "A nutritionist tries to convince a junk food lover to change their diet.",
+  // Travel & Adventure
+  "Two strangers are stuck together in an airport for eight hours due to a cancelled flight.",
+  "A traveler realizes their hotel booking was never confirmed, and there are no available rooms left.",
+  "Two friends on a road trip argue about which direction to go after getting lost without signal.",
+  "A tourist tries to negotiate a price at a market in a foreign country with a language barrier.",
+  "Two backpackers debate whether to take a risky shortcut through the mountains or the long safe route.",
+  // School & Education
+  "A student argues with a teacher about a failing grade they believe is unfair.",
+  "Two students pull an all-nighter before an exam and motivate each other not to give up.",
+  "A professor catches a student using AI to write an essay and confronts them about academic honesty.",
+  "Two classmates who don't like each other are forced to work together on a group project.",
+  "A student tries to convince their strict parent that studying art is a valid career path.",
+  // Tech & Modern Life
+  "A tech support agent tries to help an elderly customer who is very confused about their new smartphone.",
+  "Two friends debate whether social media is more harmful or beneficial to society.",
+  "Someone tries to explain to their parent what cryptocurrency is, and the parent remains deeply skeptical.",
+  "Two coworkers argue over whether working from home or working in the office is better for productivity.",
+  "A person calls customer service to complain about a package that never arrived, and the agent keeps following a script.",
+  // Funny & Lighthearted
+  "Two chefs compete in a cooking contest and both secretly burned their dish.",
+  "A person tries to return a goldfish to a pet store claiming it has a bad personality.",
+  "Two superheroes discuss their retirement plans and what they'll do after saving the world.",
+  "A customer insists a restaurant got their very complicated order wrong — but they also can't remember what they ordered.",
+  "Two people both claim they reserved the last parking spot and won't move their cars.",
+  "An alien lands on Earth and a local tries to explain why humans stand in line for coffee.",
+  // Ethics & Dilemmas
+  "Two friends find a wallet with $500 cash and no ID — one wants to keep it, the other wants to turn it in.",
+  "A journalist and a company spokesperson debate whether to publish a story that is true but might hurt innocent people.",
+  "Two friends debate whether it is ethical to eat meat in the age of climate change.",
+  "Someone discovers their best friend's partner is cheating — they debate whether to tell them.",
+  "Two people debate whether it is okay to lie to protect someone's feelings.",
+  // Finance & Business
+  "A startup founder pitches their business idea to a skeptical investor who asks tough questions.",
+  "Two business partners disagree about whether to sell their company for a big offer or keep growing independently.",
+  "A financial advisor tells a client they have been spending way above their means and need to make big cuts.",
+  "Two friends argue about whether buying a house is smarter than renting long-term.",
+  "A person tries to negotiate the price of a used car with a determined salesman.",
+];
+
+
 const LEVELS = [
   { id: 'A1', label: 'A1' },
   { id: 'A2', label: 'A2' },
@@ -691,7 +763,16 @@ export default function App() {
 
                   {contentMode === 'roleplay' ? (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-600">Scenario</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-600">Scenario</label>
+                        <button
+                          type="button"
+                          onClick={() => setSubject(pickRandom(ROLEPLAY_SCENARIOS))}
+                          className="text-xs font-bold text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-lg transition-all"
+                        >
+                          🎲 Surprise me
+                        </button>
+                      </div>
                       <textarea autoFocus placeholder="e.g. A job interview at a tech company. One speaker is the interviewer, the other is a nervous candidate applying for their first job..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[100px] resize-none" value={subject} onChange={(e) => setSubject(e.target.value)} />
                     </div>
                   ) : (
