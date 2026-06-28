@@ -49,7 +49,7 @@ function ttsCall<T>(fn: () => Promise<T>): Promise<T> {
       const wait = Math.max(0, ttsLast + 25000 - Date.now());
       if (wait > 0) await sleep(wait);
       ttsLast = Date.now();
-      try { resolve(await geminiWithRetry(fn, 2, 25000)); } catch (e) { reject(e); }
+      try { resolve(await geminiWithRetry(fn, 2, 65000)); } catch (e) { reject(e); }
     });
     if (!ttsRunning) {
       ttsRunning = true;
