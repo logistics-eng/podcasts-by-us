@@ -281,8 +281,8 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       // Extra slow rate for beginners
       const clarityRate = (level === 'A1' || level === 'A2') ? '-20%' : rate;
 
-      const VOICE_FEMALE = 'en-US-AriaNeural';
-      const VOICE_MALE   = 'en-US-GuyNeural';
+      const VOICE_FEMALE = 'en-US-EmmaMultilingualNeural';
+      const VOICE_MALE   = 'en-US-AndrewMultilingualNeural';
 
       const getVoice = (speaker: string) =>
         (hostCount === 'one' || speaker === host1Name) ? VOICE_FEMALE : VOICE_MALE;
