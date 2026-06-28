@@ -304,7 +304,11 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         await tts.setMetadata(seg.voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3, undefined, { rate: ttsRate });
         const readable = tts.toStream(seg.text);
         const chunks: Buffer[] = [];
-        for await (const chunk of readable) chunks.push(chunk as Buffer);
+        await new Promise<void>((resolve, reject) => {
+          readable.on('data', (chunk: Buffer) => chunks.push(chunk));
+          readable.on('end', resolve);
+          readable.on('error', reject);
+        });
         mp3Parts.push(Buffer.concat(chunks));
       }
 
