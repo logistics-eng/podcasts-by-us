@@ -221,8 +221,8 @@ async function startServer() {
         prompt += `\n\nPlease make sure to include these specific words or phrases: ${specificWords}.`;
       }
 
-      const scriptResponse = await geminiWithRetry(() => ai.models.generateContent({
-            model: "gemini-2.5-flash-lite-preview-06-17",
+      const scriptResponse = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
             contents: `${prompt}
             
             Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.
@@ -251,7 +251,7 @@ async function startServer() {
               temperature: 0.7,
               tools: tools.length > 0 ? tools : undefined,
             }
-          }), 2, 8000);
+          });
 
       const fullText = scriptResponse.text || '';
       res.json({ fullText });
