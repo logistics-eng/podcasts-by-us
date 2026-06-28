@@ -177,7 +177,8 @@ export default function App() {
       const binaryString = atob(base64Standard);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
-      const blob = new Blob([bytes], { type: 'audio/wav' });
+      const isMp3 = bytes[0] === 0xFF || (bytes[0] === 0x49 && bytes[1] === 0x44);
+      const blob = new Blob([bytes], { type: isMp3 ? 'audio/mpeg' : 'audio/wav' });
       setDetailAudioUrl(URL.createObjectURL(blob));
     }
     setDetailActiveTab('transcript');
@@ -198,8 +199,10 @@ export default function App() {
     const binary = atob(data.audio_data);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const blob = new Blob([bytes], { type: 'audio/wav' });
-    const filename = `${podcast.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.wav`;
+    const isMp3 = bytes[0] === 0xFF || (bytes[0] === 0x49 && bytes[1] === 0x44);
+    const blob = new Blob([bytes], { type: isMp3 ? 'audio/mpeg' : 'audio/wav' });
+    const ext = isMp3 ? 'mp3' : 'wav';
+    const filename = `${podcast.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
     return { blob, filename };
   };
 
@@ -285,38 +288,36 @@ export default function App() {
     const data = await res.json();
     if (!data.base64Pcm) throw new Error('No audio data');
 
+    const mimeType = data.mimeType || 'audio/wav';
     const base64 = data.base64Pcm.replace(/-/g, '+').replace(/_/g, '/');
     const binary = atob(base64);
-    const combinedPcm = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) combinedPcm[i] = binary.charCodeAt(i);
-    const totalPcmLength = combinedPcm.length;
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
 
-    const header = new ArrayBuffer(44);
-    const dv = new DataView(header);
-    const sampleRate = 24000;
-    dv.setUint32(0, 0x52494646, false);
-    dv.setUint32(4, 36 + totalPcmLength, true);
-    dv.setUint32(8, 0x57415645, false);
-    dv.setUint32(12, 0x666d7420, false);
-    dv.setUint32(16, 16, true);
-    dv.setUint16(20, 1, true);
-    dv.setUint16(22, 1, true);
-    dv.setUint32(24, sampleRate, true);
-    dv.setUint32(28, sampleRate * 2, true);
-    dv.setUint16(32, 2, true);
-    dv.setUint16(34, 16, true);
-    dv.setUint32(36, 0x64617461, false);
-    dv.setUint32(40, totalPcmLength, true);
+    let audioBytes: Uint8Array;
+    if (mimeType === 'audio/mpeg') {
+      audioBytes = bytes;
+    } else {
+      // Legacy WAV: build header around raw PCM
+      const header = new ArrayBuffer(44);
+      const dv = new DataView(header);
+      const sampleRate = 24000;
+      dv.setUint32(0, 0x52494646, false); dv.setUint32(4, 36 + bytes.length, true);
+      dv.setUint32(8, 0x57415645, false); dv.setUint32(12, 0x666d7420, false);
+      dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+      dv.setUint32(24, sampleRate, true); dv.setUint32(28, sampleRate * 2, true);
+      dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+      dv.setUint32(36, 0x64617461, false); dv.setUint32(40, bytes.length, true);
+      audioBytes = new Uint8Array(44 + bytes.length);
+      audioBytes.set(new Uint8Array(header), 0);
+      audioBytes.set(bytes, 44);
+    }
 
-    const wavData = new Uint8Array(44 + totalPcmLength);
-    wavData.set(new Uint8Array(header), 0);
-    wavData.set(combinedPcm, 44);
-
-    const audioBlob = new Blob([wavData], { type: 'audio/wav' });
+    const audioBlob = new Blob([audioBytes], { type: mimeType });
     setAudioUrl(URL.createObjectURL(audioBlob));
 
     let bin = '';
-    for (let i = 0; i < wavData.length; i++) bin += String.fromCharCode(wavData[i]);
+    for (let i = 0; i < audioBytes.length; i++) bin += String.fromCharCode(audioBytes[i]);
     setAudioData(btoa(bin));
   };
 

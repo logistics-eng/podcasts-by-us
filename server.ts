@@ -4,6 +4,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import dotenv from 'dotenv';
 import pg from 'pg';
 
@@ -266,63 +267,49 @@ Keep the conversation natural and engaging. Do not include any stage directions 
     }
   });
 
-  // All-in-one audio generation: chunks script, runs TTS sequentially, returns combined PCM
+  // Audio generation via Microsoft Edge TTS — free, no rate limits, neural voices
   app.post('/api/generate-audio', async (req, res) => {
     try {
-      const { script, speechSpeed, level, hostCount, readAsWritten, speakerNames } = req.body;
-      const host1Name = speakerNames?.host1 || 'Alex';
+      const { script, speechSpeed, hostCount, speakerNames } = req.body;
       const host2Name = speakerNames?.host2 || 'Sam';
 
-      const speedInstruction = speechSpeed !== 100 ? `Speak at ${speechSpeed}% normal speed. ` : '';
-      const clarityInstruction = (level === 'A1' || level === 'A2') ? 'Speak slowly and clearly. ' : '';
-      const readInstruction = readAsWritten ? 'Read the following exactly as written. Do not add, change, or improvise anything. ' : '';
+      const voice1 = 'en-US-AriaNeural';   // female
+      const voice2 = 'en-US-GuyNeural';    // male
+      const ttsRate = speechSpeed && speechSpeed !== 100 ? `${speechSpeed - 100}%` : '0%';
 
-      const speechConfig = hostCount === 'two'
-        ? {
-            multiSpeakerVoiceConfig: {
-              speakerVoiceConfigs: [
-                { speaker: host1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
-                { speaker: host2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } } },
-              ],
-            },
-          }
-        : { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } };
-
-      // Split script into dialogue-only lines (skip VOCABULARY CHART), chunk by ~2000 chars
-      const dialogueOnly = script.split('\n')
-        .filter(l => l.trim() && !l.startsWith('VOCABULARY') && !/^\d+\./.test(l.trim()))
-        .join('\n');
-
-      const CHUNK_SIZE = 2000;
-      const chunks: string[] = [];
-      let current = '';
-      for (const line of dialogueOnly.split('\n')) {
-        if (!line.trim()) continue;
-        if (current.length + line.length > CHUNK_SIZE) {
-          if (current) chunks.push(current.trim());
-          current = line + '\n';
+      // Parse dialogue lines only (skip VOCABULARY CHART section)
+      type Segment = { voice: string; text: string };
+      const segments: Segment[] = [];
+      let inVocab = false;
+      for (const raw of script.split('\n')) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (line.startsWith('VOCABULARY')) { inVocab = true; continue; }
+        if (inVocab) continue;
+        const match = line.match(/^([^:]+):\s*(.+)/);
+        if (!match) continue;
+        const [, speaker, text] = match;
+        const voice = (hostCount === 'two' && speaker.trim() === host2Name) ? voice2 : voice1;
+        const last = segments[segments.length - 1];
+        if (last && last.voice === voice) {
+          last.text += ' ' + text;
         } else {
-          current += line + '\n';
-        }
-      }
-      if (current.trim()) chunks.push(current.trim());
-
-      const pcmParts: Buffer[] = [];
-      for (const chunk of chunks) {
-        const promptText = `${speedInstruction}${clarityInstruction}${readInstruction}TTS the following:\n\n${chunk}`;
-        const ttsResponse = await ttsCall(() => ai.models.generateContent({
-          model: 'gemini-2.5-flash-preview-tts',
-          contents: [{ parts: [{ text: promptText }] }],
-          config: { responseModalities: [Modality.AUDIO], speechConfig },
-        }));
-        const audioPart = ttsResponse.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-        if (audioPart?.inlineData?.data) {
-          pcmParts.push(Buffer.from(audioPart.inlineData.data, 'base64'));
+          segments.push({ voice, text });
         }
       }
 
-      const combined = Buffer.concat(pcmParts);
-      res.json({ base64Pcm: combined.toString('base64') });
+      const mp3Parts: Buffer[] = [];
+      for (const seg of segments) {
+        const tts = new MsEdgeTTS();
+        await tts.setMetadata(seg.voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3, undefined, { rate: ttsRate });
+        const readable = tts.toStream(seg.text);
+        const chunks: Buffer[] = [];
+        for await (const chunk of readable) chunks.push(chunk as Buffer);
+        mp3Parts.push(Buffer.concat(chunks));
+      }
+
+      const combined = Buffer.concat(mp3Parts);
+      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
