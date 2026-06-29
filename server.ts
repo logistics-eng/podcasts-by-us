@@ -197,21 +197,39 @@ async function startServer() {
         prompt = `Generate a podcast script about "${subject}".`;
         tools = [];
       } else if (articleSourceType === 'url') {
-        prompt = `I am providing URLs to articles: 
-        Article 1: ${articleUrl}
-        ${articleUrl2 ? `Article 2: ${articleUrl2}` : ''}
-        
-        Your task is to generate a podcast script based on the ACTUAL CONTENT of the articles at these URLs.
-        
-        CRITICAL INSTRUCTIONS:
-        1. Access the URLs directly using your tools.
-        2. If a URL is a shortened link (like share.google, bit.ly, etc.) and you see an error page or "Something went wrong", DO NOT use that as the topic.
-        3. Instead, use Google Search to find the original article that this link points to. Search for the URL itself or any descriptive text you can find.
-        4. If you absolutely cannot find the content of the articles after trying both direct access and search, you MUST start your response with the exact phrase: "ERROR: COULD NOT ACCESS LINK". 
-        5. DO NOT hallucinate a topic like "digital memories" or "broken links" if you can't find the content.
-        
-        The podcast should summarize and discuss the key points of the articles in an engaging way.`;
-        tools = [{ urlContext: {} }, { googleSearch: {} }];
+        // Fetch URL content server-side and pass as text to Claude
+        const fetchArticle = async (url: string): Promise<string> => {
+          const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+          if (!r.ok) throw new Error(`Could not fetch URL (${r.status}): ${url}`);
+          const html = await r.text();
+          // Strip HTML tags and collapse whitespace
+          return html
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
+            .slice(0, 12000);
+        };
+
+        let fetchedText1 = '';
+        let fetchedText2 = '';
+        try { fetchedText1 = await fetchArticle(articleUrl); } catch (e: any) {
+          return res.status(400).json({ error: `ERROR: COULD NOT ACCESS LINK — ${e.message}` });
+        }
+        if (articleUrl2) {
+          try { fetchedText2 = await fetchArticle(articleUrl2); } catch { /* ignore second URL failure */ }
+        }
+
+        prompt = `Generate a podcast script based on the following article content:
+
+--- ARTICLE 1 START ---
+${fetchedText1}
+--- ARTICLE 1 END ---
+${fetchedText2 ? `\n--- ARTICLE 2 START ---\n${fetchedText2}\n--- ARTICLE 2 END ---` : ''}
+
+The podcast should summarize and discuss the key points of the article(s) in an engaging way.`;
+        tools = [];
       } else {
         prompt = `Generate a podcast script based on the following article(s):
         
