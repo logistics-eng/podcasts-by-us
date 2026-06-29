@@ -566,20 +566,20 @@ export default function App() {
               </div>
               <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
             </div>
-            <div className="flex items-center gap-1">
-              {/iPhone|iPad|iPod/.test(navigator.userAgent) && (
-                <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all" title="Refresh">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                </button>
-              )}
-              <button onClick={() => setView('create')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
-                <ArrowLeft size={16} /> Create New
-              </button>
-            </div>
+            <button onClick={() => setView('create')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+              <ArrowLeft size={16} /> Create New
+            </button>
           </div>
         </header>
         <main className="max-w-4xl mx-auto px-6 py-12">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2"><Library size={22} className="text-indigo-600" /> Your Library</h2>
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+            <Library size={22} className="text-indigo-600" /> Your Library
+            {/iPhone|iPad|iPod/.test(navigator.userAgent) && (
+              <button onClick={() => window.location.reload()} className="ml-2 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all" title="Refresh">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
+            )}
+          </h2>
           {loadingLibrary ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-indigo-400" size={32} /></div>
           ) : library.length === 0 ? (
