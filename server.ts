@@ -104,6 +104,22 @@ async function startServer() {
   const app = express();
   app.use(express.json({ limit: '100mb' }));
 
+  // Generate a short description from a title
+  app.post('/api/generate-description', async (req, res) => {
+    try {
+      const { title } = req.body;
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 100,
+        messages: [{ role: 'user', content: `Write a 1-2 sentence description for a podcast episode titled "${title}". Be concise and engaging. Return only the description, no quotes, no extra text.` }],
+      });
+      const description = (msg.content[0] as { type: string; text: string }).text.trim();
+      res.json({ description });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Save a podcast
   app.post('/api/podcasts', async (req, res) => {
     try {

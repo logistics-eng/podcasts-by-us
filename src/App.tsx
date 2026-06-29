@@ -195,6 +195,7 @@ export default function App() {
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState<SavedPodcast | null>(null);
   const [detailAudioUrl, setDetailAudioUrl] = useState<string | null>(null);
   const [detailIsPlaying, setDetailIsPlaying] = useState(false);
@@ -594,12 +595,29 @@ export default function App() {
                         onChange={e => setEditTitle(e.target.value)}
                         placeholder="Title"
                       />
-                      <textarea
-                        className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm text-gray-600 resize-none min-h-[64px]"
-                        value={editDescription}
-                        onChange={e => setEditDescription(e.target.value)}
-                        placeholder="Add a description (optional)..."
-                      />
+                      <div className="relative">
+                        <textarea
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm text-gray-600 resize-none min-h-[64px]"
+                          value={editDescription}
+                          onChange={e => setEditDescription(e.target.value)}
+                          placeholder="Add a description (optional)..."
+                        />
+                        <button
+                          type="button"
+                          disabled={isGeneratingDesc || !editTitle.trim()}
+                          onClick={async () => {
+                            setIsGeneratingDesc(true);
+                            try {
+                              const r = await fetch('/api/generate-description', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editTitle }) });
+                              const d = await r.json();
+                              if (d.description) setEditDescription(d.description);
+                            } finally { setIsGeneratingDesc(false); }
+                          }}
+                          className="absolute bottom-2 right-2 text-[10px] font-bold text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded-lg transition-all disabled:opacity-40"
+                        >
+                          {isGeneratingDesc ? '...' : '✨ Generate'}
+                        </button>
+                      </div>
                       <div className="flex gap-2 justify-end">
                         <button onClick={cancelEdit} className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-all flex items-center gap-1">
                           <X size={13} /> Cancel
