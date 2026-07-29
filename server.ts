@@ -300,7 +300,7 @@ VOCABULARY CHART
 Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`;
 
       const scriptResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-preview-05-20',
         contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
         config: {
           temperature: 0.7,
