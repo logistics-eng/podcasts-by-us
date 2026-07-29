@@ -342,20 +342,25 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         });
       };
 
-      // Strip VOCABULARY CHART and split into speaker lines
-      const lines = script.split('\n').filter((l: string) => {
-        const t = l.trim();
-        return t && !t.startsWith('VOCABULARY') && !/^\d+\.\s/.test(t) && t.includes(':');
-      });
-
-      const tasks = lines
-        .map((line: string) => {
-          const colonIdx = line.indexOf(':');
-          const speaker = line.substring(0, colonIdx).trim();
-          const text = line.substring(colonIdx + 1).trim();
-          return text ? { voice: getVoice(speaker), text } : null;
-        })
-        .filter(Boolean) as { voice: string; text: string }[];
+      // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
+      const speakerPattern = /^[A-Za-z0-9 ]{1,30}:/;
+      const entries: { voice: string; text: string }[] = [];
+      for (const line of script.split('\n')) {
+        const t = line.trim();
+        if (!t) continue;
+        if (t.startsWith('VOCABULARY')) break;
+        if (/^\d+\.\s/.test(t)) continue;
+        if (speakerPattern.test(t)) {
+          const colonIdx = t.indexOf(':');
+          const speaker = t.substring(0, colonIdx).trim();
+          const text = t.substring(colonIdx + 1).trim();
+          if (text) entries.push({ voice: getVoice(speaker), text });
+        } else if (entries.length > 0) {
+          // Continuation line — append to last speaker's text
+          entries[entries.length - 1].text += ' ' + t;
+        }
+      }
+      const tasks = entries;
 
       const audioBuffers = await Promise.all(tasks.map(t => edgeTtsLine(t.voice, t.text)));
       const combined = Buffer.concat(audioBuffers);
