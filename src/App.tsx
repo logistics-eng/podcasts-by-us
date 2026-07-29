@@ -171,6 +171,7 @@ export default function App() {
 
   // Shared output state
   const [isGenerating, setIsGenerating] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
   const [transcript, setTranscript] = useState('');
   const [vocabularyChart, setVocabularyChart] = useState('');
   const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary'>('transcript');
