@@ -299,13 +299,16 @@ VOCABULARY CHART
 
 Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`;
 
-      const scriptMsg = await anthropic.messages.create({
-        model: 'claude-haiku-4-5',
-        max_tokens: 4096,
-        temperature: 0.7,
-        messages: [{ role: 'user', content: userPrompt }],
+      const scriptResponse = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        config: {
+          temperature: 0.7,
+          maxOutputTokens: 4096,
+          tools: [{ googleSearch: {} }],
+        },
       });
-      const fullText = (scriptMsg.content[0] as { type: string; text: string }).text || '';
+      const fullText = scriptResponse.text || '';
       res.json({ fullText });
     } catch (error: any) {
       console.error("Script generation failed on server:", error);
