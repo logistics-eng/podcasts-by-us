@@ -319,12 +319,15 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       const { script, speechSpeed, level, hostCount, speakerNames } = req.body;
       const host1Name = speakerNames?.host1 || 'Alex';
 
-      // Best available Edge TTS neural voices
-      const VOICE_FEMALE = 'en-US-EmmaMultilingualNeural';
-      const VOICE_MALE   = 'en-US-AndrewMultilingualNeural';
+      // Voice constants
+      const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';   // two-host female
+      const VOICE_MALE_US   = 'en-US-AndrewMultilingualNeural'; // two-host male
+      const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
 
-      const getVoice = (speaker: string) =>
-        (hostCount === 'one' || speaker === host1Name) ? VOICE_FEMALE : VOICE_MALE;
+      const getVoice = (speaker: string) => {
+        if (hostCount === 'one') return VOICE_FEMALE_GB;
+        return speaker === host1Name ? VOICE_FEMALE_US : VOICE_MALE_US;
+      };
 
       // Speaking rate: 90% speed → 0.9, A1/A2 capped at 0.8
       const baseRate = (speechSpeed ?? 100) / 100;
