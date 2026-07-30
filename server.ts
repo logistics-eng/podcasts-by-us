@@ -317,17 +317,21 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         C2: 'all grammar structures including complex ones',
       };
       const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
-      const grammarPrompt = `You are an English grammar teacher. Read the following podcast transcript and find exactly 2 grammar patterns from this list that appear in the transcript: ${allowedPatterns}.
+      const grammarPrompt = `You are an expert English grammar teacher. Read the podcast transcript below and identify exactly 2 grammar patterns from this allowed list: ${allowedPatterns}.
 
-IMPORTANT: **Never teach perfect tenses for levels A1, A2, or B1.**
-
-For each pattern, pick a real sentence from the transcript as the example. Return ONLY a JSON array with exactly 2 objects, no extra text, no markdown:
+STRICT RULES:
+- NEVER teach perfect tenses for levels A1, A2, or B1.
+- The example sentence MUST genuinely contain the grammar pattern you name. Double-check before choosing.
+- Present progressive requires a form of "to be" + verb+ing (e.g. "is playing", "are running"). Do NOT label a sentence as present progressive if it does not contain is/am/are + verb+ing.
+- Present simple uses the base form of the verb (e.g. "they play", "she plays"). Do not confuse it with progressive.
+- Only pick sentences where the grammar pattern is clearly and unambiguously present.
+- Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
 
 [
   {
     "pattern": "Pattern Name",
-    "example": "Real sentence from transcript.",
-    "explanation": "One short sentence explaining the grammar pattern."
+    "example": "Exact sentence from transcript that contains this pattern.",
+    "explanation": "One sentence explaining what this pattern is and when to use it."
   }
 ]
 
