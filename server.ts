@@ -306,7 +306,49 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         messages: [{ role: 'user', content: userPrompt }],
       });
       const fullText = (scriptMsg.content[0] as { type: string; text: string }).text || '';
-      res.json({ fullText });
+
+      // Grammar tips: allowed patterns per level
+      const grammarByLevel: Record<string, string> = {
+        A1: 'present simple, present progressive, past simple, verb to be, prepositions',
+        A2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
+        B1: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
+        B2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
+        C1: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice, perfect tenses, conditionals, reported speech',
+        C2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice, perfect tenses, conditionals, reported speech, complex structures',
+      };
+      const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
+      const grammarPrompt = `You are an English grammar teacher. Read the following podcast transcript and find exactly 2 grammar patterns from this list that appear in the transcript: ${allowedPatterns}.
+
+IMPORTANT: Do NOT include perfect tenses for levels A1, A2, B1, or B2.
+
+For each pattern, pick a real sentence from the transcript as the example. Return ONLY a JSON array with exactly 2 objects, no extra text, no markdown:
+
+[
+  {
+    "pattern": "Pattern Name",
+    "example": "Real sentence from transcript.",
+    "explanation": "One short sentence explaining the grammar pattern."
+  }
+]
+
+Transcript:
+${fullText}`;
+
+      let grammarTips: { pattern: string; example: string; explanation: string }[] = [];
+      try {
+        const grammarMsg = await anthropic.messages.create({
+          model: 'claude-haiku-4-5',
+          max_tokens: 512,
+          temperature: 0.3,
+          messages: [{ role: 'user', content: grammarPrompt }],
+        });
+        const grammarText = (grammarMsg.content[0] as { type: string; text: string }).text.trim();
+        grammarTips = JSON.parse(grammarText);
+      } catch {
+        grammarTips = [];
+      }
+
+      res.json({ fullText, grammarTips });
     } catch (error: any) {
       console.error("Script generation failed on server:", error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });
