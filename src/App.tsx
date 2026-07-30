@@ -418,15 +418,21 @@ export default function App() {
     const audioBlob = new Blob([audioBytes], { type: mimeType });
     setAudioUrl(URL.createObjectURL(audioBlob));
 
-    const tempAudio = new Audio(URL.createObjectURL(audioBlob));
-    tempAudio.onloadedmetadata = () => {
-      setAudioDuration(Math.round(tempAudio.duration));
-      URL.revokeObjectURL(tempAudio.src);
-    };
+    const duration = await new Promise<number>((resolve) => {
+      const tempAudio = new Audio(URL.createObjectURL(audioBlob));
+      tempAudio.onloadedmetadata = () => {
+        const secs = Math.round(tempAudio.duration);
+        setAudioDuration(secs);
+        URL.revokeObjectURL(tempAudio.src);
+        resolve(secs);
+      };
+      tempAudio.onerror = () => resolve(0);
+    });
 
     let bin = '';
     for (let i = 0; i < audioBytes.length; i++) bin += String.fromCharCode(audioBytes[i]);
     setAudioData(btoa(bin));
+    return duration;
   };
 
   const highlightWords = (text: string, highlights: string[]): JSX.Element => {
@@ -515,10 +521,17 @@ export default function App() {
 
       setGeneratedTitle(title);
       setGeneratedDescription(description);
-      setTranscript(script);
       setVocabularyChart(vocab);
 
-      await generateAudio(script, hostCount, speechSpeed, level, false, names);
+      const sName = data.sourceName || '';
+      const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names) ?? 0;
+      const formatDur = (secs: number) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+      const headerLines = [
+        `Length: ${actualDuration ? formatDur(actualDuration) : ''} • Level ${level}`,
+        sName ? `Taken from: ${sName}` : '',
+        `${title}${description ? ` — ${description}` : ''}`,
+      ].filter(Boolean).join('\n');
+      setTranscript(headerLines + '\n\n\n' + script);
 
     } catch (error: any) {
       console.error("Generation failed:", error);
