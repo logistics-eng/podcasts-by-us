@@ -320,7 +320,7 @@ export default function App() {
     };
     const podcastDuration = podcast.duration || 0;
     const lines = [
-      `🎙️ PBU generated Podcast${podcastDuration ? ` • ${formatDuration(podcastDuration)}` : ''}`,
+      `🎙️ PBU generated Podcast${podcastDuration ? ` • ${formatDuration(podcastDuration)}` : ''}${podcast.level ? ` • Level ${podcast.level}` : ''}`,
       `${podcast.title}${podcast.description ? ` — ${podcast.description}` : ''}`,
     ].filter(Boolean).join('\n\n');
 
@@ -575,7 +575,7 @@ export default function App() {
         return `${m}:${String(s).padStart(2, '0')}`;
       };
       const lines = [
-        `🎙️ PBU generated Podcast${audioDuration ? ` • ${formatDuration(audioDuration)}` : ''}`,
+        `🎙️ PBU generated Podcast${audioDuration ? ` • ${formatDuration(audioDuration)}` : ''}${level ? ` • Level ${level}` : ''}`,
         sourceName ? `Taken from: ${sourceName}` : '',
         `${generatedTitle}${generatedDescription ? ` — ${generatedDescription}` : ''}`,
       ].filter(Boolean).join('\n\n');
