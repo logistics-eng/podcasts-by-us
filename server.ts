@@ -84,6 +84,7 @@ async function initDb() {
   `);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS description TEXT`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS speech_speed INTEGER`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS duration INTEGER`);
 }
 
 // Shared Gemini client defined on the server side
@@ -125,10 +126,10 @@ async function startServer() {
   // Save a podcast
   app.post('/api/podcasts', async (req, res) => {
     try {
-      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed } = req.body;
+      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration } = req.body;
       const result = await pool.query(
-        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id, title, level, host_count, speech_speed, created_at',
-        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100]
+        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
+        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null]
       );
       res.json(result.rows[0]);
     } catch (error: any) {
@@ -139,7 +140,7 @@ async function startServer() {
   // List all podcasts
   app.get('/api/podcasts', async (_req, res) => {
     try {
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, created_at FROM podcasts ORDER BY created_at DESC');
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at FROM podcasts ORDER BY created_at DESC');
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -366,7 +367,30 @@ ${fullText}`;
         grammarTips = [];
       }
 
-      res.json({ fullText, grammarTips });
+      // Extract publication/source name from article content (only for article-based, non-roleplay podcasts)
+      let sourceName = '';
+      if (sourceType !== 'subject' && contentMode !== 'roleplay') {
+        try {
+          const articleContent = articleSourceType === 'url'
+            ? (prompt.match(/--- ARTICLE 1 START ---\n([\s\S]*?)\n--- ARTICLE 1 END ---/)?.[1] || '').slice(0, 3000)
+            : (articleText || '').slice(0, 3000);
+          if (articleContent.trim()) {
+            const sourceMsg = await anthropic.messages.create({
+              model: 'claude-haiku-4-5',
+              max_tokens: 60,
+              messages: [{
+                role: 'user',
+                content: `Look at this article text and identify the name of the publication or website that published it (e.g. "The New York Times", "Ynet", "BBC"). Return ONLY the publication name as plain text, nothing else. If you cannot identify a publication name, return an empty string.\n\nArticle: ${articleContent}`,
+              }],
+            });
+            sourceName = ((sourceMsg.content[0] as { type: string; text: string }).text || '').trim();
+          }
+        } catch {
+          sourceName = '';
+        }
+      }
+
+      res.json({ fullText, grammarTips, sourceName });
     } catch (error: any) {
       console.error("Script generation failed on server:", error);
       res.status(error?.status || 500).json({ error: error?.message || String(error) });

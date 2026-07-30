@@ -121,6 +121,7 @@ interface SavedPodcast {
   level: string;
   host_count: string;
   speech_speed?: number;
+  duration?: number;
   created_at: string;
   transcript?: string;
   vocabulary?: string;
@@ -197,6 +198,8 @@ export default function App() {
   const [savedId, setSavedId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isSharing, setIsSharing] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [sourceName, setSourceName] = useState('');
 
   // Library state
   const [library, setLibrary] = useState<SavedPodcast[]>([]);
@@ -245,6 +248,7 @@ export default function App() {
           level: mode === 'script' ? '—' : level,
           hostCount: mode === 'script' ? scriptHostCount : hostCount,
           speechSpeed: mode === 'script' ? undefined : speechSpeed,
+          duration: audioDuration || undefined,
         }),
       });
       const data = await res.json();
@@ -308,18 +312,30 @@ export default function App() {
     e.stopPropagation();
     const result = await getAudioBlob(podcast);
     if (!result) return;
+
+    const formatDuration = (secs: number) => {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    };
+    const podcastDuration = podcast.duration || 0;
+    const lines = [
+      `🎙️ PBU generated Podcast${podcastDuration ? ` • ${formatDuration(podcastDuration)}` : ''}`,
+      `${podcast.title}${podcast.description ? ` — ${podcast.description}` : ''}`,
+    ].filter(Boolean).join('\n\n');
+
     const file = new File([result.blob], result.filename, { type: 'audio/wav' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: podcast.title });
+      await navigator.share({ files: [file], title: podcast.title, text: lines });
     } else {
-      // Desktop fallback: download the file then open WhatsApp Web
+      // Desktop fallback: download the file then open WhatsApp Web with pre-written message
       const url = URL.createObjectURL(result.blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = result.filename;
       a.click();
       URL.revokeObjectURL(url);
-      setTimeout(() => window.open('https://web.whatsapp.com', '_blank'), 500);
+      setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(lines)}`, '_blank'), 500);
     }
   };
 
@@ -402,6 +418,12 @@ export default function App() {
     const audioBlob = new Blob([audioBytes], { type: mimeType });
     setAudioUrl(URL.createObjectURL(audioBlob));
 
+    const tempAudio = new Audio(URL.createObjectURL(audioBlob));
+    tempAudio.onloadedmetadata = () => {
+      setAudioDuration(Math.round(tempAudio.duration));
+      URL.revokeObjectURL(tempAudio.src);
+    };
+
     let bin = '';
     for (let i = 0; i < audioBytes.length; i++) bin += String.fromCharCode(audioBytes[i]);
     setAudioData(btoa(bin));
@@ -445,6 +467,8 @@ export default function App() {
     setAudioUrl(null);
     setAudioData(null);
     setSavedId(null);
+    setSourceName('');
+    setAudioDuration(0);
 
     try {
       const response = await fetch('/api/generate-script', {
@@ -466,6 +490,7 @@ export default function App() {
       const data = await response.json();
       const fullText = data.fullText || '';
       setGrammarTips(data.grammarTips ?? []);
+      setSourceName(data.sourceName || '');
 
       if (fullText.startsWith("ERROR: COULD NOT ACCESS LINK")) {
         alert("The AI was unable to access the content of the link provided. Please try using the direct URL or paste the article text directly.");
@@ -543,14 +568,26 @@ export default function App() {
     if (!audioUrl) return;
     try {
       setIsSharing(true);
+
+      const formatDuration = (secs: number) => {
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        return `${m}:${String(s).padStart(2, '0')}`;
+      };
+      const lines = [
+        `🎙️ PBU generated Podcast${audioDuration ? ` • ${formatDuration(audioDuration)}` : ''}`,
+        sourceName ? `Taken from: ${sourceName}` : '',
+        `${generatedTitle}${generatedDescription ? ` — ${generatedDescription}` : ''}`,
+      ].filter(Boolean).join('\n\n');
+
       const response = await fetch(audioUrl);
       const blob = await response.blob();
       const fileName = `Podcast-${generatedTitle.replace(/\s+/g, '-')}.wav`;
       const file = new File([blob], fileName, { type: 'audio/wav' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
+        await navigator.share({ files: [file], text: lines });
       } else {
-        const shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(`Check out this podcast: ${generatedTitle}! ${window.location.href}`)}`;
+        const shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(lines)}`;
         window.open(shareUrl, '_blank');
         alert("WhatsApp Desktop requires you to download the file and drag it into the chat.\n\n1. Click Download (↓)\n2. Drag the file into WhatsApp.");
       }
