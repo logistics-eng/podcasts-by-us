@@ -321,24 +321,34 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
 STRICT RULES:
 - NEVER teach perfect tenses for levels A1, A2, or B1.
-- The example sentence MUST genuinely contain the grammar pattern you name. Double-check before choosing.
+- The podcastExample sentence MUST genuinely come from the transcript and contain the grammar pattern you name. Double-check before choosing.
 - Present progressive requires a form of "to be" + verb+ing (e.g. "is playing", "are running"). Do NOT label a sentence as present progressive if it does not contain is/am/are + verb+ing.
 - Present simple uses the base form of the verb (e.g. "they play", "she plays"). Do not confuse it with progressive.
 - Only pick sentences where the grammar pattern is clearly and unambiguously present.
+- formulaHighlights must be substrings of formula (exactly as they appear).
+- podcastHighlights must be substrings of podcastExample (exactly as they appear).
+- examples[].highlights must be substrings of the corresponding sentence.
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
 
 [
   {
-    "pattern": "Pattern Name",
-    "example": "Exact sentence from transcript that contains this pattern.",
-    "explanation": "One sentence explaining what this pattern is and when to use it."
+    "pattern": "Pattern Name (e.g. Passive Progressive)",
+    "formula": "structural formula (e.g. is/am/are + being + V3)",
+    "formulaHighlights": ["is/am/are", "being", "V3"],
+    "whenToUse": "One plain sentence explaining when to use this pattern.",
+    "podcastExample": "Exact sentence from the transcript that contains this pattern.",
+    "podcastHighlights": ["grammatical", "key words"],
+    "examples": [
+      { "sentence": "A fresh example sentence not from the podcast.", "highlights": ["key", "words"] },
+      { "sentence": "Another fresh example sentence.", "highlights": ["key", "words"] }
+    ]
   }
 ]
 
 Transcript:
 ${fullText}`;
 
-      let grammarTips: { pattern: string; example: string; explanation: string }[] = [];
+      let grammarTips: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { sentence: string; highlights: string[] }[] }[] = [];
       try {
         const grammarMsg = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',

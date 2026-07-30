@@ -175,7 +175,15 @@ export default function App() {
   const [transcript, setTranscript] = useState('');
   const [vocabularyChart, setVocabularyChart] = useState('');
   const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar'>('transcript');
-  const [grammarTips, setGrammarTips] = useState<{pattern: string; example: string; explanation: string}[]>([]);
+  const [grammarTips, setGrammarTips] = useState<{
+    pattern: string;
+    formula: string;
+    formulaHighlights: string[];
+    whenToUse: string;
+    podcastExample: string;
+    podcastHighlights: string[];
+    examples: { sentence: string; highlights: string[] }[];
+  }[]>([]);
   const [generatedTitle, setGeneratedTitle] = useState('');
   const [generatedDescription, setGeneratedDescription] = useState('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -397,6 +405,22 @@ export default function App() {
     let bin = '';
     for (let i = 0; i < audioBytes.length; i++) bin += String.fromCharCode(audioBytes[i]);
     setAudioData(btoa(bin));
+  };
+
+  const highlightWords = (text: string, highlights: string[]): JSX.Element => {
+    if (!highlights.length) return <>{text}</>;
+    const pattern = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    const parts = text.split(regex);
+    return (
+      <>
+        {parts.map((part, i) =>
+          highlights.some(h => h.toLowerCase() === part.toLowerCase())
+            ? <span key={i} style={{ color: '#2563eb', fontWeight: 600 }}>{part}</span>
+            : <span key={i}>{part}</span>
+        )}
+      </>
+    );
   };
 
   const handleGenerate = async () => {
@@ -1104,13 +1128,30 @@ export default function App() {
                           {grammarTips.length === 0 ? (
                             <p className="text-sm text-gray-400 italic">Grammar tips will appear after generating a podcast.</p>
                           ) : (
-                            <div className="grid gap-3">
+                            <div className="grid gap-4">
                               {grammarTips.map((tip, idx) => (
-                                <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                  <span className="font-bold text-indigo-600 block mb-2">{tip.pattern}</span>
-                                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">From the podcast:</p>
-                                  <p className="text-sm text-gray-700 italic mb-2">"{tip.example}"</p>
-                                  <p className="text-sm text-gray-600">{tip.explanation}</p>
+                                <div key={idx} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+                                  <p className="font-bold text-base text-gray-900">{tip.pattern}</p>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Formula</p>
+                                    <p className="text-sm font-mono text-gray-700">{highlightWords(tip.formula, tip.formulaHighlights)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">When to use it</p>
+                                    <p className="text-sm text-gray-600">{tip.whenToUse}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">From the podcast</p>
+                                    <p className="text-sm text-gray-700 italic">"{highlightWords(tip.podcastExample, tip.podcastHighlights)}"</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Examples</p>
+                                    <div className="space-y-1">
+                                      {tip.examples.map((ex, ei) => (
+                                        <p key={ei} className="text-sm text-gray-700">{highlightWords(ex.sentence, ex.highlights)}</p>
+                                      ))}
+                                    </div>
+                                  </div>
                                 </div>
                               ))}
                             </div>
