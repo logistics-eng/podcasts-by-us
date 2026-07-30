@@ -309,17 +309,17 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
       // Grammar tips: allowed patterns per level
       const grammarByLevel: Record<string, string> = {
-        A1: 'present simple, present progressive, past simple, verb to be, prepositions',
-        A2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
-        B1: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
-        B2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice',
-        C1: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice, perfect tenses, conditionals, reported speech',
-        C2: 'present simple, present progressive, past simple, verb to be, prepositions, passive voice, perfect tenses, conditionals, reported speech, complex structures',
+        A1: 'verb to be, past simple',
+        A2: 'verb to be, past simple, present simple',
+        B1: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs',
+        B2: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs, present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.)',
+        C1: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs, present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.), conditionals, reported speech',
+        C2: 'all grammar structures including complex ones',
       };
       const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
       const grammarPrompt = `You are an English grammar teacher. Read the following podcast transcript and find exactly 2 grammar patterns from this list that appear in the transcript: ${allowedPatterns}.
 
-IMPORTANT: Do NOT include perfect tenses for levels A1, A2, B1, or B2.
+IMPORTANT: **Never teach perfect tenses for levels A1, A2, or B1.**
 
 For each pattern, pick a real sentence from the transcript as the example. Return ONLY a JSON array with exactly 2 objects, no extra text, no markdown:
 
