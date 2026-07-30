@@ -328,6 +328,8 @@ STRICT RULES:
 - formulaHighlights must be substrings of formula (exactly as they appear).
 - podcastHighlights must be substrings of podcastExample (exactly as they appear).
 - examples[].highlights must be substrings of the corresponding sentence.
+- examples must always contain exactly 3 items: one positive, one negative, one question — in that order.
+- highlights must include the auxiliary/main verb words that show the grammar pattern (e.g. for negative present simple: "doesn't"/"don't" AND the main verb; for questions: the auxiliary "do/does/is/are/have" AND the main verb).
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
 
 [
@@ -339,8 +341,9 @@ STRICT RULES:
     "podcastExample": "Exact sentence from the transcript that contains this pattern.",
     "podcastHighlights": ["grammatical", "key words"],
     "examples": [
-      { "sentence": "A fresh example sentence not from the podcast.", "highlights": ["key", "words"] },
-      { "sentence": "Another fresh example sentence.", "highlights": ["key", "words"] }
+      { "type": "positive", "sentence": "The company sells products every day.", "highlights": ["sells"] },
+      { "type": "negative", "sentence": "The manager doesn't arrive early.", "highlights": ["doesn't", "arrive"] },
+      { "type": "question", "sentence": "Do the employees like their job?", "highlights": ["Do", "like"] }
     ]
   }
 ]
@@ -348,7 +351,7 @@ STRICT RULES:
 Transcript:
 ${fullText}`;
 
-      let grammarTips: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { sentence: string; highlights: string[] }[] }[] = [];
+      let grammarTips: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[] = [];
       try {
         const grammarMsg = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',

@@ -182,7 +182,7 @@ export default function App() {
     whenToUse: string;
     podcastExample: string;
     podcastHighlights: string[];
-    examples: { sentence: string; highlights: string[] }[];
+    examples: { type: string; sentence: string; highlights: string[] }[];
   }[]>([]);
   const [generatedTitle, setGeneratedTitle] = useState('');
   const [generatedDescription, setGeneratedDescription] = useState('');
@@ -1148,7 +1148,12 @@ export default function App() {
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Examples</p>
                                     <div className="space-y-1">
                                       {tip.examples.map((ex, ei) => (
-                                        <p key={ei} className="text-sm text-gray-700">{highlightWords(ex.sentence, ex.highlights)}</p>
+                                        <p key={ei} className="text-sm text-gray-700">
+                                          {ex.type === 'positive' && <span style={{ color: '#16a34a', fontWeight: 600, marginRight: 6 }}>+</span>}
+                                          {ex.type === 'negative' && <span style={{ color: '#dc2626', fontWeight: 600, marginRight: 6 }}>−</span>}
+                                          {ex.type === 'question' && <span style={{ color: '#d97706', fontWeight: 600, marginRight: 6 }}>?</span>}
+                                          {highlightWords(ex.sentence, ex.highlights)}
+                                        </p>
                                       ))}
                                     </div>
                                   </div>
