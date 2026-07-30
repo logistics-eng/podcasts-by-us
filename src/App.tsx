@@ -527,6 +527,7 @@ export default function App() {
       const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names) ?? 0;
       const formatDur = (secs: number) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
       const headerLines = [
+        'Podcasts By Us',
         `Length: ${actualDuration ? formatDur(actualDuration) : ''} • Level ${level}`,
         sName ? `Taken from: ${sName}` : '',
         `${title}${description ? ` — ${description}` : ''}`,
