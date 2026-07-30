@@ -342,7 +342,8 @@ ${fullText}`;
           temperature: 0.3,
           messages: [{ role: 'user', content: grammarPrompt }],
         });
-        const grammarText = (grammarMsg.content[0] as { type: string; text: string }).text.trim();
+        const grammarText = (grammarMsg.content[0] as { type: string; text: string }).text.trim()
+          .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
         grammarTips = JSON.parse(grammarText);
       } catch {
         grammarTips = [];
