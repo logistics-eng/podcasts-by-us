@@ -365,7 +365,10 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       }
       const tasks = entries;
 
-      const audioBuffers = await Promise.all(tasks.map(t => edgeTtsLine(t.voice, t.text)));
+      const audioBuffers: Buffer[] = [];
+      for (const t of tasks) {
+        audioBuffers.push(await edgeTtsLine(t.voice, t.text));
+      }
       const combined = Buffer.concat(audioBuffers);
       res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
