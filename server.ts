@@ -323,8 +323,11 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 STRICT RULES:
 - NEVER teach perfect tenses for levels A1, A2, or B1.
 - The podcastExample sentence MUST genuinely come from the transcript and contain the grammar pattern you name. Double-check before choosing.
+- For present simple: the sentence must use the BASE FORM of the verb (e.g. "they play", "she plays", "companies use"). DO NOT pick sentences with "have/has + past participle" — that is present perfect, not present simple.
+- For present perfect: the sentence must contain "have" or "has" + past participle (e.g. "have reduced", "has grown"). Verify the verb form before choosing.
 - Present progressive requires a form of "to be" + verb+ing (e.g. "is playing", "are running"). Do NOT label a sentence as present progressive if it does not contain is/am/are + verb+ing.
-- Present simple uses the base form of the verb (e.g. "they play", "she plays"). Do not confuse it with progressive.
+- Present simple uses the base form of the verb (e.g. "they play", "she plays"). Do not confuse it with progressive or perfect.
+- Before finalising each podcastExample, explicitly verify: does this sentence contain the exact grammatical structure I named? If no, search the transcript again.
 - Only pick sentences where the grammar pattern is clearly and unambiguously present.
 - formulaHighlights must be substrings of formula (exactly as they appear).
 - podcastHighlights must be substrings of podcastExample (exactly as they appear).
@@ -445,6 +448,9 @@ ${fullText}`;
         } else if (entries.length > 0) {
           // Continuation line — append to last speaker's text
           entries[entries.length - 1].text += ' ' + t;
+        } else {
+          // Plain text with no speaker prefix — treat as single speaker
+          entries.push({ voice: getVoice(''), text: t });
         }
       }
       const tasks = entries;

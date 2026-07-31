@@ -548,7 +548,7 @@ export default function App() {
   };
 
   const handleScriptGenerate = async () => {
-    if (!scriptTitle.trim() || !scriptText.trim()) return;
+    if (!scriptText.trim()) return;
 
     setIsGenerating(true);
     startTimer();
@@ -560,7 +560,8 @@ export default function App() {
     setAudioData(null);
     setSavedId(null);
 
-    setGeneratedTitle(scriptTitle);
+    const autoTitle = scriptTitle.trim() || scriptText.trim().split('\n').find(l => l.trim())?.replace(/^[^:]+:\s*/, '').slice(0, 60) || 'My Script';
+    setGeneratedTitle(autoTitle);
     setTranscript(scriptText);
 
     try {
@@ -1002,7 +1003,7 @@ export default function App() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Title</label>
+                    <label className="text-sm font-medium text-gray-600">Title <span className="text-gray-400 font-normal">(optional)</span></label>
                     <input
                       type="text"
                       placeholder="e.g. My roleplay conversation..."
@@ -1053,7 +1054,7 @@ export default function App() {
 
                 <button
                   onClick={handleScriptGenerate}
-                  disabled={isGenerating || !scriptTitle.trim() || !scriptText.trim()}
+                  disabled={isGenerating || !scriptText.trim()}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
                   {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Read My Script</>)}
