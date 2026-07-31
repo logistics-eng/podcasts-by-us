@@ -1135,11 +1135,19 @@ export default function App() {
                           <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                         )}
                       </div>
-                      {activeTab !== 'grammar' && (
+                      {activeTab === 'transcript' && (
+                        <div className="flex justify-start">
+                          <button onClick={copyToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
+                            {copied ? <Check size={14} /> : <Copy size={14} />}
+                            {copied ? 'Copied' : 'Copy Transcript'}
+                          </button>
+                        </div>
+                      )}
+                      {activeTab === 'vocabulary' && (
                         <div className="flex justify-end">
-                          <button onClick={activeTab === 'transcript' ? copyToClipboard : copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
-                            {activeTab === 'transcript' ? (copied ? <Check size={14} /> : <Copy size={14} />) : (vocabCopied ? <Check size={14} /> : <Copy size={14} />)}
-                            {activeTab === 'transcript' ? (copied ? 'Copied' : 'Copy Text') : (vocabCopied ? 'Copied' : 'Copy Chart')}
+                          <button onClick={copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
+                            {vocabCopied ? <Check size={14} /> : <Copy size={14} />}
+                            {vocabCopied ? 'Copied' : 'Copy Chart'}
                           </button>
                         </div>
                       )}
