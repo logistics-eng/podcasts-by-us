@@ -1167,7 +1167,24 @@ export default function App() {
                           </div>
                         </div>
                       ) : activeTab === 'transcript' ? (
-                        <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{transcript}</p>
+                        (() => {
+                          const parts = transcript.split('\n\n\n');
+                          const hasHeader = parts.length >= 2;
+                          const header = hasHeader ? parts[0] : '';
+                          const body = hasHeader ? parts.slice(1).join('\n\n\n') : transcript;
+                          return (
+                            <div>
+                              {hasHeader && (
+                                <div className="mb-4 pb-3 border-b border-indigo-100">
+                                  {header.split('\n').map((line, i) => (
+                                    <p key={i} className="font-bold text-indigo-700 leading-snug">{line}</p>
+                                  ))}
+                                </div>
+                              )}
+                              <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{body}</p>
+                            </div>
+                          );
+                        })()
                       ) : activeTab === 'vocabulary' ? (
                         <div className="space-y-4">
                           <h4 className="text-gray-900 font-bold mb-4">Vocabulary & Idioms</h4>
