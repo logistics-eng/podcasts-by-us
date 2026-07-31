@@ -283,7 +283,7 @@ ${contentMode !== 'roleplay' ? `Today's date: ${new Date().toLocaleDateString('e
 
 IMPORTANT:
 1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".
-2. On the very next line, write a description of what this episode is about in NO MORE THAN 6 WORDS, formatted as "DESCRIPTION: [Your Description]". This will appear as a subtitle in the library.
+2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
 3. For each vocabulary item, provide a simple explanation/definition in the format: "Word/Phrase = Explanation".
 
