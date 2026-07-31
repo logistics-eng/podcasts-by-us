@@ -313,9 +313,9 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         A1: 'verb to be, past simple',
         A2: 'verb to be, past simple, present simple',
         B1: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs',
-        B2: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs, present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.)',
-        C1: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs, present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.), conditionals, reported speech',
-        C2: 'all grammar structures including complex ones',
+        B2: 'present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.), modal verbs (advanced usage)',
+        C1: 'present perfect, present perfect progressive, passive in all tenses, modal verbs (advanced usage), conditionals (all types), reported speech',
+        C2: 'conditionals, reported speech, mixed tenses, inversion, subjunctive, cleft sentences, advanced modal verbs, complex passive structures',
       };
       const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
       const grammarPrompt = `You are an expert English grammar teacher. Read the podcast transcript below and identify exactly 2 grammar patterns from this allowed list: ${allowedPatterns}.
