@@ -323,8 +323,8 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
 PREPOSITIONS GUIDANCE (when "prepositions" is in the allowed list):
 - Prepositions here means time and place prepositions: "in" (in the morning, in 2024, in summer), "on" (on Monday, on the weekend, on the street), "at" (at school, at home, at night, at the weekend).
-- If the transcript contains any time or place prepositional phrases, you MUST consider prepositions as one of the 2 tips — do not always skip it in favour of verb tenses.
-- The examples should show the contrast: "in the year" vs "on Monday" vs "at night" to help learners understand when to use each.
+- Occasionally choose prepositions as one of the 2 tips (not every time — vary it with verb tenses across podcasts).
+- When you do choose prepositions, the examples should contrast in/on/at to help learners understand when to use each.
 
 STRICT RULES:
 - NEVER teach perfect tenses for levels A1, A2, or B1.
