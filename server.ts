@@ -323,6 +323,7 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
 STRICT RULES:
 - NEVER teach perfect tenses for levels A1, A2, or B1.
+- For B1 passive voice: ONLY use simple tenses (e.g. "is made", "was built"). NEVER use passive perfect ("has been made", "had been built") or passive progressive ("is being made") in the examples — those are too advanced for B1. The 3 examples (positive, negative, question) must all use simple passive only.
 - The podcastExample sentence MUST genuinely come from the transcript and contain the grammar pattern you name. Double-check before choosing.
 - For present simple: the sentence must use the BASE FORM of the verb (e.g. "they play", "she plays", "companies use"). DO NOT pick sentences with "have/has + past participle" — that is present perfect, not present simple.
 - For present perfect: the sentence must contain "have" or "has" + past participle (e.g. "have reduced", "has grown"). Verify the verb form before choosing.
