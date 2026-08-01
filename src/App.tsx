@@ -249,6 +249,7 @@ export default function App() {
           hostCount: mode === 'script' ? scriptHostCount : hostCount,
           speechSpeed: mode === 'script' ? undefined : speechSpeed,
           duration: audioDuration || undefined,
+          grammarTips: grammarTips.length > 0 ? grammarTips : undefined,
         }),
       });
       const data = await res.json();
@@ -262,6 +263,7 @@ export default function App() {
     const res = await fetch(`/api/podcasts/${podcast.id}`);
     const data = await res.json();
     setSelectedPodcast(data);
+    setGrammarTips(data.grammar_tips || []);
     if (data.audio_data) {
       const base64Standard = data.audio_data.replace(/-/g, '+').replace(/_/g, '/');
       const binaryString = atob(base64Standard);

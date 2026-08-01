@@ -85,6 +85,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS description TEXT`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS speech_speed INTEGER`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS duration INTEGER`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS grammar_tips JSONB`);
 }
 
 // Shared Gemini client defined on the server side
@@ -126,10 +127,10 @@ async function startServer() {
   // Save a podcast
   app.post('/api/podcasts', async (req, res) => {
     try {
-      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration } = req.body;
+      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips } = req.body;
       const result = await pool.query(
-        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
-        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null]
+        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
+        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ?? null]
       );
       res.json(result.rows[0]);
     } catch (error: any) {
