@@ -321,6 +321,11 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
       const grammarPrompt = `You are an expert English grammar teacher. Read the podcast transcript below and identify exactly 2 grammar patterns from this allowed list: ${allowedPatterns}.
 
+PREPOSITIONS GUIDANCE (when "prepositions" is in the allowed list):
+- Prepositions here means time and place prepositions: "in" (in the morning, in 2024, in summer), "on" (on Monday, on the weekend, on the street), "at" (at school, at home, at night, at the weekend).
+- If the transcript contains any time or place prepositional phrases, you MUST consider prepositions as one of the 2 tips — do not always skip it in favour of verb tenses.
+- The examples should show the contrast: "in the year" vs "on Monday" vs "at night" to help learners understand when to use each.
+
 STRICT RULES:
 - NEVER teach perfect tenses for levels A1, A2, or B1.
 - For B1 passive voice: ONLY use simple tenses (e.g. "is made", "was built"). NEVER use passive perfect ("has been made", "had been built") or passive progressive ("is being made") in the examples — those are too advanced for B1. The 3 examples (positive, negative, question) must all use simple passive only.
