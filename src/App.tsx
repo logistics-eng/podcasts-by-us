@@ -646,7 +646,7 @@ export default function App() {
                 <Mic size={20} strokeWidth={2.5} />
               </div>
               <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
-              <span style={{fontSize:'1.1rem',lineHeight:1}}>🛞</span>
+              <span style={{fontSize:'1.4rem',lineHeight:1}}>🛞</span>
             </div>
             <button onClick={() => setView('create')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
               <ArrowLeft size={16} /> Create New
@@ -766,7 +766,7 @@ export default function App() {
                 <Mic size={20} strokeWidth={2.5} />
               </div>
               <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
-              <span style={{fontSize:'1.1rem',lineHeight:1}}>🛞</span>
+              <span style={{fontSize:'1.4rem',lineHeight:1}}>🛞</span>
             </div>
             <button onClick={() => { setView('library'); setDetailAudioUrl(null); setDetailIsPlaying(false); }} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
               <ArrowLeft size={16} /> Library
@@ -836,7 +836,7 @@ export default function App() {
               <Mic size={20} strokeWidth={2.5} />
             </div>
             <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
-            <span style={{fontSize:'1.1rem',lineHeight:1}}>🛞</span>
+            <span style={{fontSize:'1.4rem',lineHeight:1}}>🛞</span>
           </div>
           <button onClick={() => setView('library')} className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
             <Library size={16} /> Library
