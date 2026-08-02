@@ -233,7 +233,10 @@ export default function App() {
   }, [view]);
 
   const handleSave = async () => {
-    if (!transcript || !audioData) return;
+    if (!transcript || !audioData) {
+      alert('Nothing to save yet — please generate a podcast first.');
+      return;
+    }
     setIsSaving(true);
     try {
       const res = await fetch('/api/podcasts', {
@@ -252,9 +255,15 @@ export default function App() {
           grammarTips: grammarTips.length > 0 ? grammarTips : undefined,
         }),
       });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
       const data = await res.json();
       setSavedId(data.id);
       fetchLibrary();
+    } catch (error: any) {
+      alert('Failed to save: ' + (error?.message || error));
     } finally {
       setIsSaving(false);
     }
