@@ -126,6 +126,7 @@ interface SavedPodcast {
   transcript?: string;
   vocabulary?: string;
   audio_data?: string;
+  grammar_tips?: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[];
 }
 
 export default function App() {
@@ -214,7 +215,7 @@ export default function App() {
   const [detailIsPlaying, setDetailIsPlaying] = useState(false);
   const [detailCurrentTime, setDetailCurrentTime] = useState(0);
   const [detailDuration, setDetailDuration] = useState(0);
-  const [detailActiveTab, setDetailActiveTab] = useState<'transcript' | 'vocabulary'>('transcript');
+  const [detailActiveTab, setDetailActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar'>('transcript');
   const detailAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const fetchLibrary = async () => {
@@ -809,10 +810,25 @@ export default function App() {
               {selectedPodcast.vocabulary && (
                 <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
               )}
+              {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
+                <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+              )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
               {detailActiveTab === 'transcript' ? (
                 <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{selectedPodcast.transcript}</p>
+              ) : detailActiveTab === 'grammar' ? (
+                <div className="grid gap-4">
+                  {(selectedPodcast.grammar_tips || []).map((tip, idx) => (
+                    <div key={idx} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+                      <h5 className="font-bold text-indigo-700">{tip.pattern}</h5>
+                      <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Formula</p><p className="text-sm font-mono text-gray-700">{highlightWords(tip.formula, tip.formulaHighlights)}</p></div>
+                      <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">When to use</p><p className="text-sm text-gray-600">{tip.whenToUse}</p></div>
+                      <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">From the podcast</p><p className="text-sm italic text-gray-600">"{highlightWords(tip.podcastExample, tip.podcastHighlights)}"</p></div>
+                      <div className="space-y-2">{tip.examples.map((ex, i) => (<p key={i} className="text-sm text-gray-700">{highlightWords(ex.sentence, ex.highlights)}</p>))}</div>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="space-y-4">
                   <h4 className="text-gray-900 font-bold mb-4">Vocabulary & Idioms</h4>
