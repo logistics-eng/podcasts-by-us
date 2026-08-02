@@ -130,7 +130,7 @@ async function startServer() {
       const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips } = req.body;
       const result = await pool.query(
         'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
-        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ?? null]
+        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null]
       );
       res.json(result.rows[0]);
     } catch (error: any) {
