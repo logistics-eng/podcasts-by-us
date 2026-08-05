@@ -127,6 +127,7 @@ interface SavedPodcast {
   vocabulary?: string;
   audio_data?: string;
   grammar_tips?: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[];
+  content_mode?: string;
 }
 
 export default function App() {
@@ -262,6 +263,7 @@ export default function App() {
           duration: audioDuration || undefined,
           grammarTips: grammarTips.length > 0 ? grammarTips : undefined,
           language,
+          contentMode,
         }),
       });
       if (!res.ok) {
@@ -741,10 +743,13 @@ export default function App() {
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
                         <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-                          <Volume2 size={16} className="text-indigo-600" />
+                          {podcast.content_mode === 'roleplay' ? <span style={{fontSize:'1.1rem'}}>🎭</span> : <Volume2 size={16} className="text-indigo-600" />}
                         </div>
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900 leading-snug line-clamp-2">{podcast.title}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-gray-900 leading-snug line-clamp-2">{podcast.title}</p>
+                            {podcast.content_mode === 'roleplay' && <span className="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full shrink-0">Role Play</span>}
+                          </div>
                           {podcast.description && <p className="text-xs text-gray-500 mt-1">{podcast.description}</p>}
                           <p className="text-xs text-gray-400 mt-1">
                             {podcast.level !== '—' ? `Level ${podcast.level} · ` : ''}{podcast.host_count === 'two' ? 'Two hosts' : 'One host'}{podcast.speech_speed && podcast.speech_speed !== 100 ? ` · ${podcast.speech_speed}%` : ''} · {new Date(podcast.created_at).toLocaleDateString()}
