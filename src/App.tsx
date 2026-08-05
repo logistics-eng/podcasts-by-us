@@ -192,6 +192,7 @@ export default function App() {
   const [audioData, setAudioData] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [vocabCopied, setVocabCopied] = useState(false);
+  const [detailCopied, setDetailCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -814,7 +815,18 @@ export default function App() {
                 <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
               )}
               {detailActiveTab === 'transcript' && selectedPodcast.transcript && (
-                <button onClick={() => navigator.clipboard.writeText(selectedPodcast.transcript || '')} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1"><Copy size={13} />Copy Transcript</button>
+                <button onClick={() => {
+                  const text = selectedPodcast.transcript || '';
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => { setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000); }).catch(() => {
+                      const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
+                    });
+                  } else {
+                    const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
+                  }
+                }} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
+                  {detailCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Transcript</>}
+                </button>
               )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
