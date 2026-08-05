@@ -326,7 +326,7 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         C2: 'conditionals, reported speech, mixed tenses, inversion, subjunctive, cleft sentences, advanced modal verbs, complex passive structures',
       };
       const allowedPatterns = grammarByLevel[level] || grammarByLevel['B2'];
-      const grammarPrompt = `You are an expert English grammar teacher. Read the podcast transcript below and identify exactly 2 grammar patterns from this allowed list: ${allowedPatterns}.
+      const grammarPrompt = `You are an expert English grammar teacher. Read the podcast transcript below and identify 1 or 2 grammar patterns from this allowed list: ${allowedPatterns}. Return 2 if you can find 2 clear examples, otherwise return 1. Never return an empty array — always return at least 1.
 
 PREPOSITIONS GUIDANCE (when "prepositions" is in the allowed list):
 - Prepositions here means time and place prepositions: "in" (in the morning, in 2024, in summer), "on" (on Monday, on the weekend, on the street), "at" (at school, at home, at night, at the weekend).
@@ -381,7 +381,8 @@ ${fullText}`;
         const grammarText = (grammarMsg.content[0] as { type: string; text: string }).text.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
         grammarTips = JSON.parse(grammarText);
-      } catch {
+      } catch (grammarErr: any) {
+        console.error('Grammar tips generation failed:', grammarErr?.message || grammarErr);
         grammarTips = [];
       }
 
