@@ -133,6 +133,8 @@ export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
+  const [language, setLanguage] = useState<'english' | 'spanish'>('english');
+
   // Generate mode state
   const [contentMode, setContentMode] = useState<'podcast' | 'roleplay'>('podcast');
   const [subject, setSubject] = useState('');
@@ -222,7 +224,7 @@ export default function App() {
   const fetchLibrary = async () => {
     setLoadingLibrary(true);
     try {
-      const res = await fetch('/api/podcasts');
+      const res = await fetch(`/api/podcasts?language=${language}`);
       const data = await res.json();
       setLibrary(data);
     } finally {
@@ -233,6 +235,10 @@ export default function App() {
   useEffect(() => {
     if (view === 'library') fetchLibrary();
   }, [view]);
+
+  useEffect(() => {
+    if (view === 'library') fetchLibrary();
+  }, [language]);
 
   const handleSave = async () => {
     if (!transcript || !audioData) {
@@ -255,6 +261,7 @@ export default function App() {
           speechSpeed: mode === 'script' ? undefined : speechSpeed,
           duration: audioDuration || undefined,
           grammarTips: grammarTips.length > 0 ? grammarTips : undefined,
+          language,
         }),
       });
       if (!res.ok) {
@@ -390,12 +397,13 @@ export default function App() {
     speed: number,
     lvl: string,
     readAsWritten: boolean,
-    names: { host1: string; host2: string }
+    names: { host1: string; host2: string },
+    lang?: string
   ) => {
     const res = await fetch('/api/generate-audio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ script, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names }),
+      body: JSON.stringify({ script, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names, language: lang }),
     });
     if (!res.ok) {
       const err = await res.json();
@@ -498,7 +506,7 @@ export default function App() {
           subject, sourceType: contentMode === 'roleplay' ? 'subject' : sourceType,
           contentMode, articleSourceType, articleText, articleText2,
           articleUrl, articleUrl2, specificWords, length, level,
-          hostCount: contentMode === 'roleplay' ? 'two' : hostCount, speakerNames: names,
+          hostCount: contentMode === 'roleplay' ? 'two' : hostCount, speakerNames: names, language,
         }),
       });
 
@@ -538,7 +546,7 @@ export default function App() {
       setVocabularyChart(vocab);
 
       const sName = data.sourceName || '';
-      const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names) ?? 0;
+      const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names, language) ?? 0;
       const formatDur = (secs: number) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
       const headerLines = [
         'Podcasts By Us',
@@ -915,6 +923,12 @@ export default function App() {
                 </h2>
 
                 <div className="space-y-4">
+                  {/* Language toggle */}
+                  <div className="flex p-1 bg-gray-100 rounded-xl">
+                    <button onClick={() => setLanguage('english')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'english' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇬🇧 English</button>
+                    <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
+                  </div>
+
                   {/* Podcast / Role Play toggle */}
                   <div className="flex p-1 bg-gray-100 rounded-xl">
                     <button onClick={() => { setContentMode('podcast'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'podcast' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎙 Podcast</button>
@@ -1017,7 +1031,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> English Level</label>
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : 'English'} Level</label>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map((l) => (
                         <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>

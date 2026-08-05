@@ -86,6 +86,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS speech_speed INTEGER`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS duration INTEGER`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS grammar_tips JSONB`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'english'`);
 }
 
 // Shared Gemini client defined on the server side
@@ -127,10 +128,10 @@ async function startServer() {
   // Save a podcast
   app.post('/api/podcasts', async (req, res) => {
     try {
-      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips } = req.body;
+      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips, language } = req.body;
       const result = await pool.query(
-        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
-        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null]
+        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips, language) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
+        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english']
       );
       res.json(result.rows[0]);
     } catch (error: any) {
@@ -139,9 +140,10 @@ async function startServer() {
   });
 
   // List all podcasts
-  app.get('/api/podcasts', async (_req, res) => {
+  app.get('/api/podcasts', async (req, res) => {
     try {
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at FROM podcasts ORDER BY created_at DESC');
+      const lang = (req.query.language as string) || 'english';
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -201,6 +203,7 @@ async function startServer() {
         level,
         hostCount,
         speakerNames,
+        language,
       } = req.body;
 
       const host1 = speakerNames?.host1 || 'Alex';
@@ -301,11 +304,15 @@ VOCABULARY CHART
 
 Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`;
 
+      const finalUserPrompt = language === 'spanish'
+        ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Spanish. All dialogue, vocabulary chart, and content must be in Spanish.'
+        : userPrompt;
+
       const scriptMsg = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
         max_tokens: 4096,
         temperature: 0.7,
-        messages: [{ role: 'user', content: userPrompt }],
+        messages: [{ role: 'user', content: finalUserPrompt }],
       });
       const fullText = (scriptMsg.content[0] as { type: string; text: string }).text || '';
 
@@ -342,6 +349,7 @@ STRICT RULES:
 - examples must always contain exactly 3 items: one positive, one negative, one question — in that order.
 - highlights must include the auxiliary/main verb words that show the grammar pattern (e.g. for negative present simple: "doesn't"/"don't" AND the main verb; for questions: the auxiliary "do/does/is/are/have" AND the main verb).
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
+${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : ''}
 
 [
   {
@@ -410,15 +418,21 @@ ${fullText}`;
   // Audio generation via Microsoft Edge TTS (neural voices)
   app.post('/api/generate-audio', async (req, res) => {
     try {
-      const { script, speechSpeed, level, hostCount, speakerNames } = req.body;
+      const { script, speechSpeed, level, hostCount, speakerNames, language } = req.body;
       const host1Name = speakerNames?.host1 || 'Alex';
 
       // Voice constants
       const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';   // two-host female
       const VOICE_MALE_US   = 'en-US-AndrewMultilingualNeural'; // two-host male
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
+      const VOICE_FEMALE_ES = 'es-ES-ElviraNeural';
+      const VOICE_MALE_ES   = 'es-ES-AlvaroNeural';
 
       const getVoice = (speaker: string) => {
+        if (language === 'spanish') {
+          if (hostCount === 'one') return VOICE_FEMALE_ES;
+          return speaker === host1Name ? VOICE_FEMALE_ES : VOICE_MALE_ES;
+        }
         if (hostCount === 'one') return VOICE_FEMALE_GB;
         return speaker === host1Name ? VOICE_FEMALE_US : VOICE_MALE_US;
       };
