@@ -805,13 +805,16 @@ export default function App() {
             </div>
           )}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[600px]">
-            <div className="p-2 border-b border-gray-100 flex items-center bg-gray-50/50">
+            <div className="p-2 border-b border-gray-100 flex items-center bg-gray-50/50 gap-1 flex-wrap">
               <button onClick={() => setDetailActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
               {selectedPodcast.vocabulary && (
                 <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
               )}
               {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
                 <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+              )}
+              {detailActiveTab === 'transcript' && selectedPodcast.transcript && (
+                <button onClick={() => navigator.clipboard.writeText(selectedPodcast.transcript || '')} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1"><Copy size={13} />Copy Transcript</button>
               )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
