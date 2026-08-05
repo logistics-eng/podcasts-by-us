@@ -247,6 +247,7 @@ export default function App() {
       return;
     }
     setIsSaving(true);
+    console.log('Saving podcast with contentMode:', contentMode);
     try {
       const res = await fetch('/api/podcasts', {
         method: 'POST',
