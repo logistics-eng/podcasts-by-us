@@ -128,6 +128,7 @@ interface SavedPodcast {
   audio_data?: string;
   grammar_tips?: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[];
   content_mode?: string;
+  topic?: string;
 }
 
 export default function App() {
@@ -207,6 +208,10 @@ export default function App() {
   const [audioDuration, setAudioDuration] = useState(0);
   const [sourceName, setSourceName] = useState('');
 
+  // Filter state
+  const [filterTopic, setFilterTopic] = useState<string>('All');
+  const [filterLevel, setFilterLevel] = useState<string>('All');
+
   // Library state
   const [library, setLibrary] = useState<SavedPodcast[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(false);
@@ -240,6 +245,8 @@ export default function App() {
 
   useEffect(() => {
     if (view === 'library') fetchLibrary();
+    setFilterTopic('All');
+    setFilterLevel('All');
   }, [language]);
 
   const handleSave = async () => {
@@ -661,6 +668,12 @@ export default function App() {
     return `${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')}`;
   };
 
+  const filteredLibrary = library.filter(p => {
+    if (filterTopic !== 'All' && p.topic !== filterTopic) return false;
+    if (filterLevel !== 'All' && p.level !== filterLevel) return false;
+    return true;
+  });
+
   // LIBRARY VIEW
   if (view === 'library') {
     return (
@@ -689,15 +702,35 @@ export default function App() {
           </h2>
           {loadingLibrary ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-indigo-400" size={32} /></div>
-          ) : library.length === 0 ? (
-            <div className="text-center py-20 text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
-              <Library size={48} className="mx-auto mb-4 text-gray-200" />
-              <p className="text-lg font-medium">No saved podcasts yet</p>
-              <p className="text-sm">Generate a podcast and click Save</p>
-            </div>
           ) : (
-            <div className="space-y-3">
-              {library.map(podcast => (
+            <div className="space-y-4">
+              {library.length > 0 && (
+                <>
+                  {/* Topic filters */}
+                  <div className="flex gap-2 flex-wrap">
+                    {['All','Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'].map(t => (
+                      <button key={t} onClick={() => setFilterTopic(t)} className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${filterTopic === t ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}`}>{t}</button>
+                    ))}
+                  </div>
+                  {/* Level filters */}
+                  <div className="flex gap-2 flex-wrap">
+                    {['All','A1','A2','B1','B2','C1','C2'].map(l => (
+                      <button key={l} onClick={() => setFilterLevel(l)} className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${filterLevel === l ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}`}>{l}</button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {library.length === 0 ? (
+                <div className="text-center py-20 text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
+                  <Library size={48} className="mx-auto mb-4 text-gray-200" />
+                  <p className="text-lg font-medium">No saved podcasts yet</p>
+                  <p className="text-sm">Generate a podcast and click Save</p>
+                </div>
+              ) : filteredLibrary.length === 0 ? (
+                <p className="text-center text-gray-400 text-sm py-8">No podcasts match the selected filters.</p>
+              ) : (
+              <div className="space-y-3">
+              {filteredLibrary.map(podcast => (
                 <div key={podcast.id} className={`bg-white rounded-2xl border shadow-sm p-5 transition-all ${editingId === podcast.id ? 'border-indigo-300' : 'border-gray-100 hover:border-indigo-200 cursor-pointer'}`}
                   onClick={() => editingId !== podcast.id && handleOpenPodcast(podcast)}>
                   {editingId === podcast.id ? (
@@ -751,6 +784,7 @@ export default function App() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-gray-900 leading-snug line-clamp-2">{podcast.title}</p>
                             {podcast.content_mode === 'roleplay' && <span className="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full shrink-0">Role Play</span>}
+                            {podcast.topic && podcast.topic !== 'Other' && <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{podcast.topic}</span>}
                           </div>
                           {podcast.description && <p className="text-xs text-gray-500 mt-1">{podcast.description}</p>}
                           <p className="text-xs text-gray-400 mt-1">
@@ -776,6 +810,8 @@ export default function App() {
                   )}
                 </div>
               ))}
+              </div>
+              )}
             </div>
           )}
         </main>

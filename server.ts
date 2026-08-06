@@ -88,6 +88,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS grammar_tips JSONB`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'english'`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS content_mode TEXT DEFAULT 'podcast'`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS topic TEXT`);
 }
 
 // Shared Gemini client defined on the server side
@@ -134,7 +135,21 @@ async function startServer() {
         'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips, language, content_mode) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
         [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english', contentMode ?? 'podcast']
       );
-      res.json(result.rows[0]);
+      let topic = 'Other';
+      if (transcript) {
+        try {
+          const topicMsg = await anthropic.messages.create({
+            model: 'claude-haiku-4-5',
+            max_tokens: 20,
+            messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: Politics, Business, Health, Travel, Science, Psychology, Education, Technology, Culture, World Events, Other\n\nTranscript:\n${(transcript as string).slice(0, 2000)}` }],
+          });
+          const raw = ((topicMsg.content[0] as any).text || '').trim();
+          const valid = ['Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'];
+          topic = valid.find(t => raw.includes(t)) || 'Other';
+        } catch { topic = 'Other'; }
+      }
+      await pool.query('UPDATE podcasts SET topic = $1 WHERE id = $2', [topic, result.rows[0].id]);
+      res.json({ ...result.rows[0], topic });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -144,7 +159,7 @@ async function startServer() {
   app.get('/api/podcasts', async (req, res) => {
     try {
       const lang = (req.query.language as string) || 'english';
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
