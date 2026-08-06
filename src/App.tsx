@@ -196,6 +196,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [vocabCopied, setVocabCopied] = useState(false);
   const [detailCopied, setDetailCopied] = useState(false);
+  const [detailVocabCopied, setDetailVocabCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -827,6 +828,16 @@ export default function App() {
               )}
               {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
                 <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+              )}
+              {detailActiveTab === 'vocabulary' && selectedPodcast.vocabulary && (
+                <button onClick={() => {
+                  const text = selectedPodcast.vocabulary || '';
+                  const copyFn = () => { setDetailVocabCopied(true); setTimeout(() => setDetailVocabCopied(false), 2000); };
+                  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(copyFn).catch(() => { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); copyFn(); }); }
+                  else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); copyFn(); }
+                }} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
+                  {detailVocabCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Vocabulary</>}
+                </button>
               )}
               {detailActiveTab === 'transcript' && selectedPodcast.transcript && (
                 <button onClick={() => {
