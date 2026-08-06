@@ -202,6 +202,34 @@ async function startServer() {
     }
   });
 
+  // Backfill topics for all podcasts that don't have one yet
+  app.post('/api/admin/backfill-topics', async (req, res) => {
+    try {
+      const { rows: podcasts } = await pool.query('SELECT id, transcript FROM podcasts WHERE topic IS NULL');
+      let updated = 0;
+      for (const podcast of podcasts) {
+        try {
+          const topicMsg = await anthropic.messages.create({
+            model: 'claude-haiku-4-5',
+            max_tokens: 20,
+            messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: Politics, Business, Health, Travel, Science, Psychology, Education, Technology, Culture, World Events, Other\n\nTranscript:\n${(podcast.transcript as string).slice(0, 2000)}` }],
+          });
+          const raw = ((topicMsg.content[0] as any).text || '').trim();
+          const valid = ['Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'];
+          const topic = valid.find(t => raw.includes(t)) || 'Other';
+          await pool.query('UPDATE podcasts SET topic = $1 WHERE id = $2', [topic, podcast.id]);
+          updated++;
+        } catch (err: any) {
+          console.error(`Failed to classify podcast ${podcast.id}:`, err?.message || err);
+        }
+        await sleep(300);
+      }
+      res.json({ updated, total: podcasts.length });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // API Route for generating the script
   app.post('/api/generate-script', async (req, res) => {
     try {
