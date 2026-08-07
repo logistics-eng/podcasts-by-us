@@ -357,6 +357,8 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
       const finalUserPrompt = language === 'spanish'
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Spanish. All dialogue, vocabulary chart, and content must be in Spanish.'
+        : language === 'french'
+        ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in French. All dialogue, vocabulary chart, and content must be in French.'
         : userPrompt;
 
       const scriptMsg = await anthropic.messages.create({
@@ -400,7 +402,7 @@ STRICT RULES:
 - examples must always contain exactly 3 items: one positive, one negative, one question — in that order.
 - highlights must include the auxiliary/main verb words that show the grammar pattern (e.g. for negative present simple: "doesn't"/"don't" AND the main verb; for questions: the auxiliary "do/does/is/are/have" AND the main verb).
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
-${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : ''}
+${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : language === 'french' ? '- The podcast is in FRENCH. The podcastExample must be a French sentence from the transcript. All 3 example sentences (positive, negative, question) must be in French. Explanations (formula, whenToUse) stay in English.' : ''}
 
 [
   {
@@ -479,11 +481,17 @@ ${fullText}`;
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
       const VOICE_FEMALE_ES = 'es-ES-ElviraNeural';
       const VOICE_MALE_ES   = 'es-ES-AlvaroNeural';
+      const VOICE_FEMALE_FR = 'fr-FR-DeniseNeural';
+      const VOICE_MALE_FR   = 'fr-FR-HenriNeural';
 
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
           if (hostCount === 'one') return VOICE_FEMALE_ES;
           return speaker === host1Name ? VOICE_FEMALE_ES : VOICE_MALE_ES;
+        }
+        if (language === 'french') {
+          if (hostCount === 'one') return VOICE_FEMALE_FR;
+          return speaker === host1Name ? VOICE_FEMALE_FR : VOICE_MALE_FR;
         }
         if (hostCount === 'one') return VOICE_FEMALE_GB;
         return speaker === host1Name ? VOICE_FEMALE_US : VOICE_MALE_US;

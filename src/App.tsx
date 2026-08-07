@@ -135,7 +135,7 @@ export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
-  const [language, setLanguage] = useState<'english' | 'spanish'>('english');
+  const [language, setLanguage] = useState<'english' | 'spanish' | 'french'>('english');
 
   // Generate mode state
   const [contentMode, setContentMode] = useState<'podcast' | 'roleplay'>('podcast');
@@ -980,6 +980,7 @@ export default function App() {
                   <div className="flex p-1 bg-gray-100 rounded-xl">
                     <button onClick={() => setLanguage('english')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'english' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇬🇧 English</button>
                     <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
+                    <button onClick={() => setLanguage('french')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'french' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇫🇷 French</button>
                   </div>
 
                   {/* Podcast / Role Play toggle */}
@@ -1084,7 +1085,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : 'English'} Level</label>
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} Level</label>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map((l) => (
                         <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
