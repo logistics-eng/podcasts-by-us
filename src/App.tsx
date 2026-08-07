@@ -974,7 +974,7 @@ export default function App() {
             {mode === 'generate' ? (
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <BookOpen size={18} className="text-indigo-600" />
+                  <Mic size={18} className="text-indigo-600" />
                   Build Your Podcast
                 </h2>
 
