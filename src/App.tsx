@@ -962,7 +962,7 @@ export default function App() {
             onClick={() => { setMode('script'); setTranscript(''); setAudioUrl(null); setAudioData(null); setSavedId(null); }}
             className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'script' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
           >
-            <FileText size={15} /> My Script
+            <FileText size={15} /> Use My Own Script
           </button>
         </div>
 
@@ -1109,7 +1109,7 @@ export default function App() {
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <FileText size={18} className="text-indigo-600" />
-                  My Script
+                  Use My Own Script
                 </h2>
 
                 <div className="space-y-4">
@@ -1168,7 +1168,7 @@ export default function App() {
                   disabled={isGenerating || !scriptText.trim()}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Read My Script</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />Read My Own Script</>)}
                 </button>
               </section>
             )}
@@ -1189,7 +1189,7 @@ export default function App() {
                     <>
                       <FileText size={48} className="mb-4 text-indigo-200" />
                       <p className="text-lg font-medium">Audio will appear here</p>
-                      <p className="text-sm">Paste your script and click Read My Script</p>
+                      <p className="text-sm">Paste your script and click Read My Own Script</p>
                     </>
                   )}
                 </motion.div>
