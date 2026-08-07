@@ -135,18 +135,20 @@ async function startServer() {
         'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips, language, content_mode) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
         [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english', contentMode ?? 'podcast']
       );
-      let topic = 'Other';
-      if (transcript) {
+      let topic = 'Education & Culture';
+      if (contentMode === 'roleplay') {
+        topic = 'Role Play';
+      } else if (transcript) {
         try {
           const topicMsg = await anthropic.messages.create({
             model: 'claude-haiku-4-5',
             max_tokens: 20,
-            messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: Politics, Business, Health, Travel, Science, Psychology, Education, Technology, Culture, World Events, Other\n\nTranscript:\n${(transcript as string).slice(0, 2000)}` }],
+            messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: World Events & Politics, Business & Economy, Science & Technology, Health & Psychology, Education & Culture, Travel & Places, Role Play\n\nTranscript:\n${(transcript as string).slice(0, 2000)}` }],
           });
           const raw = ((topicMsg.content[0] as any).text || '').trim();
-          const valid = ['Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'];
-          topic = valid.find(t => raw.includes(t)) || 'Other';
-        } catch { topic = 'Other'; }
+          const valid = ['World Events & Politics','Business & Economy','Science & Technology','Health & Psychology','Education & Culture','Travel & Places','Role Play'];
+          topic = valid.find(t => raw.includes(t)) || 'Education & Culture';
+        } catch { topic = 'Education & Culture'; }
       }
       await pool.query('UPDATE podcasts SET topic = $1 WHERE id = $2', [topic, result.rows[0].id]);
       res.json({ ...result.rows[0], topic });
@@ -205,18 +207,23 @@ async function startServer() {
   // Backfill topics for all podcasts that don't have one yet
   app.post('/api/admin/backfill-topics', async (req, res) => {
     try {
-      const { rows: podcasts } = await pool.query('SELECT id, transcript FROM podcasts WHERE topic IS NULL');
+      const { rows: podcasts } = await pool.query('SELECT id, transcript, content_mode FROM podcasts WHERE topic IS NULL');
       let updated = 0;
       for (const podcast of podcasts) {
         try {
-          const topicMsg = await anthropic.messages.create({
-            model: 'claude-haiku-4-5',
-            max_tokens: 20,
-            messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: Politics, Business, Health, Travel, Science, Psychology, Education, Technology, Culture, World Events, Other\n\nTranscript:\n${(podcast.transcript as string).slice(0, 2000)}` }],
-          });
-          const raw = ((topicMsg.content[0] as any).text || '').trim();
-          const valid = ['Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'];
-          const topic = valid.find(t => raw.includes(t)) || 'Other';
+          let topic: string;
+          if (podcast.content_mode === 'roleplay') {
+            topic = 'Role Play';
+          } else {
+            const topicMsg = await anthropic.messages.create({
+              model: 'claude-haiku-4-5',
+              max_tokens: 20,
+              messages: [{ role: 'user', content: `Read this transcript and pick exactly ONE category that best fits it. Return ONLY the category name, nothing else.\n\nCategories: World Events & Politics, Business & Economy, Science & Technology, Health & Psychology, Education & Culture, Travel & Places, Role Play\n\nTranscript:\n${(podcast.transcript as string).slice(0, 2000)}` }],
+            });
+            const raw = ((topicMsg.content[0] as any).text || '').trim();
+            const valid = ['World Events & Politics','Business & Economy','Science & Technology','Health & Psychology','Education & Culture','Travel & Places','Role Play'];
+            topic = valid.find(t => raw.includes(t)) || 'Education & Culture';
+          }
           await pool.query('UPDATE podcasts SET topic = $1 WHERE id = $2', [topic, podcast.id]);
           updated++;
         } catch (err: any) {

@@ -708,7 +708,7 @@ export default function App() {
                 <>
                   {/* Topic filters */}
                   <div className="flex gap-2 flex-wrap">
-                    {['All','Politics','Business','Health','Travel','Science','Psychology','Education','Technology','Culture','World Events','Other'].map(t => (
+                    {['All','World Events & Politics','Business & Economy','Science & Technology','Health & Psychology','Education & Culture','Travel & Places','Role Play'].map(t => (
                       <button key={t} onClick={() => setFilterTopic(t)} className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${filterTopic === t ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}`}>{t}</button>
                     ))}
                   </div>
@@ -784,7 +784,7 @@ export default function App() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-gray-900 leading-snug line-clamp-2">{podcast.title}</p>
                             {podcast.content_mode === 'roleplay' && <span className="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full shrink-0">Role Play</span>}
-                            {podcast.topic && podcast.topic !== 'Other' && <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{podcast.topic}</span>}
+                            {podcast.topic && <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{podcast.topic}</span>}
                           </div>
                           {podcast.description && <p className="text-xs text-gray-500 mt-1">{podcast.description}</p>}
                           <p className="text-xs text-gray-400 mt-1">
