@@ -221,6 +221,7 @@ export default function App() {
   const [editDescription, setEditDescription] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+  const [isGeneratingWorksheet, setIsGeneratingWorksheet] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState<SavedPodcast | null>(null);
   const [detailAudioUrl, setDetailAudioUrl] = useState<string | null>(null);
   const [detailIsPlaying, setDetailIsPlaying] = useState(false);
@@ -249,6 +250,28 @@ export default function App() {
     setFilterTopic('All');
     setFilterLevel('All');
   }, [language]);
+
+  const handleGenerateWorksheet = async () => {
+    if (!vocabulary || !level) return;
+    setIsGeneratingWorksheet(true);
+    try {
+      const res = await fetch('/api/generate-worksheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: generatedTitle, vocabulary: vocabularyChart, level, grammarTips }),
+      });
+      const data = await res.json();
+      if (data.html) {
+        const blob = new Blob([data.html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      }
+    } catch (e) {
+      alert('Failed to generate worksheet');
+    } finally {
+      setIsGeneratingWorksheet(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!transcript || !audioData) {
@@ -1242,6 +1265,17 @@ export default function App() {
                           <Download size={18} />
                         </a>
                       </div>
+                      {language === 'spanish' && (level === 'A1' || level === 'A2') && transcript && (
+                        <div className="flex justify-end mt-2">
+                          <button
+                            onClick={handleGenerateWorksheet}
+                            disabled={isGeneratingWorksheet}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all text-sm"
+                          >
+                            {isGeneratingWorksheet ? <><Loader2 className="animate-spin" size={16} /> Generating...</> : <>📄 Generate Worksheet</>}
+                          </button>
+                        </div>
+                      )}
                       <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)} onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)} className="hidden" />
                     </div>
                   )}

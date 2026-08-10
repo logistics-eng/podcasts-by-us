@@ -561,6 +561,39 @@ ${fullText}`;
   });
 
 
+  app.post('/api/generate-worksheet', async (req, res) => {
+    try {
+      const { title, level, vocabulary, grammarTips } = req.body;
+
+      const prompt = `You are creating a Spanish language learning worksheet for level ${level} students.
+
+Podcast title: ${title}
+Vocabulary list: ${vocabulary}
+Grammar tip: ${JSON.stringify(grammarTips?.[0] || {})}
+
+Create a complete HTML worksheet. Requirements:
+- All exercise instructions must be written in Hebrew
+- All Spanish content (words, sentences, examples) must be in Spanish
+- The worksheet must be appropriate for ${level} level (${level === 'A1' ? 'complete beginners — very short sentences, max 6 words, only present simple, basic matching and fill-in-the-blank' : 'elementary — slightly longer sentences, fill-in-blank with word bank, short sentence completion'})
+- Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
+- ${level === 'A1' ? '3 exercises: (1) match word to meaning — 5 words, (2) fill in the blank with word bank — 5 sentences, (3) grammar fill-in-the-blank — 3 sentences' : '4 exercises: (1) match word to meaning — 7 words, (2) fill in the blank with word bank — 5 sentences, (3) complete the sentence — 3 sentences, (4) grammar exercise — 4 sentences'}
+- Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
+- Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
+
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const html = (response.content[0] as any).text;
+      res.json({ html });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+
   // Vite development vs production middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
