@@ -136,7 +136,7 @@ async function startServer() {
         [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english', contentMode ?? 'podcast']
       );
       let topic = 'Education & Culture';
-      if (contentMode === 'roleplay') {
+      if (contentMode === 'roleplay' || contentMode === 'phonecall') {
         topic = 'Role Play';
       } else if (transcript) {
         try {
@@ -212,7 +212,7 @@ async function startServer() {
       for (const podcast of podcasts) {
         try {
           let topic: string;
-          if (podcast.content_mode === 'roleplay') {
+          if (podcast.content_mode === 'roleplay' || podcast.content_mode === 'phonecall') {
             topic = 'Role Play';
           } else {
             const topicMsg = await anthropic.messages.create({
@@ -264,7 +264,10 @@ async function startServer() {
       let prompt = '';
       let tools: any[] = [];
 
-      if (contentMode === 'roleplay') {
+      if (contentMode === 'phonecall') {
+        prompt = `Create a phone call script between two speakers: ${host1} (Female, the one receiving the call) and ${host2} (Male, the one calling).\n\nWhat the call is about: ${subject}`;
+        tools = [];
+      } else if (contentMode === 'roleplay') {
         prompt = `Create a role play script between two speakers: ${host1} (Female) and ${host2} (Male).\n\nScenario: ${subject}`;
         tools = [];
       } else if (isSubjectMode) {
@@ -328,13 +331,13 @@ The podcast should summarize and discuss the key points of the article(s) in an 
 
 Target Length: EXACTLY ${length} minutes of spoken audio. Write between ${length * 150} and ${length * 165} words of actual dialogue (not counting speaker labels). Do not write fewer OR more words than this range.
 English Level: ${level} (CEFR).
-${contentMode === 'roleplay'
-  ? `The script MUST be a role play dialogue between ${host1} (Female) and ${host2} (Male). They should act out the scenario naturally and conversationally.`
+${contentMode === 'roleplay' || contentMode === 'phonecall'
+  ? `The script MUST be a ${contentMode === 'phonecall' ? 'phone call dialogue' : 'role play dialogue'} between ${host1} (Female) and ${host2} (Male). ${contentMode === 'phonecall' ? 'It should sound like a real phone call: natural greetings, slight informality, realistic back-and-forth. One speaker initiates the call, the other picks up.' : 'They should act out the scenario naturally and conversationally.'}`
   : hostCount === 'two'
     ? `The script MUST be a dialogue between two hosts: ${host1} (Female) and ${host2} (Male).`
     : `The script MUST be a monologue by a single host: ${host1} (Female).`
 }
-${contentMode !== 'roleplay' ? `Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.` : ''}
+${contentMode !== 'roleplay' && contentMode !== 'phonecall' ? `Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.` : ''}
 
 IMPORTANT:
 1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".
@@ -441,7 +444,7 @@ ${fullText}`;
 
       // Extract publication/source name from article content (only for article-based, non-roleplay podcasts)
       let sourceName = '';
-      if (sourceType !== 'subject' && contentMode !== 'roleplay') {
+      if (sourceType !== 'subject' && contentMode !== 'roleplay' && contentMode !== 'phonecall') {
         try {
           const articleContent = articleSourceType === 'url'
             ? (prompt.match(/--- ARTICLE 1 START ---\n([\s\S]*?)\n--- ARTICLE 1 END ---/)?.[1] || '').slice(0, 3000)

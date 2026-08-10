@@ -138,7 +138,7 @@ export default function App() {
   const [language, setLanguage] = useState<'english' | 'spanish' | 'french'>('english');
 
   // Generate mode state
-  const [contentMode, setContentMode] = useState<'podcast' | 'roleplay'>('podcast');
+  const [contentMode, setContentMode] = useState<'podcast' | 'roleplay' | 'phonecall'>('podcast');
   const [subject, setSubject] = useState('');
   const [sourceType, setSourceType] = useState<'subject' | 'article'>('subject');
   const [articleSourceType, setArticleSourceType] = useState<'text' | 'url'>('text');
@@ -514,10 +514,10 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subject, sourceType: contentMode === 'roleplay' ? 'subject' : sourceType,
+          subject, sourceType: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'subject' : sourceType,
           contentMode, articleSourceType, articleText, articleText2,
           articleUrl, articleUrl2, specificWords, length, level,
-          hostCount: contentMode === 'roleplay' ? 'two' : hostCount, speakerNames: names, language,
+          hostCount: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'two' : hostCount, speakerNames: names, language,
         }),
       });
 
@@ -778,11 +778,12 @@ export default function App() {
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
                         <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-                          {podcast.content_mode === 'roleplay' ? <span style={{fontSize:'1.1rem'}}>🎭</span> : <Volume2 size={16} className="text-indigo-600" />}
+                          {podcast.content_mode === 'phonecall' ? <span style={{fontSize:'1.1rem'}}>📞</span> : podcast.content_mode === 'roleplay' ? <span style={{fontSize:'1.1rem'}}>🎭</span> : <Volume2 size={16} className="text-indigo-600" />}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-gray-900 leading-snug line-clamp-2">{podcast.title}</p>
+                            {podcast.content_mode === 'phonecall' && <span className="text-[10px] font-bold bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full shrink-0">Phone Call</span>}
                             {podcast.content_mode === 'roleplay' && <span className="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full shrink-0">Role Play</span>}
                             {podcast.topic && <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{podcast.topic}</span>}
                           </div>
@@ -990,9 +991,10 @@ export default function App() {
                   <div className="flex p-1 bg-gray-100 rounded-xl">
                     <button onClick={() => { setContentMode('podcast'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'podcast' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎙 Podcast</button>
                     <button onClick={() => { setContentMode('roleplay'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'roleplay' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎭 Role Play</button>
+                    <button onClick={() => { setContentMode('phonecall'); setHostCount('two'); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${contentMode === 'phonecall' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>📞 Phone Call</button>
                   </div>
 
-                  {contentMode === 'roleplay' ? (
+                  {contentMode === 'roleplay' || contentMode === 'phonecall' ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-gray-600">Scenario</label>
@@ -1099,10 +1101,10 @@ export default function App() {
 
                 <button
                   onClick={handleGenerate}
-                  disabled={isGenerating || (contentMode === 'roleplay' ? !subject.trim() : (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim())))}
+                  disabled={isGenerating || (contentMode === 'roleplay' || contentMode === 'phonecall' ? !subject.trim() : (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim())))}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />{contentMode === 'roleplay' ? 'Create Role Play' : 'Create Podcast'}</>)}
+                  {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />{contentMode === 'phonecall' ? 'Create Phone Call' : contentMode === 'roleplay' ? 'Create Role Play' : 'Create Podcast'}</>)}
                 </button>
               </section>
             ) : (
