@@ -221,6 +221,7 @@ export default function App() {
   const [editDescription, setEditDescription] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+  const [isGeneratingGrammar, setIsGeneratingGrammar] = useState(false);
   const [isGeneratingWorksheet, setIsGeneratingWorksheet] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState<SavedPodcast | null>(null);
   const [detailAudioUrl, setDetailAudioUrl] = useState<string | null>(null);
@@ -553,7 +554,6 @@ export default function App() {
 
       const data = await response.json();
       const fullText = data.fullText || '';
-      setGrammarTips(data.grammarTips ?? []);
       setSourceName(data.sourceName || '');
 
       if (fullText.startsWith("ERROR: COULD NOT ACCESS LINK")) {
@@ -582,6 +582,22 @@ export default function App() {
       setVocabularyChart(vocab);
 
       const sName = data.sourceName || '';
+
+      // Fire grammar tips call in background (don't await — let audio generation run in parallel)
+      setIsGeneratingGrammar(true);
+      const grammarPromise = fetch('/api/generate-grammar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: fullText, level, language, contentMode }),
+      }).then(r => r.json()).then(gData => {
+        setGrammarTips(gData.grammarTips ?? []);
+      }).catch(err => {
+        console.error('Grammar tips failed:', err);
+        setGrammarTips([]);
+      }).finally(() => {
+        setIsGeneratingGrammar(false);
+      });
+
       const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names, language, spanishDialect) ?? 0;
       const formatDur = (secs: number) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
       const headerLines = [
@@ -591,6 +607,9 @@ export default function App() {
         `${title}${description ? ` — ${description}` : ''}`,
       ].filter(Boolean).join('\n');
       setTranscript(headerLines + '\n\n\n' + script);
+
+      // Wait for grammar tips before releasing isGenerating
+      await grammarPromise;
 
     } catch (error: any) {
       console.error("Generation failed:", error);
@@ -1359,7 +1378,12 @@ export default function App() {
                       ) : (
                         <div className="space-y-4">
                           <h4 className="text-gray-900 font-bold mb-4">Grammar Tips</h4>
-                          {grammarTips.length === 0 ? (
+                          {isGeneratingGrammar ? (
+                            <div className="flex items-center gap-2 text-sm text-indigo-500 font-medium">
+                              <Loader2 size={15} className="animate-spin shrink-0" />
+                              <span>Generating grammar tips...</span>
+                            </div>
+                          ) : grammarTips.length === 0 ? (
                             <p className="text-sm text-gray-400 italic">Grammar tips will appear after generating a podcast.</p>
                           ) : (
                             <div className="grid gap-4">

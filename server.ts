@@ -352,7 +352,41 @@ Keep the conversation natural and engaging. Do not include any stage directions 
       });
       const fullText = (scriptMsg.content[0] as { type: string; text: string }).text || '';
 
-      // Grammar tips: allowed patterns per level
+      // Extract publication/source name from article content (only for article-based, non-roleplay podcasts)
+      let sourceName = '';
+      if (sourceType !== 'subject' && contentMode !== 'roleplay' && contentMode !== 'phonecall') {
+        try {
+          const articleContent = articleSourceType === 'url'
+            ? (prompt.match(/--- ARTICLE 1 START ---\n([\s\S]*?)\n--- ARTICLE 1 END ---/)?.[1] || '').slice(0, 3000)
+            : (articleText || '').slice(0, 3000);
+          if (articleContent.trim()) {
+            const sourceMsg = await anthropic.messages.create({
+              model: 'claude-haiku-4-5',
+              max_tokens: 60,
+              messages: [{
+                role: 'user',
+                content: `Look at this article text and identify the name of the publication or website that published it (e.g. "The New York Times", "Ynet", "BBC"). Return ONLY the publication name as plain text, nothing else. If you cannot identify a publication name, return an empty string.\n\nArticle: ${articleContent}`,
+              }],
+            });
+            sourceName = ((sourceMsg.content[0] as { type: string; text: string }).text || '').trim();
+          }
+        } catch {
+          sourceName = '';
+        }
+      }
+
+      res.json({ fullText, sourceName });
+    } catch (error: any) {
+      console.error("Script generation failed on server:", error);
+      res.status(error?.status || 500).json({ error: error?.message || String(error) });
+    }
+  });
+
+  // Generate grammar tips for a transcript
+  app.post('/api/generate-grammar', async (req, res) => {
+    try {
+      const { transcript, level, language, contentMode } = req.body;
+
       const grammarByLevel: Record<string, string> = {
         A1: 'verb to be, present simple, basic nouns, basic adjectives',
         A2: 'verb to be, past simple, present simple',
@@ -405,7 +439,7 @@ ${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must
 ]
 
 Transcript:
-${fullText}`;
+${transcript}`;
 
       let grammarTips: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[] = [];
       try {
@@ -423,33 +457,10 @@ ${fullText}`;
         grammarTips = [];
       }
 
-      // Extract publication/source name from article content (only for article-based, non-roleplay podcasts)
-      let sourceName = '';
-      if (sourceType !== 'subject' && contentMode !== 'roleplay' && contentMode !== 'phonecall') {
-        try {
-          const articleContent = articleSourceType === 'url'
-            ? (prompt.match(/--- ARTICLE 1 START ---\n([\s\S]*?)\n--- ARTICLE 1 END ---/)?.[1] || '').slice(0, 3000)
-            : (articleText || '').slice(0, 3000);
-          if (articleContent.trim()) {
-            const sourceMsg = await anthropic.messages.create({
-              model: 'claude-haiku-4-5',
-              max_tokens: 60,
-              messages: [{
-                role: 'user',
-                content: `Look at this article text and identify the name of the publication or website that published it (e.g. "The New York Times", "Ynet", "BBC"). Return ONLY the publication name as plain text, nothing else. If you cannot identify a publication name, return an empty string.\n\nArticle: ${articleContent}`,
-              }],
-            });
-            sourceName = ((sourceMsg.content[0] as { type: string; text: string }).text || '').trim();
-          }
-        } catch {
-          sourceName = '';
-        }
-      }
-
-      res.json({ fullText, grammarTips, sourceName });
+      res.json({ grammarTips });
     } catch (error: any) {
-      console.error("Script generation failed on server:", error);
-      res.status(error?.status || 500).json({ error: error?.message || String(error) });
+      console.error('Grammar generation failed on server:', error);
+      res.status(500).json({ error: error?.message || String(error) });
     }
   });
 
