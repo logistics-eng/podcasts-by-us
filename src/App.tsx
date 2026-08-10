@@ -255,6 +255,7 @@ export default function App() {
   const handleGenerateWorksheet = async () => {
     if (!vocabulary || !level) return;
     setIsGeneratingWorksheet(true);
+    const win = window.open('', '_blank');
     try {
       const res = await fetch('/api/generate-worksheet', {
         method: 'POST',
@@ -262,12 +263,12 @@ export default function App() {
         body: JSON.stringify({ title: generatedTitle, vocabulary: vocabularyChart, level, grammarTips }),
       });
       const data = await res.json();
-      if (data.html) {
-        const blob = new Blob([data.html], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+      if (data.html && win) {
+        win.document.write(data.html);
+        win.document.close();
       }
     } catch (e) {
+      if (win) win.close();
       alert('Failed to generate worksheet');
     } finally {
       setIsGeneratingWorksheet(false);
@@ -1284,17 +1285,6 @@ export default function App() {
                           <Download size={18} />
                         </a>
                       </div>
-                      {language === 'spanish' && (level === 'A1' || level === 'A2') && transcript && (
-                        <div className="flex justify-end mt-2">
-                          <button
-                            onClick={handleGenerateWorksheet}
-                            disabled={isGeneratingWorksheet}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all text-sm"
-                          >
-                            {isGeneratingWorksheet ? <><Loader2 className="animate-spin" size={16} /> Generating...</> : <>📄 Generate Worksheet</>}
-                          </button>
-                        </div>
-                      )}
                       <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)} onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)} className="hidden" />
                     </div>
                   )}
@@ -1357,6 +1347,17 @@ export default function App() {
                                 </div>
                               )}
                               <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{body}</p>
+                              {language === 'spanish' && (level === 'A1' || level === 'A2') && (
+                                <div className="flex justify-start mt-6 pt-4 border-t border-gray-100">
+                                  <button
+                                    onClick={handleGenerateWorksheet}
+                                    disabled={isGeneratingWorksheet}
+                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all text-sm"
+                                  >
+                                    {isGeneratingWorksheet ? <><Loader2 className="animate-spin" size={16} /> Generating Worksheet...</> : <>📄 Generate Worksheet</>}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           );
                         })()
