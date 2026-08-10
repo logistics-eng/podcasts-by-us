@@ -375,7 +375,7 @@ Keep the conversation natural and engaging. Do not include any stage directions 
 
       // Grammar tips: allowed patterns per level
       const grammarByLevel: Record<string, string> = {
-        A1: 'verb to be, past simple',
+        A1: 'verb to be, present simple, basic nouns, basic adjectives',
         A2: 'verb to be, past simple, present simple',
         B1: 'verb to be, past simple, present simple, present progressive, prepositions, passive voice (simple tenses only), modal verbs',
         B2: 'present perfect, present perfect progressive, passive in all tenses (passive simple, passive progressive, passive perfect, etc.), modal verbs (advanced usage)',
@@ -391,6 +391,7 @@ PREPOSITIONS GUIDANCE (when "prepositions" is in the allowed list):
 - When you do choose prepositions, the examples should contrast in/on/at to help learners understand when to use each.
 
 STRICT RULES:
+- For Spanish A1: ONLY teach present simple tense or basic noun/adjective patterns. NEVER teach past simple, past continuous, or any other past tense. Keep everything at the most basic beginner level possible.
 - NEVER teach perfect tenses for levels A1, A2, or B1.
 - For B1 passive voice: ONLY use simple tenses (e.g. "is made", "was built"). NEVER use passive perfect ("has been made", "had been built") or passive progressive ("is being made") in the examples — those are too advanced for B1. The 3 examples (positive, negative, question) must all use simple passive only.
 - The podcastExample sentence MUST genuinely come from the transcript and contain the grammar pattern you name. Double-check before choosing.
