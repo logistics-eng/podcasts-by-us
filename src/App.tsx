@@ -136,6 +136,7 @@ export default function App() {
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
   const [language, setLanguage] = useState<'english' | 'spanish' | 'french'>('english');
+  const [spanishDialect, setSpanishDialect] = useState<'spain' | 'argentina'>('spain');
 
   // Generate mode state
   const [contentMode, setContentMode] = useState<'podcast' | 'roleplay' | 'phonecall'>('podcast');
@@ -409,12 +410,13 @@ export default function App() {
     lvl: string,
     readAsWritten: boolean,
     names: { host1: string; host2: string },
-    lang?: string
+    lang?: string,
+    dialect?: string
   ) => {
     const res = await fetch('/api/generate-audio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ script, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names, language: lang }),
+      body: JSON.stringify({ script, speechSpeed: speed, level: lvl, hostCount: hCount, readAsWritten, speakerNames: names, language: lang, spanishDialect: dialect }),
     });
     if (!res.ok) {
       const err = await res.json();
@@ -517,7 +519,7 @@ export default function App() {
           subject, sourceType: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'subject' : sourceType,
           contentMode, articleSourceType, articleText, articleText2,
           articleUrl, articleUrl2, specificWords, length, level,
-          hostCount: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'two' : hostCount, speakerNames: names, language,
+          hostCount: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'two' : hostCount, speakerNames: names, language, spanishDialect,
         }),
       });
 
@@ -557,7 +559,7 @@ export default function App() {
       setVocabularyChart(vocab);
 
       const sName = data.sourceName || '';
-      const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names, language) ?? 0;
+      const actualDuration = await generateAudio(script, hostCount, speechSpeed, level, false, names, language, spanishDialect) ?? 0;
       const formatDur = (secs: number) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
       const headerLines = [
         'Podcasts By Us',
@@ -986,6 +988,12 @@ export default function App() {
                     <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
                     <button onClick={() => setLanguage('french')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'french' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇫🇷 French</button>
                   </div>
+                  {language === 'spanish' && (
+                    <div className="flex p-1 bg-gray-100 rounded-xl">
+                      <button onClick={() => setSpanishDialect('spain')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${spanishDialect === 'spain' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spain</button>
+                      <button onClick={() => setSpanishDialect('argentina')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${spanishDialect === 'argentina' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇦🇷 Argentina</button>
+                    </div>
+                  )}
 
                   {/* Podcast / Role Play toggle */}
                   <div className="flex p-1 bg-gray-100 rounded-xl">

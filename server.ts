@@ -255,6 +255,7 @@ async function startServer() {
         hostCount,
         speakerNames,
         language,
+        spanishDialect,
       } = req.body;
 
       const host1 = speakerNames?.host1 || 'Alex';
@@ -475,7 +476,7 @@ ${fullText}`;
   // Audio generation via Microsoft Edge TTS (neural voices)
   app.post('/api/generate-audio', async (req, res) => {
     try {
-      const { script, speechSpeed, level, hostCount, speakerNames, language } = req.body;
+      const { script, speechSpeed, level, hostCount, speakerNames, language, spanishDialect } = req.body;
       const host1Name = speakerNames?.host1 || 'Alex';
 
       // Voice constants
@@ -484,13 +485,17 @@ ${fullText}`;
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
       const VOICE_FEMALE_ES = 'es-ES-ElviraNeural';
       const VOICE_MALE_ES   = 'es-ES-AlvaroNeural';
+      const VOICE_FEMALE_AR = 'es-AR-ElenaNeural';
+      const VOICE_MALE_AR   = 'es-AR-TomasNeural';
       const VOICE_FEMALE_FR = 'fr-FR-DeniseNeural';
       const VOICE_MALE_FR   = 'fr-FR-HenriNeural';
 
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
-          if (hostCount === 'one') return VOICE_FEMALE_ES;
-          return speaker === host1Name ? VOICE_FEMALE_ES : VOICE_MALE_ES;
+          const femaleVoice = spanishDialect === 'argentina' ? VOICE_FEMALE_AR : VOICE_FEMALE_ES;
+          const maleVoice   = spanishDialect === 'argentina' ? VOICE_MALE_AR   : VOICE_MALE_ES;
+          if (hostCount === 'one') return femaleVoice;
+          return speaker === host1Name ? femaleVoice : maleVoice;
         }
         if (language === 'french') {
           if (hostCount === 'one') return VOICE_FEMALE_FR;
