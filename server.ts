@@ -40,30 +40,6 @@ async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 4, retryWai
   throw new Error('Max retries exceeded');
 }
 
-// TTS serial queue: 8s gap between calls.
-// Serializes all TTS calls so concurrent requests don't pile up.
-// Within a single podcast (4-5 chunks × 8s = 32-40s) stays within Railway's timeout.
-let ttsLast = 0;
-const ttsQueue: Array<() => void> = [];
-let ttsRunning = false;
-
-function ttsCall<T>(fn: () => Promise<T>): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    ttsQueue.push(async () => {
-      const wait = Math.max(0, ttsLast + 8000 - Date.now());
-      if (wait > 0) await sleep(wait);
-      ttsLast = Date.now();
-      try { resolve(await geminiWithRetry(fn, 2, 65000)); } catch (e) { reject(e); }
-    });
-    if (!ttsRunning) {
-      ttsRunning = true;
-      (async () => {
-        while (ttsQueue.length > 0) await ttsQueue.shift()!();
-        ttsRunning = false;
-      })();
-    }
-  });
-}
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -548,10 +524,7 @@ ${fullText}`;
       }
       const tasks = entries;
 
-      const audioBuffers: Buffer[] = [];
-      for (const t of tasks) {
-        audioBuffers.push(await edgeTtsLine(t.voice, t.text));
-      }
+      const audioBuffers: Buffer[] = await Promise.all(tasks.map(t => edgeTtsLine(t.voice, t.text)));
       const combined = Buffer.concat(audioBuffers);
       res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
