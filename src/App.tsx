@@ -129,13 +129,17 @@ interface SavedPodcast {
   grammar_tips?: { pattern: string; formula: string; formulaHighlights: string[]; whenToUse: string; podcastExample: string; podcastHighlights: string[]; examples: { type: string; sentence: string; highlights: string[] }[] }[];
   content_mode?: string;
   topic?: string;
+  language?: string;
 }
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
-  const [language, setLanguage] = useState<'english' | 'spanish' | 'french'>('english');
+  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic'>('english');
+  const [showHebrew, setShowHebrew] = useState(false);
+  const [hebrewTranscript, setHebrewTranscript] = useState('');
+  const [isTranslatingHebrew, setIsTranslatingHebrew] = useState(false);
   const [spanishDialect, setSpanishDialect] = useState<'spain' | 'argentina'>('spain');
 
   // Generate mode state
@@ -332,6 +336,8 @@ export default function App() {
     setDetailActiveTab('transcript');
     setDetailIsPlaying(false);
     setDetailCurrentTime(0);
+    setShowHebrew(false);
+    setHebrewTranscript('');
     setView('detail');
   };
 
@@ -511,6 +517,22 @@ export default function App() {
     );
   };
 
+  const handleToggleHebrew = async (overrideTranscript?: string) => {
+    if (showHebrew) { setShowHebrew(false); return; }
+    if (hebrewTranscript) { setShowHebrew(true); return; }
+    setIsTranslatingHebrew(true);
+    try {
+      const res = await fetch('/api/translate-hebrew', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: overrideTranscript ?? transcript }),
+      });
+      const data = await res.json();
+      if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
+    } catch (e) { alert('Failed to translate'); }
+    finally { setIsTranslatingHebrew(false); }
+  };
+
   const handleGenerate = async () => {
     const isSubjectMode = sourceType === 'subject';
     const isArticleUrlMode = !isSubjectMode && articleSourceType === 'url';
@@ -535,6 +557,8 @@ export default function App() {
     setSavedId(null);
     setSourceName('');
     setAudioDuration(0);
+    setShowHebrew(false);
+    setHebrewTranscript('');
 
     try {
       const response = await fetch('/api/generate-script', {
@@ -737,14 +761,23 @@ export default function App() {
           </div>
         </header>
         <main className="max-w-4xl mx-auto px-6 py-12">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-            <Library size={22} className="text-indigo-600" /> Your Library
-            {/iPhone|iPad|iPod/.test(navigator.userAgent) && (
-              <button onClick={() => window.location.reload()} className="ml-2 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all" title="Refresh">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-              </button>
-            )}
-          </h2>
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Library size={22} className="text-indigo-600" /> Your Library
+              {/iPhone|iPad|iPod/.test(navigator.userAgent) && (
+                <button onClick={() => window.location.reload()} className="ml-2 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all" title="Refresh">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </button>
+              )}
+            </h2>
+            <div className="flex p-1 bg-white border border-gray-100 rounded-xl shadow-sm">
+              {(['english','spanish','french','arabic'] as const).map(lang => (
+                <button key={lang} onClick={() => setLanguage(lang)} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${language === lang ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                  {lang === 'english' ? '🇬🇧' : lang === 'spanish' ? '🇪🇸' : lang === 'french' ? '🇫🇷' : '🇸🇾'} {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
           {loadingLibrary ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-indigo-400" size={32} /></div>
           ) : (
@@ -925,23 +958,43 @@ export default function App() {
                 </button>
               )}
               {detailActiveTab === 'transcript' && selectedPodcast.transcript && (
-                <button onClick={() => {
-                  const text = selectedPodcast.transcript || '';
-                  if (navigator.clipboard) {
-                    navigator.clipboard.writeText(text).then(() => { setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000); }).catch(() => {
+                <div className="ml-auto flex items-center gap-2">
+                  <button onClick={() => {
+                    const text = selectedPodcast.transcript || '';
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(text).then(() => { setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000); }).catch(() => {
+                        const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
+                      });
+                    } else {
                       const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
-                    });
-                  } else {
-                    const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
-                  }
-                }} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
-                  {detailCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Transcript</>}
-                </button>
+                    }
+                  }} className="px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
+                    {detailCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Transcript</>}
+                  </button>
+                  {(selectedPodcast.level === 'A1' || selectedPodcast.level === 'A2') && selectedPodcast.transcript && (
+                    <button onClick={() => handleToggleHebrew(selectedPodcast.transcript)} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                      {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
               {detailActiveTab === 'transcript' ? (
-                <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{selectedPodcast.transcript}</p>
+                showHebrew && hebrewTranscript ? (
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>
+                      <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={selectedPodcast.language === 'arabic' ? 'rtl' : undefined}>{selectedPodcast.transcript}</p>
+                    </div>
+                    <div dir="rtl">
+                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">עברית</p>
+                      <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{hebrewTranscript}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={selectedPodcast.language === 'arabic' ? 'rtl' : undefined}>{selectedPodcast.transcript}</p>
+                )
               ) : detailActiveTab === 'grammar' ? (
                 <div className="grid gap-4">
                   {(selectedPodcast.grammar_tips || []).map((tip, idx) => (
@@ -961,7 +1014,7 @@ export default function App() {
                     {(selectedPodcast.vocabulary || '').split('\n').filter(line => line.trim()).map((line, idx) => {
                       const [word, definition] = line.split('=');
                       return (
-                        <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100" dir={selectedPodcast.language === 'arabic' ? 'rtl' : undefined}>
                           <span className="font-bold text-indigo-600 block mb-1">{word?.trim()}</span>
                           <span className="text-sm text-gray-600">{definition?.trim()}</span>
                         </div>
@@ -1030,6 +1083,7 @@ export default function App() {
                     <button onClick={() => setLanguage('english')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'english' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇬🇧 English</button>
                     <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
                     <button onClick={() => setLanguage('french')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'french' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇫🇷 French</button>
+                    <button onClick={() => setLanguage('arabic')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'arabic' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇸🇾 Arabic</button>
                   </div>
                   {language === 'spanish' && (
                     <div className="flex p-1 bg-gray-100 rounded-xl">
@@ -1141,7 +1195,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} Level</label>
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} Level</label>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map((l) => (
                         <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
@@ -1301,11 +1355,16 @@ export default function App() {
                         )}
                       </div>
                       {activeTab === 'transcript' && (
-                        <div className="flex justify-start">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <button onClick={copyToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
                             {copied ? <Check size={14} /> : <Copy size={14} />}
                             {copied ? 'Copied' : 'Copy Transcript'}
                           </button>
+                          {(level === 'A1' || level === 'A2') && transcript && (
+                            <button onClick={handleToggleHebrew} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                              {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
+                            </button>
+                          )}
                         </div>
                       )}
                       {activeTab === 'vocabulary' && (
@@ -1346,7 +1405,20 @@ export default function App() {
                                   ))}
                                 </div>
                               )}
-                              <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{body}</p>
+                              {showHebrew && hebrewTranscript ? (
+                                <div className="grid grid-cols-2 gap-6">
+                                  <div>
+                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={language === 'arabic' ? 'rtl' : undefined}>{body}</p>
+                                  </div>
+                                  <div dir="rtl">
+                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">עברית</p>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{hebrewTranscript}</p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={language === 'arabic' ? 'rtl' : undefined}>{body}</p>
+                              )}
                               {language === 'spanish' && (level === 'A1' || level === 'A2') && (
                                 <div className="flex justify-start mt-6 pt-4 border-t border-gray-100">
                                   <button
@@ -1368,7 +1440,7 @@ export default function App() {
                             {vocabularyChart.split('\n').filter(line => line.trim()).map((line, idx) => {
                               const [word, definition] = line.split('=');
                               return (
-                                <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100" dir={language === 'arabic' ? 'rtl' : undefined}>
                                   <span className="font-bold text-indigo-600 block mb-1">{word?.trim()}</span>
                                   <span className="text-sm text-gray-600">{definition?.trim()}</span>
                                 </div>

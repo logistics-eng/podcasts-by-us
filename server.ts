@@ -321,8 +321,8 @@ IMPORTANT:
 2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
 ${(level === 'A1' || level === 'A2')
-  ? `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} and then a Hebrew translation, in this format: "Word/Phrase = Explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} — תרגום בעברית".`
-  : `3. For each vocabulary item, provide a simple explanation/definition in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} in the format: "Word/Phrase = Explanation".`
+  ? `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} and then a Hebrew translation, in this format: "Word/Phrase = Explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} — תרגום בעברית".`
+  : `3. For each vocabulary item, provide a simple explanation/definition in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} in the format: "Word/Phrase = Explanation".`
 }
 
 Format:
@@ -342,6 +342,8 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Spanish. All dialogue, vocabulary chart, and content must be in Spanish.'
         : language === 'french'
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in French. All dialogue, vocabulary chart, and content must be in French.'
+        : language === 'arabic'
+        ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Levantine Arabic dialect. All dialogue, vocabulary chart, and content must be in Arabic.'
         : userPrompt;
 
       const scriptMsg = await anthropic.messages.create({
@@ -420,7 +422,7 @@ STRICT RULES:
 - examples must always contain exactly 3 items: one positive, one negative, one question — in that order.
 - highlights must include the auxiliary/main verb words that show the grammar pattern (e.g. for negative present simple: "doesn't"/"don't" AND the main verb; for questions: the auxiliary "do/does/is/are/have" AND the main verb).
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
-${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : language === 'french' ? '- The podcast is in FRENCH. The podcastExample must be a French sentence from the transcript. All 3 example sentences (positive, negative, question) must be in French. Explanations (formula, whenToUse) stay in English.' : ''}
+${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : language === 'french' ? '- The podcast is in FRENCH. The podcastExample must be a French sentence from the transcript. All 3 example sentences (positive, negative, question) must be in French. Explanations (formula, whenToUse) stay in English.' : language === 'arabic' ? '- The podcast is in ARABIC. The podcastExample must be an Arabic sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Arabic. Explanations (formula, whenToUse) stay in English.' : ''}
 
 [
   {
@@ -480,6 +482,8 @@ ${transcript}`;
       const VOICE_MALE_AR   = 'es-AR-TomasNeural';
       const VOICE_FEMALE_FR = 'fr-FR-DeniseNeural';
       const VOICE_MALE_FR   = 'fr-FR-HenriNeural';
+      const VOICE_FEMALE_AR_LEV = 'ar-SY-AmanyNeural';
+      const VOICE_MALE_AR_LEV   = 'ar-SY-LaithNeural';
 
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
@@ -491,6 +495,10 @@ ${transcript}`;
         if (language === 'french') {
           if (hostCount === 'one') return VOICE_FEMALE_FR;
           return speaker === host1Name ? VOICE_FEMALE_FR : VOICE_MALE_FR;
+        }
+        if (language === 'arabic') {
+          if (hostCount === 'one') return VOICE_FEMALE_AR_LEV;
+          return speaker === host1Name ? VOICE_FEMALE_AR_LEV : VOICE_MALE_AR_LEV;
         }
         if (hostCount === 'one') return VOICE_FEMALE_GB;
         return speaker === host1Name ? VOICE_FEMALE_US : VOICE_MALE_US;
@@ -577,6 +585,22 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
+
+  // Translate a transcript to Hebrew
+  app.post('/api/translate-hebrew', async (req, res) => {
+    try {
+      const { transcript } = req.body;
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: `Translate the following podcast transcript to Hebrew. Keep the speaker names as-is (do not translate names). Keep the same format with speaker labels on each line. Return only the translated transcript, nothing else.\n\n${transcript}` }],
+      });
+      const translated = (msg.content[0] as any).text.trim();
+      res.json({ translated });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Vite development vs production middleware setup
   if (process.env.NODE_ENV !== 'production') {
