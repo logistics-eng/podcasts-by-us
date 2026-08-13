@@ -140,6 +140,9 @@ export default function App() {
   const [showHebrew, setShowHebrew] = useState(false);
   const [hebrewTranscript, setHebrewTranscript] = useState('');
   const [isTranslatingHebrew, setIsTranslatingHebrew] = useState(false);
+  const [showTransliteration, setShowTransliteration] = useState(false);
+  const [transliteratedTranscript, setTransliteratedTranscript] = useState('');
+  const [isTransliterating, setIsTransliterating] = useState(false);
   const [spanishDialect, setSpanishDialect] = useState<'spain' | 'argentina'>('spain');
 
   // Generate mode state
@@ -338,6 +341,8 @@ export default function App() {
     setDetailCurrentTime(0);
     setShowHebrew(false);
     setHebrewTranscript('');
+    setShowTransliteration(false);
+    setTransliteratedTranscript('');
     setView('detail');
   };
 
@@ -533,6 +538,22 @@ export default function App() {
     finally { setIsTranslatingHebrew(false); }
   };
 
+  const handleToggleTransliteration = async () => {
+    if (showTransliteration) { setShowTransliteration(false); return; }
+    if (transliteratedTranscript) { setShowTransliteration(true); return; }
+    setIsTransliterating(true);
+    try {
+      const res = await fetch('/api/transliterate-arabic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      });
+      const data = await res.json();
+      if (data.transliterated) { setTransliteratedTranscript(data.transliterated); setShowTransliteration(true); }
+    } catch (e) { alert('Failed to transliterate'); }
+    finally { setIsTransliterating(false); }
+  };
+
   const handleGenerate = async () => {
     const isSubjectMode = sourceType === 'subject';
     const isArticleUrlMode = !isSubjectMode && articleSourceType === 'url';
@@ -559,6 +580,8 @@ export default function App() {
     setAudioDuration(0);
     setShowHebrew(false);
     setHebrewTranscript('');
+    setShowTransliteration(false);
+    setTransliteratedTranscript('');
 
     try {
       const response = await fetch('/api/generate-script', {
@@ -976,12 +999,28 @@ export default function App() {
                       {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                     </button>
                   )}
+                  {selectedPodcast.language === 'arabic' && (selectedPodcast.level === 'A1' || selectedPodcast.level === 'A2' || selectedPodcast.level === 'B1') && selectedPodcast.transcript && (
+                    <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                      {isTransliterating ? <><Loader2 size={14} className="animate-spin" /> Transliterating...</> : <>{showTransliteration ? '✕ Hide Transliteration' : '🔤 Transliteration'}</>}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
             <div className="p-8 overflow-y-auto prose prose-indigo max-w-none">
               {detailActiveTab === 'transcript' ? (
-                showHebrew && hebrewTranscript ? (
+                showTransliteration && transliteratedTranscript ? (
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">טרנסליטרציה</p>
+                      <p className="whitespace-pre-wrap leading-relaxed text-gray-700 text-right" dir="rtl">{transliteratedTranscript}</p>
+                    </div>
+                    <div dir="rtl">
+                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">عربي</p>
+                      <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{selectedPodcast.transcript}</p>
+                    </div>
+                  </div>
+                ) : showHebrew && hebrewTranscript ? (
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>
@@ -1365,6 +1404,11 @@ export default function App() {
                               {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                             </button>
                           )}
+                          {language === 'arabic' && (level === 'A1' || level === 'A2' || level === 'B1') && transcript && (
+                            <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                              {isTransliterating ? <><Loader2 size={14} className="animate-spin" /> Transliterating...</> : <>{showTransliteration ? '✕ Hide Transliteration' : '🔤 Transliteration'}</>}
+                            </button>
+                          )}
                         </div>
                       )}
                       {activeTab === 'vocabulary' && (
@@ -1405,7 +1449,18 @@ export default function App() {
                                   ))}
                                 </div>
                               )}
-                              {showHebrew && hebrewTranscript ? (
+                              {showTransliteration && transliteratedTranscript ? (
+                                <div className="grid grid-cols-2 gap-6">
+                                  <div>
+                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">טרנסליטרציה</p>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-gray-700 text-right" dir="rtl">{transliteratedTranscript}</p>
+                                  </div>
+                                  <div dir="rtl">
+                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">عربي</p>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{body}</p>
+                                  </div>
+                                </div>
+                              ) : showHebrew && hebrewTranscript ? (
                                 <div className="grid grid-cols-2 gap-6">
                                   <div>
                                     <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>

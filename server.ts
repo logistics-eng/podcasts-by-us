@@ -604,6 +604,22 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
+  // Transliterate Arabic transcript into Hebrew letters phonetically
+  app.post('/api/transliterate-arabic', async (req, res) => {
+    try {
+      const { transcript } = req.body;
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: `Transliterate the following Arabic podcast transcript into Hebrew letters phonetically, so that Hebrew speakers can read and pronounce the Arabic words using Hebrew characters. Keep the speaker names as-is. Keep the same format with speaker labels on each line. Return only the transliterated transcript in Hebrew letters, nothing else.\n\n${transcript}` }],
+      });
+      const transliterated = (msg.content[0] as any).text.trim();
+      res.json({ transliterated });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Vite development vs production middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
