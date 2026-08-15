@@ -560,9 +560,10 @@ ${transcript}`;
 
   app.post('/api/generate-worksheet', async (req, res) => {
     try {
-      const { title, level, vocabulary, grammarTips } = req.body;
+      const { title, level, vocabulary, grammarTips, language } = req.body;
+      const langName = language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic (Levantine)' : 'English';
 
-      const prompt = `You are creating a Spanish language learning worksheet for level ${level} students.
+      const prompt = `You are creating a ${langName} language learning worksheet for level ${level} students.
 
 Podcast title: ${title}
 Vocabulary list: ${vocabulary}
@@ -570,7 +571,7 @@ Grammar tip: ${JSON.stringify(grammarTips?.[0] || {})}
 
 Create a complete HTML worksheet. Requirements:
 - All exercise instructions must be written in Hebrew
-- All Spanish content (words, sentences, examples) must be in Spanish
+- All ${langName} content (words, sentences, examples) must be in ${langName}
 - The worksheet must be appropriate for ${level} level (${level === 'A1' ? 'complete beginners — very short sentences, max 6 words, only present simple, basic matching and fill-in-the-blank' : 'elementary — slightly longer sentences, fill-in-blank with word bank, short sentence completion'})
 - Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
 - ${level === 'A1' ? '3 exercises: (1) match word to meaning — 5 words, (2) fill in the blank with word bank — 5 sentences, (3) grammar fill-in-the-blank — 3 sentences' : '4 exercises: (1) match word to meaning — 7 words, (2) fill in the blank with word bank — 5 sentences, (3) complete the sentence — 3 sentences, (4) grammar exercise — 4 sentences'}
