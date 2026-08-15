@@ -578,7 +578,7 @@ Create a complete HTML worksheet. Requirements:
 - Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
 
       const response = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-haiku-4-5',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
@@ -596,7 +596,7 @@ Create a complete HTML worksheet. Requirements:
     try {
       const { transcript } = req.body;
       const msg = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-haiku-4-5',
         max_tokens: 4096,
         messages: [{ role: 'user', content: `Translate the following podcast transcript to Hebrew. Keep the speaker names as-is (do not translate names). Keep the same format with speaker labels on each line. Return only the translated transcript, nothing else.\n\n${transcript}` }],
       });
@@ -612,7 +612,7 @@ Create a complete HTML worksheet. Requirements:
     try {
       const { transcript } = req.body;
       const msg = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-haiku-4-5',
         max_tokens: 4096,
         messages: [{ role: 'user', content: `Transliterate the following Arabic podcast transcript into Hebrew letters phonetically, so that Hebrew speakers can read and pronounce the Arabic words using Hebrew characters. Keep the speaker names as-is. Keep the same format with speaker labels on each line. Return only the transliterated transcript in Hebrew letters, nothing else.\n\n${transcript}` }],
       });
