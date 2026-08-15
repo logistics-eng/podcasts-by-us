@@ -534,12 +534,12 @@ export default function App() {
       const res = await fetch('/api/translate-hebrew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: overrideTranscript ?? transcript }),
+        body: JSON.stringify({ transcript: String(overrideTranscript ?? transcript) }),
       });
       const data = await res.json();
       if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
       else { alert('Failed to translate: ' + (data.error || 'Unknown error')); }
-    } catch (e: any) { alert('Failed to translate: ' + e.message); }
+    } catch (e: any) { alert('Failed to translate: ' + (typeof e?.message === 'string' ? e.message : String(e))); }
     finally { setIsTranslatingHebrew(false); }
   };
 
@@ -1004,7 +1004,7 @@ export default function App() {
                   }} className="px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
                     {detailCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Transcript</>}
                   </button>
-                  {(selectedPodcast.level === 'A1' || selectedPodcast.level === 'A2') && selectedPodcast.transcript && (
+                  {selectedPodcast.transcript && (
                     <button onClick={() => handleToggleHebrew(selectedPodcast.transcript)} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
                       {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                     </button>
@@ -1412,7 +1412,7 @@ export default function App() {
                             {copied ? <Check size={14} /> : <Copy size={14} />}
                             {copied ? 'Copied' : 'Copy Transcript'}
                           </button>
-                          {(level === 'A1' || level === 'A2') && transcript && (
+                          {transcript && (
                             <button onClick={handleToggleHebrew} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
                               {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                             </button>
