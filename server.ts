@@ -319,7 +319,7 @@ ${contentMode !== 'roleplay' && contentMode !== 'phonecall' ? `Today's date: ${n
 IMPORTANT:
 1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ` Write the title in ${language === 'arabic' ? 'Arabic' : language === 'spanish' ? 'Spanish' : 'French'} first, then on the next line write "TITLE_EN: [English translation of the title]".` : ''}
 2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
-3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
+3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled exactly "VOCABULARY CHART" (always in English, never translated) containing exactly 10 interesting words, phrases, or idioms used in the script.
 ${(level === 'A1' || level === 'A2')
   ? (language === 'arabic'
     ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום עברי של המילה עצמה".`
