@@ -260,7 +260,7 @@ export default function App() {
   }, [language]);
 
   const handleGenerateWorksheet = async () => {
-    if (!vocabulary || !level) return;
+    if (!vocabularyChart || !level) return;
     setIsGeneratingWorksheet(true);
     const win = window.open('', '_blank');
     try {
