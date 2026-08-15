@@ -273,10 +273,13 @@ export default function App() {
       if (data.html && win) {
         win.document.write(data.html);
         win.document.close();
+      } else {
+        if (win) win.close();
+        alert('Failed to generate worksheet: ' + (data.error || 'Unknown error'));
       }
-    } catch (e) {
+    } catch (e: any) {
       if (win) win.close();
-      alert('Failed to generate worksheet');
+      alert('Failed to generate worksheet: ' + e.message);
     } finally {
       setIsGeneratingWorksheet(false);
     }
@@ -534,7 +537,8 @@ export default function App() {
       });
       const data = await res.json();
       if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
-    } catch (e) { alert('Failed to translate'); }
+      else { alert('Failed to translate: ' + (data.error || 'Unknown error')); }
+    } catch (e: any) { alert('Failed to translate: ' + e.message); }
     finally { setIsTranslatingHebrew(false); }
   };
 
