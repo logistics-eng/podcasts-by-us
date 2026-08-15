@@ -322,8 +322,8 @@ IMPORTANT:
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
 ${(level === 'A1' || level === 'A2')
   ? (language === 'arabic'
-    ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation. Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום בעברית".`
-    : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} and then a Hebrew translation, in this format: "Word/Phrase = Explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} — תרגום בעברית".`)
+    ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום עברי של המילה עצמה".`
+    : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
   : `3. For each vocabulary item, provide a simple explanation/definition in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} in the format: "Word/Phrase = Explanation".`
 }
 
