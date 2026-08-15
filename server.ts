@@ -526,7 +526,7 @@ ${transcript}`;
       };
 
       // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
-      const speakerPattern = /^[A-Za-z0-9 ]{1,30}:/;
+      const speakerPattern = /^[؀-ۿa-zA-Z0-9 ]{1,30}:/;
       const entries: { voice: string; text: string }[] = [];
       for (const line of script.split('\n')) {
         const t = line.trim();
