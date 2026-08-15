@@ -575,6 +575,9 @@ Create a complete HTML worksheet. Requirements:
 - Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
 - ${level === 'A1' ? '3 exercises: (1) match word to meaning — 5 words, (2) fill in the blank with word bank — 5 sentences, (3) grammar fill-in-the-blank — 3 sentences' : '4 exercises: (1) match word to meaning — 7 words, (2) fill in the blank with word bank — 5 sentences, (3) complete the sentence — 3 sentences, (4) grammar exercise — 4 sentences'}
 - Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
+- Include a @media print stylesheet that hides the print button and sets page margins to 1cm
+- Include a visible "🖨️ הדפס / Save as PDF" button at the top styled in blue that calls window.print()
+- Include <script>window.onload = function() { window.print(); }</script> so the print dialog opens automatically when the page loads
 - Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
 
       const response = await anthropic.messages.create({
