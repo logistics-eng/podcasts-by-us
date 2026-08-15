@@ -199,6 +199,7 @@ export default function App() {
     examples: { type: string; sentence: string; highlights: string[] }[];
   }[]>([]);
   const [generatedTitle, setGeneratedTitle] = useState('');
+  const [generatedTitleEn, setGeneratedTitleEn] = useState('');
   const [generatedDescription, setGeneratedDescription] = useState('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioData, setAudioData] = useState<string | null>(null);
@@ -617,6 +618,9 @@ export default function App() {
       const titleMatch = fullText.match(/^TITLE:\s*(.*)/im);
       const title = titleMatch ? titleMatch[1].trim() : (isSubjectMode ? subject : 'Podcast Episode');
 
+      const titleEnMatch = fullText.match(/^TITLE_EN:\s*(.*)/im);
+      const titleEn = titleEnMatch ? titleEnMatch[1].trim() : '';
+
       const descMatch = fullText.match(/^DESCRIPTION:\s*(.*)/im);
       const description = descMatch ? descMatch[1].trim() : '';
 
@@ -625,11 +629,13 @@ export default function App() {
 
       const script = fullText
         .replace(/^TITLE:.*\n?/im, '')
+        .replace(/^TITLE_EN:.*\n?/im, '')
         .replace(/^DESCRIPTION:.*\n?/im, '')
         .replace(/VOCABULARY CHART[\s\S]*/i, '')
         .trim();
 
       setGeneratedTitle(title);
+      setGeneratedTitleEn(titleEn);
       setGeneratedDescription(description);
       setVocabularyChart(vocab);
 
@@ -1358,7 +1364,10 @@ export default function App() {
                       </button>
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex justify-between items-center gap-2">
-                          <p className="text-sm font-bold text-gray-900 truncate">{generatedTitle}</p>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 truncate">{generatedTitle}</p>
+                            {generatedTitleEn && <p className="text-xs text-gray-400 truncate">{generatedTitleEn}</p>}
+                          </div>
                           {mode === 'generate' && <p className="text-[10px] font-medium text-gray-400 whitespace-nowrap">Level {LEVELS.find(l => l.id === level)?.label}</p>}
                         </div>
                         <div className="flex items-center gap-3">
@@ -1451,6 +1460,7 @@ export default function App() {
                                   {header.split('\n').map((line, i) => (
                                     <p key={i} className="font-bold text-indigo-700 leading-snug">{line}</p>
                                   ))}
+                                  {generatedTitleEn && <p className="text-sm text-gray-400 mt-1">{generatedTitleEn}</p>}
                                 </div>
                               )}
                               {showTransliteration && transliteratedTranscript ? (

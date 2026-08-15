@@ -317,7 +317,7 @@ ${contentMode === 'roleplay' || contentMode === 'phonecall'
 ${contentMode !== 'roleplay' && contentMode !== 'phonecall' ? `Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.` : ''}
 
 IMPORTANT:
-1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ' Write the title in English only — do NOT write it in the podcast language.' : ''}
+1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ` Write the title in ${language === 'arabic' ? 'Arabic' : language === 'spanish' ? 'Spanish' : 'French'} first, then on the next line write "TITLE_EN: [English translation of the title]".` : ''}
 2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled "VOCABULARY CHART" containing exactly 10 interesting words, phrases, or idioms used in the script.
 ${(level === 'A1' || level === 'A2')
