@@ -595,11 +595,13 @@ Create a complete HTML worksheet. Requirements:
 
       const response = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
-        max_tokens: 4096,
+        max_tokens: 8192,
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const html = (response.content[0] as any).text;
+      let html = (response.content[0] as any).text;
+      const doctypeIdx = html.indexOf('<!DOCTYPE');
+      if (doctypeIdx > 0) html = html.substring(doctypeIdx);
       res.json({ html });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
