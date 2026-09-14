@@ -136,7 +136,7 @@ export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
-  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic'>('english');
+  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish'>('english');
   const [showHebrew, setShowHebrew] = useState(false);
   const [hebrewTranscript, setHebrewTranscript] = useState('');
   const [isTranslatingHebrew, setIsTranslatingHebrew] = useState(false);
@@ -804,9 +804,9 @@ export default function App() {
               )}
             </h2>
             <div className="flex p-1 bg-white border border-gray-100 rounded-xl shadow-sm">
-              {(['english','spanish','french','arabic'] as const).map(lang => (
+              {(['english','spanish','french','arabic','turkish'] as const).map(lang => (
                 <button key={lang} onClick={() => setLanguage(lang)} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${language === lang ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-                  {lang === 'english' ? '🇬🇧' : lang === 'spanish' ? '🇪🇸' : lang === 'french' ? '🇫🇷' : '🇸🇾'} {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                  {lang === 'english' ? '🇬🇧' : lang === 'spanish' ? '🇪🇸' : lang === 'french' ? '🇫🇷' : lang === 'arabic' ? '🇸🇾' : '🇹🇷'} {lang.charAt(0).toUpperCase() + lang.slice(1)}
                 </button>
               ))}
             </div>
@@ -1133,6 +1133,7 @@ export default function App() {
                     <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
                     <button onClick={() => setLanguage('french')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'french' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇫🇷 French</button>
                     <button onClick={() => setLanguage('arabic')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'arabic' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇸🇾 Arabic</button>
+                    <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
                   </div>
                   {language === 'spanish' && (
                     <div className="flex p-1 bg-gray-100 rounded-xl">
@@ -1244,7 +1245,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : 'English'} Level</label>
+                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : language === 'turkish' ? 'Turkish' : 'English'} Level</label>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map((l) => (
                         <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
