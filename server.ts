@@ -234,8 +234,10 @@ async function startServer() {
         spanishDialect,
       } = req.body;
 
-      const host1 = speakerNames?.host1 || 'Alex';
-      const host2 = speakerNames?.host2 || 'Sam';
+      const defaultHost1 = language === 'spanish' && spanishDialect === 'argentina' ? 'Valentina' : language === 'spanish' ? 'Isabel' : language === 'french' ? 'Camille' : language === 'arabic' ? 'Layla' : 'Alex';
+      const defaultHost2 = language === 'spanish' && spanishDialect === 'argentina' ? 'Matías' : language === 'spanish' ? 'Alejandro' : language === 'french' ? 'Lucas' : language === 'arabic' ? 'Omar' : 'Sam';
+      const host1 = speakerNames?.host1 || defaultHost1;
+      const host2 = speakerNames?.host2 || defaultHost2;
 
       const isSubjectMode = sourceType === 'subject';
       let prompt = '';
