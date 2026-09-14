@@ -611,7 +611,7 @@ Create a complete HTML worksheet. Requirements:
       const { transcript } = req.body;
       const msg = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
-        max_tokens: 4096,
+        max_tokens: 8192,
         messages: [{ role: 'user', content: `Translate the following podcast transcript to Hebrew. Keep the speaker names as-is (do not translate names). Keep the same format with speaker labels on each line. Return only the translated transcript, nothing else.\n\n${transcript}` }],
       });
       const translated = (msg.content[0] as any).text.trim();

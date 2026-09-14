@@ -263,7 +263,6 @@ export default function App() {
   const handleGenerateWorksheet = async () => {
     if (!vocabularyChart || !level) return;
     setIsGeneratingWorksheet(true);
-    const win = window.open('', '_blank');
     try {
       const res = await fetch('/api/generate-worksheet', {
         method: 'POST',
@@ -271,15 +270,20 @@ export default function App() {
         body: JSON.stringify({ title: generatedTitle, vocabulary: vocabularyChart, level, grammarTips, language }),
       });
       const data = await res.json();
-      if (data.html && win) {
-        win.document.write(data.html);
-        win.document.close();
+      if (data.html) {
+        const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, '_blank');
+        if (!win) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `worksheet-${generatedTitle || 'podcast'}.html`;
+          a.click();
+        }
       } else {
-        if (win) win.close();
         alert('Failed to generate worksheet: ' + (data.error || 'Unknown error'));
       }
     } catch (e: any) {
-      if (win) win.close();
       alert('Failed to generate worksheet: ' + e.message);
     } finally {
       setIsGeneratingWorksheet(false);
@@ -567,9 +571,19 @@ export default function App() {
     if (!isSubjectMode && articleSourceType === 'text' && !articleText.trim()) return;
     if (isArticleUrlMode && !articleUrl.trim()) return;
 
+    const TURKISH_FEMALE = ['Elif', 'Zeynep', 'Ayşe', 'Fatma', 'Merve'];
+    const TURKISH_MALE = ['Mehmet', 'Ahmet', 'Mustafa', 'Emre', 'Burak'];
+    const ARABIC_FEMALE = ['Layla', 'Nour', 'Rima', 'Hana', 'Dina'];
+    const ARABIC_MALE = ['Omar', 'Karim', 'Tariq', 'Ziad', 'Hassan'];
+    const FRENCH_FEMALE = ['Camille', 'Chloé', 'Léa', 'Marie', 'Julie'];
+    const FRENCH_MALE = ['Lucas', 'Hugo', 'Théo', 'Antoine', 'Maxime'];
+    const SPANISH_FEMALE = spanishDialect === 'argentina' ? ['Valentina', 'Sofía', 'Lucía', 'Martina', 'Florencia'] : ['Isabel', 'Carmen', 'Lucía', 'Ana', 'Elena'];
+    const SPANISH_MALE = spanishDialect === 'argentina' ? ['Matías', 'Santiago', 'Nicolás', 'Tomás', 'Facundo'] : ['Alejandro', 'Carlos', 'Miguel', 'Javier', 'Pablo'];
+    const femalePool = language === 'turkish' ? TURKISH_FEMALE : language === 'arabic' ? ARABIC_FEMALE : language === 'french' ? FRENCH_FEMALE : language === 'spanish' ? SPANISH_FEMALE : FEMALE_NAMES;
+    const malePool = language === 'turkish' ? TURKISH_MALE : language === 'arabic' ? ARABIC_MALE : language === 'french' ? FRENCH_MALE : language === 'spanish' ? SPANISH_MALE : MALE_NAMES;
     const names = hostCount === 'two'
-      ? { host1: pickRandom(FEMALE_NAMES), host2: pickRandom(MALE_NAMES) }
-      : { host1: pickRandom(FEMALE_NAMES), host2: '' };
+      ? { host1: pickRandom(femalePool), host2: pickRandom(malePool) }
+      : { host1: pickRandom(femalePool), host2: '' };
     setSpeakerNames(names);
 
     setIsGenerating(true);
