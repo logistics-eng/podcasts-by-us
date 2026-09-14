@@ -343,7 +343,9 @@ VOCABULARY CHART
 Keep the conversation natural and engaging. Do not include any stage directions or non-spoken text.`;
 
       const finalUserPrompt = language === 'spanish'
-        ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Spanish. All dialogue, vocabulary chart, and content must be in Spanish.'
+        ? userPrompt + (spanishDialect === 'argentina'
+            ? '\n\nIMPORTANT: Write the ENTIRE podcast script in Argentine Spanish (Rioplatense dialect). All dialogue, vocabulary chart, and content must be in Spanish. Avoid English loanwords that contain "sh" sounds (e.g. use "compras" instead of "shopping", "programa" instead of "show"). If an English term is unavoidable, rephrase or use the closest Spanish equivalent.'
+            : '\n\nIMPORTANT: Write the ENTIRE podcast script in Spanish. All dialogue, vocabulary chart, and content must be in Spanish.')
         : language === 'french'
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in French. All dialogue, vocabulary chart, and content must be in French.'
         : language === 'arabic'
