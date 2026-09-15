@@ -1454,7 +1454,7 @@ export default function App() {
                             </button>
                           )}
                           {transcript && (
-                            <button onClick={handleToggleHebrew} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                            <button onClick={() => handleToggleHebrew()} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
                               {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                             </button>
                           )}
