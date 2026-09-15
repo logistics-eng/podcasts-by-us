@@ -1016,7 +1016,7 @@ export default function App() {
                 )}
               </div>
               {selectedPodcast.vocabulary && selectedPodcast.level && (
-                <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english' })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 transition-all">
+                <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english' })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
                   {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>📄 Worksheet</>}
                 </button>
               )}
@@ -1028,7 +1028,7 @@ export default function App() {
                   const copyFn = () => { setDetailVocabCopied(true); setTimeout(() => setDetailVocabCopied(false), 2000); };
                   if (navigator.clipboard) { navigator.clipboard.writeText(text).then(copyFn).catch(() => { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); copyFn(); }); }
                   else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); copyFn(); }
-                }} className="ml-auto px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
+                }} className="ml-auto flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-full transition-all">
                   {detailVocabCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Vocabulary</>}
                 </button>
               )}
@@ -1043,16 +1043,16 @@ export default function App() {
                     } else {
                       const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); setDetailCopied(true); setTimeout(() => setDetailCopied(false), 2000);
                     }
-                  }} className="px-3 py-2 text-xs font-bold text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1">
+                  }} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-full transition-all">
                     {detailCopied ? <><Check size={13} />Copied!</> : <><Copy size={13} />Copy Transcript</>}
                   </button>
                   {selectedPodcast.transcript && (
-                    <button onClick={() => handleToggleHebrew(selectedPodcast.transcript)} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                    <button onClick={() => handleToggleHebrew(selectedPodcast.transcript)} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
                       {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                     </button>
                   )}
                   {selectedPodcast.language === 'arabic' && (selectedPodcast.level === 'A1' || selectedPodcast.level === 'A2' || selectedPodcast.level === 'B1') && selectedPodcast.transcript && (
-                    <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                    <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
                       {isTransliterating ? <><Loader2 size={14} className="animate-spin" /> Transliterating...</> : <>{showTransliteration ? '✕ Hide Transliteration' : '🔤 Transliteration'}</>}
                     </button>
                   )}
@@ -1451,29 +1451,29 @@ export default function App() {
                           )}
                         </div>
                         {vocabularyChart && level && (
-                          <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 transition-all">
+                          <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
                             {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>📄 Worksheet</>}
                           </button>
                         )}
                       </div>
                       {activeTab === 'transcript' && (
                         <div className="flex items-center gap-2 flex-wrap">
-                          <button onClick={copyToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
+                          <button onClick={copyToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-full transition-all">
                             {copied ? <Check size={14} /> : <Copy size={14} />}
                             {copied ? 'Copied' : 'Copy Transcript'}
                           </button>
                           {transcript && (
-                            <button onClick={() => shareViaWhatsApp(transcript, `transcript-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition-all">
+                            <button onClick={() => shareViaWhatsApp(transcript, `transcript-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-full transition-all">
                               💬 WhatsApp
                             </button>
                           )}
                           {transcript && (
-                            <button onClick={() => handleToggleHebrew()} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                            <button onClick={() => handleToggleHebrew()} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
                               {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                             </button>
                           )}
                           {language === 'arabic' && (level === 'A1' || level === 'A2' || level === 'B1') && transcript && (
-                            <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
+                            <button onClick={handleToggleTransliteration} disabled={isTransliterating} className="flex items-center gap-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
                               {isTransliterating ? <><Loader2 size={14} className="animate-spin" /> Transliterating...</> : <>{showTransliteration ? '✕ Hide Transliteration' : '🔤 Transliteration'}</>}
                             </button>
                           )}
@@ -1481,12 +1481,12 @@ export default function App() {
                       )}
                       {activeTab === 'vocabulary' && (
                         <div className="flex items-center gap-2 flex-wrap justify-end">
-                          <button onClick={copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
+                          <button onClick={copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-full transition-all">
                             {vocabCopied ? <Check size={14} /> : <Copy size={14} />}
                             {vocabCopied ? 'Copied' : 'Copy Chart'}
                           </button>
                           {vocabularyChart && (
-                            <button onClick={() => shareViaWhatsApp(vocabularyChart, `vocabulary-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition-all">
+                            <button onClick={() => shareViaWhatsApp(vocabularyChart, `vocabulary-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-full transition-all">
                               💬 WhatsApp
                             </button>
                           )}
