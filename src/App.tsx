@@ -1117,6 +1117,21 @@ export default function App() {
                       <div className="space-y-2">{tip.examples.map((ex, i) => (<p key={i} className="text-sm text-gray-700">{highlightWords(ex.sentence, ex.highlights)}</p>))}</div>
                     </div>
                   ))}
+                  {(selectedPodcast.grammar_tips || []).length > 0 && (() => {
+                    const langHe = (selectedPodcast.language || 'english') === 'spanish' ? 'ספרדית' : (selectedPodcast.language || 'english') === 'french' ? 'צרפתית' : (selectedPodcast.language || 'english') === 'arabic' ? 'ערבית' : (selectedPodcast.language || 'english') === 'turkish' ? 'טורקית' : 'אנגלית';
+                    const patternNames = (selectedPodcast.grammar_tips || []).map((t: any) => t.pattern).join(', ');
+                    const prompt = `רוצה לתרגל ${langHe} ברמה ${selectedPodcast.level}. למדתי את הדפוסים הדקדוקיים הבאים: ${patternNames}. שאל אותי שאלות אחת בכל פעם שידרשו ממני להשתמש בדפוסים האלה, תן לי לענות, ואחרי שסיימנו — תגיה לי על הדקדוק שלי.`;
+                    return (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-2">
+                        <p className="text-xs font-bold text-blue-700">🎙️ פעילות דיבור עם בינה מלאכותית</p>
+                        <p className="text-sm text-gray-700 leading-relaxed" dir="rtl">{prompt}</p>
+                        <button onClick={() => navigator.clipboard.writeText(prompt)} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-all">
+                          <Copy size={12} /> העתק פרומפט
+                        </button>
+                        <p className="text-[10px] text-gray-400" dir="rtl">העתק את הטקסט הזה והדבק אותו לכלי AI כמו Claude, ChatGPT או כל עוזר AI אחר.</p>
+                      </div>
+                    );
+                  })()}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1628,6 +1643,21 @@ export default function App() {
                                   </div>
                                 </div>
                               ))}
+                              {grammarTips.length > 0 && (() => {
+                                const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : 'אנגלית';
+                                const patternNames = grammarTips.map(t => t.pattern).join(', ');
+                                const prompt = `רוצה לתרגל ${langHe} ברמה ${level}. למדתי את הדפוסים הדקדוקיים הבאים: ${patternNames}. שאל אותי שאלות אחת בכל פעם שידרשו ממני להשתמש בדפוסים האלה, תן לי לענות, ואחרי שסיימנו — תגיה לי על הדקדוק שלי.`;
+                                return (
+                                  <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-2">
+                                    <p className="text-xs font-bold text-blue-700">🎙️ פעילות דיבור עם בינה מלאכותית</p>
+                                    <p className="text-sm text-gray-700 leading-relaxed" dir="rtl">{prompt}</p>
+                                    <button onClick={() => navigator.clipboard.writeText(prompt)} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-all">
+                                      <Copy size={12} /> העתק פרומפט
+                                    </button>
+                                    <p className="text-[10px] text-gray-400" dir="rtl">העתק את הטקסט הזה והדבק אותו לכלי AI כמו Claude, ChatGPT או כל עוזר AI אחר.</p>
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>
