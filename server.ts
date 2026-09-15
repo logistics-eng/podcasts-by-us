@@ -575,6 +575,22 @@ ${transcript}`;
       const { title, level, vocabulary, grammarTips, language } = req.body;
       const langName = language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic (Levantine)' : language === 'turkish' ? 'Turkish' : 'English';
 
+      const levelDesc: Record<string, string> = {
+        A1: 'complete beginners — very short sentences (max 6 words), present simple only, basic matching and fill-in-the-blank with word bank',
+        A2: 'elementary — simple sentences, fill-in-blank with word bank, short sentence completion, basic grammar patterns',
+        B1: 'intermediate — fuller sentences, gap-fill without word bank, sentence transformation, guided writing prompt (2–3 sentences)',
+        B2: 'upper-intermediate — complex sentences, gap-fill, error correction, sentence transformation, short paragraph writing (4–5 sentences)',
+        C1: 'advanced — sophisticated vocabulary, error correction, paraphrase/transformation, discussion questions, paragraph writing with argument',
+        C2: 'mastery — nuanced vocabulary and idioms, stylistic analysis, complex transformation, extended writing task',
+      };
+      const levelExercises: Record<string, string> = {
+        A1: '3 exercises: (1) match word to meaning — 5 words, (2) fill in the blank with word bank — 5 sentences, (3) grammar fill-in-the-blank — 3 sentences',
+        A2: '4 exercises: (1) match word to meaning — 7 words, (2) fill in the blank with word bank — 5 sentences, (3) complete the sentence — 3 sentences, (4) grammar exercise — 4 sentences',
+        B1: '4 exercises: (1) vocabulary in context — 8 words, match to definitions, (2) fill in the blank without word bank — 6 sentences, (3) sentence transformation — 4 sentences, (4) guided writing — write 2–3 sentences using given words',
+        B2: '5 exercises: (1) vocabulary matching — 8 words, (2) fill in blank without word bank — 6 sentences, (3) error correction — find and fix 5 mistakes, (4) sentence transformation — 4 sentences, (5) short paragraph writing — 4–5 sentences on the podcast topic',
+        C1: '5 exercises: (1) advanced vocabulary — 10 words, define or use in a sentence, (2) error correction — 6 sentences, (3) paraphrase/transformation — 5 sentences, (4) discussion questions — 3 open questions related to the topic, (5) writing task — one paragraph arguing a point from the podcast',
+        C2: '5 exercises: (1) vocabulary and idioms — 10 items, define or contrast, (2) stylistic/register analysis — 3 sentences to improve or transform, (3) complex sentence transformation — 5 sentences, (4) extended discussion questions — 3 analytical questions, (5) extended writing — one well-structured paragraph with argument and evidence',
+      };
       const prompt = `You are creating a ${langName} language learning worksheet for level ${level} students.
 
 Podcast title: ${title}
@@ -584,9 +600,9 @@ Grammar tip: ${JSON.stringify(grammarTips?.[0] || {})}
 Create a complete HTML worksheet. Requirements:
 - All exercise instructions must be written in Hebrew
 - All ${langName} content (words, sentences, examples) must be in ${langName}
-- The worksheet must be appropriate for ${level} level (${level === 'A1' ? 'complete beginners — very short sentences, max 6 words, only present simple, basic matching and fill-in-the-blank' : 'elementary — slightly longer sentences, fill-in-blank with word bank, short sentence completion'})
+- The worksheet must be appropriate for ${level} level: ${levelDesc[level] || 'intermediate'}
 - Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
-- ${level === 'A1' ? '3 exercises: (1) match word to meaning — 5 words, (2) fill in the blank with word bank — 5 sentences, (3) grammar fill-in-the-blank — 3 sentences' : '4 exercises: (1) match word to meaning — 7 words, (2) fill in the blank with word bank — 5 sentences, (3) complete the sentence — 3 sentences, (4) grammar exercise — 4 sentences'}
+- ${levelExercises[level] || levelExercises['B1']}
 - Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
 - Include a @media print stylesheet that hides the print button and sets page margins to 1cm
 - Include a visible "🖨️ הדפס / Save as PDF" button at the top styled in blue that calls window.print()

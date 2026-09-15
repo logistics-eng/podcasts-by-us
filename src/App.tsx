@@ -1520,7 +1520,7 @@ export default function App() {
                               );
                             })}
                           </div>
-                          {(level === 'A1' || level === 'A2') && (
+                          {level && (
                             <div className="flex justify-start mt-4 pt-4 border-t border-gray-100">
                               <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all text-sm">
                                 {isGeneratingWorksheet ? <><Loader2 className="animate-spin" size={16} /> Generating Worksheet...</> : <>📄 Generate Worksheet</>}
