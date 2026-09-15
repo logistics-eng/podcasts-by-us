@@ -642,8 +642,13 @@ Create a complete HTML worksheet. Requirements:
         messages: [{ role: 'user', content: `Translate the following podcast transcript into Hebrew. Rules:\n- Translate ALL spoken content into Hebrew, regardless of what language it is in\n- Keep speaker names exactly as they appear (do not translate names)\n- Keep the same format: one line per speaker with the speaker label\n- If the text already contains some Hebrew words or phrases, translate the surrounding non-Hebrew content and keep the structure\n- Do NOT include vocabulary charts, headers, or metadata — only the dialogue lines\n- Return only the translated dialogue, nothing else\n\nTranscript:\n${transcript}` }],
       });
       const translated = (msg.content[0] as any).text.trim();
+      if (!translated) {
+        console.error('translate-hebrew: Claude returned empty. Input length:', (transcript as string)?.length);
+        return res.status(500).json({ error: 'Translation returned empty. The transcript may be too long or in an unsupported format.' });
+      }
       res.json({ translated });
     } catch (error: any) {
+      console.error('translate-hebrew error:', error.message);
       res.status(500).json({ error: error.message });
     }
   });

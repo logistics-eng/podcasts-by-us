@@ -538,12 +538,14 @@ export default function App() {
   const handleToggleHebrew = async (overrideTranscript?: string) => {
     if (showHebrew) { setShowHebrew(false); return; }
     if (hebrewTranscript) { setShowHebrew(true); return; }
+    const textToTranslate = String(overrideTranscript ?? transcript).replace(/VOCABULARY CHART[\s\S]*/i, '').trim();
+    if (!textToTranslate) { alert('No transcript to translate.'); return; }
     setIsTranslatingHebrew(true);
     try {
       const res = await fetch('/api/translate-hebrew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: String(overrideTranscript ?? transcript).replace(/VOCABULARY CHART[\s\S]*/i, '').trim() }),
+        body: JSON.stringify({ transcript: textToTranslate }),
       });
       const data = await res.json();
       if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
