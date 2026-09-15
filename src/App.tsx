@@ -114,6 +114,132 @@ const LEVELS = [
   { id: 'C2', label: 'C2' }
 ];
 
+// Arabic Vocabulary Builder — themed word lists for A1 beginners
+interface ArabicWord { ar: string; translit: string; he: string; }
+interface ArabicTopic { emoji: string; title: string; words: ArabicWord[]; }
+const ARABIC_VOCAB_TOPICS: ArabicTopic[] = [
+  { emoji: '🔢', title: 'מספרים', words: [
+    { ar: 'واحد', translit: 'וָאחֶד', he: 'אחד' },
+    { ar: 'اثنان', translit: 'אִתְ׳נַאן', he: 'שניים' },
+    { ar: 'ثلاثة', translit: 'תַ׳לָאתָ׳ה', he: 'שלושה' },
+    { ar: 'أربعة', translit: 'אַרְבַּעָה', he: 'ארבעה' },
+    { ar: 'خمسة', translit: 'חַ׳מְסָה', he: 'חמישה' },
+    { ar: 'ستة', translit: 'סִתָּה', he: 'שישה' },
+    { ar: 'سبعة', translit: 'סַבְּעָה', he: 'שבעה' },
+    { ar: 'ثمانية', translit: 'תְ׳מַאנְיָה', he: 'שמונה' },
+    { ar: 'تسعة', translit: 'תִ׳סְעָה', he: 'תשעה' },
+    { ar: 'عشرة', translit: 'עַשַׁרָה', he: 'עשרה' },
+  ]},
+  { emoji: '👋', title: 'ברכות', words: [
+    { ar: 'مرحبا', translit: 'מַרְחַבָּא', he: 'שלום / היי' },
+    { ar: 'أهلاً', translit: 'אַהְלַאן', he: 'ברוך הבא' },
+    { ar: 'صباح الخير', translit: 'צַּבָּאח אַלְחֵיר', he: 'בוקר טוב' },
+    { ar: 'مساء الخير', translit: 'מַסָּא אַלְחֵיר', he: 'ערב טוב' },
+    { ar: 'كيفك؟', translit: 'כֵּיפַּק?', he: 'מה שלומך?' },
+    { ar: 'منيح', translit: 'מְנִיח', he: 'טוב (לבנטי)' },
+    { ar: 'شكرا', translit: 'שֻׁקְרַאן', he: 'תודה' },
+    { ar: 'عفواً', translit: 'עַפְוַאן', he: 'בבקשה / סליחה' },
+    { ar: 'مع السلامة', translit: "מַע אַסַּלַאמָ'ה", he: 'להתראות' },
+    { ar: 'يلا', translit: 'יַאלַּה', he: 'יאללה / בוא נלך' },
+  ]},
+  { emoji: '👨‍👩‍👧‍👦', title: 'משפחה', words: [
+    { ar: 'أب', translit: 'אַב', he: 'אבא' },
+    { ar: 'أم', translit: 'אֻמּ', he: 'אמא' },
+    { ar: 'أخ', translit: 'אַח׳', he: 'אח' },
+    { ar: 'أخت', translit: "אֻחְת'", he: 'אחות' },
+    { ar: 'جد', translit: 'גַ׳ד', he: 'סבא' },
+    { ar: 'ستو', translit: 'סִתּוּ', he: 'סבתא' },
+    { ar: 'ابن', translit: 'אִבְּן', he: 'בן' },
+    { ar: 'بنت', translit: 'בִּנְת', he: 'בת' },
+    { ar: 'عم', translit: 'עַם', he: "דוד (מצד האב)" },
+    { ar: 'زوج', translit: 'זַוְ׳ג', he: 'בעל / זוג' },
+  ]},
+  { emoji: '🎨', title: 'צבעים', words: [
+    { ar: 'أحمر', translit: 'אַחְמַר', he: 'אדום' },
+    { ar: 'أزرق', translit: 'אַזְרַק', he: 'כחול' },
+    { ar: 'أخضر', translit: "אַחְ'צַ'ר", he: 'ירוק' },
+    { ar: 'أصفر', translit: 'אַצְפַ׳ר', he: 'צהוב' },
+    { ar: 'أبيض', translit: 'אַבְיַד', he: 'לבן' },
+    { ar: 'أسود', translit: 'אַסְוַד', he: 'שחור' },
+    { ar: 'بنفسجي', translit: 'בַּנַפְסַ׳ג׳י', he: 'סגול' },
+    { ar: 'برتقالي', translit: 'בּוּרְתוּקַּאלִי', he: 'כתום' },
+    { ar: 'وردي', translit: 'וַרְדִּי', he: 'ורוד' },
+    { ar: 'بني', translit: "בּוּנִּי", he: 'חום' },
+  ]},
+  { emoji: '😊', title: 'רגשות', words: [
+    { ar: 'سعيد', translit: 'סַעִיד', he: 'שמח' },
+    { ar: 'زعلان', translit: 'זַעְלָאן', he: 'עצוב / כועס' },
+    { ar: 'خايف', translit: "חַ'איִף", he: 'מפחד' },
+    { ar: 'متوتر', translit: 'מִתַּוַּתֵּר', he: 'לחוץ / עצבני' },
+    { ar: 'متحمس', translit: 'מִתְחַמֶּס', he: 'נרגש / נלהב' },
+    { ar: 'تعبان', translit: 'תַּעְבָּאן', he: 'עייף' },
+    { ar: 'جوعان', translit: 'ג׳וּעַאן', he: 'רעב' },
+    { ar: 'عطشان', translit: 'עַטְשָׁאן', he: 'צמא' },
+    { ar: 'كسلان', translit: 'כַּסְלָאן', he: 'עצלן' },
+    { ar: 'مبسوط', translit: 'מַבְּסוּט', he: 'מאושר / מרוצה' },
+  ]},
+  { emoji: '🍕', title: 'אוכל', words: [
+    { ar: 'خبز', translit: "חֻ'בְּז", he: 'לחם' },
+    { ar: 'ماء', translit: 'מַאא', he: 'מים' },
+    { ar: 'قهوة', translit: 'קַהְוֶה', he: 'קפה' },
+    { ar: 'شاي', translit: 'שַׁאי', he: 'תה' },
+    { ar: 'تفاح', translit: 'תֻּפַּאח', he: 'תפוח' },
+    { ar: 'دجاج', translit: 'דַ׳ג׳ַאג׳', he: 'עוף' },
+    { ar: 'أرز', translit: 'אַרֻּז', he: 'אורז' },
+    { ar: 'حلوى', translit: 'חַלְוַא', he: 'ממתק / קינוח' },
+    { ar: 'بيض', translit: 'בֵּיד', he: 'ביצים' },
+    { ar: 'لبن', translit: 'לַבַּן', he: 'יוגורט / חלב' },
+  ]},
+  { emoji: '🏠', title: 'מקומות', words: [
+    { ar: 'بيت', translit: 'בֵּית', he: 'בית' },
+    { ar: 'مدرسة', translit: 'מַדְרַסֶה', he: 'בית ספר' },
+    { ar: 'سوق', translit: 'סוּק', he: 'שוק' },
+    { ar: 'مستشفى', translit: 'מֻסְתַשְׁפַ׳א', he: 'בית חולים' },
+    { ar: 'مطعم', translit: 'מַטְעַם', he: 'מסעדה' },
+    { ar: 'شارع', translit: 'שַׁארִע', he: 'רחוב' },
+    { ar: 'محطة', translit: 'מַחַטָּה', he: 'תחנה' },
+    { ar: 'دكان', translit: 'דּוּכַּאן', he: 'חנות' },
+    { ar: 'مسجد', translit: 'מַסְג׳ִד', he: 'מסגד' },
+    { ar: 'بحر', translit: 'בַּחַר', he: 'ים' },
+  ]},
+  { emoji: '⏰', title: 'זמן', words: [
+    { ar: 'اليوم', translit: 'אַלְיוֹם', he: 'היום' },
+    { ar: 'بكرا', translit: 'בּוּכְרַא', he: 'מחר' },
+    { ar: 'امبارح', translit: 'אִמְבָּארִח', he: 'אתמול' },
+    { ar: 'هلق', translit: 'הַלַּק', he: 'עכשיו' },
+    { ar: 'الصبح', translit: 'אַצּוּבּוּח', he: 'בוקר' },
+    { ar: 'الليل', translit: 'אַלְלֵיל', he: 'לילה' },
+    { ar: 'الأسبوع', translit: 'אַלּוּסְבּוּע', he: 'שבוע' },
+    { ar: 'الشهر', translit: "אַשְּׁשַׁהְר", he: 'חודש' },
+    { ar: 'السنة', translit: 'אַסַּנֶה', he: 'שנה' },
+    { ar: 'دقيقة', translit: 'דַּקִּיקַה', he: 'דקה' },
+  ]},
+  { emoji: '🏃', title: 'פעלים בסיסיים', words: [
+    { ar: 'بدي', translit: 'בַּדִּי', he: 'אני רוצה' },
+    { ar: 'بحكي', translit: 'בִּחְכִּי', he: 'אני מדבר' },
+    { ar: 'بشرب', translit: 'בִּשְׁרַב', he: 'אני שותה' },
+    { ar: 'باكل', translit: 'בַּאכֻּל', he: 'אני אוכל' },
+    { ar: 'بروح', translit: 'בְּרוּח', he: 'אני הולך' },
+    { ar: 'بيجي', translit: 'בְּיִיג׳י', he: 'הוא בא' },
+    { ar: 'بشتغل', translit: 'בְּשַׁתְּגַ׳ל', he: 'אני עובד' },
+    { ar: 'بنام', translit: 'בְּנָאם', he: 'אני ישן' },
+    { ar: 'بحب', translit: 'בְּחֻב', he: 'אני אוהב' },
+    { ar: 'مافهمت', translit: 'מָא פְהִמְת', he: 'לא הבנתי' },
+  ]},
+  { emoji: '🧍', title: 'גוף', words: [
+    { ar: 'راس', translit: 'רַאס', he: 'ראש' },
+    { ar: 'عين', translit: 'עֵין', he: 'עין' },
+    { ar: 'إيد', translit: 'אִיד', he: 'יד' },
+    { ar: 'رجل', translit: 'רִ׳ג׳ל', he: "רגל" },
+    { ar: 'قلب', translit: 'קַלְב', he: 'לב' },
+    { ar: 'أذن', translit: "אֻ'ד'ן", he: 'אוזן' },
+    { ar: 'انف', translit: 'אַנְף', he: 'אף' },
+    { ar: 'شعر', translit: "שַׁעַר", he: 'שיער' },
+    { ar: 'كتف', translit: "כְּתֵף", he: 'כתף' },
+    { ar: 'بطن', translit: "בַּטְּן", he: 'בטן' },
+  ]},
+];
+
 interface SavedPodcast {
   id: number;
   title: string;
@@ -134,7 +260,16 @@ interface SavedPodcast {
 }
 
 export default function App() {
-  const [view, setView] = useState<'create' | 'library' | 'detail'>('create');
+  const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
+  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | null>(null);
+  const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
+  const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
+  const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizOptions, setQuizOptions] = useState<string[]>([]);
+  const [quizAnswered, setQuizAnswered] = useState<string | null>(null);
+  const [quizScore, setQuizScore] = useState(0);
+  const [playAllActive, setPlayAllActive] = useState(false);
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
   const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish'>('english');
@@ -553,6 +688,49 @@ export default function App() {
     );
   };
 
+  const getVocabAudio = async (word: ArabicWord) => {
+    const key = word.ar;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.ar }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const startQuiz = (topic: ArabicTopic) => {
+    setQuizIndex(0);
+    setQuizAnswered(null);
+    setQuizScore(0);
+    setVocabMode('quiz');
+    generateQuizOptions(topic, 0);
+  };
+
+  const generateQuizOptions = (topic: ArabicTopic, idx: number) => {
+    const correct = topic.words[idx].he;
+    const others = ARABIC_VOCAB_TOPICS
+      .flatMap(t => t.words.map(w => w.he))
+      .filter(h => h !== correct);
+    const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
+    const opts = [...shuffled, correct].sort(() => Math.random() - 0.5);
+    setQuizOptions(opts);
+  };
+
   const handleToggleHebrew = async (overrideTranscript?: string) => {
     if (showHebrew) { setShowHebrew(false); return; }
     if (hebrewTranscript) { setShowHebrew(true); return; }
@@ -831,6 +1009,156 @@ export default function App() {
     if (filterLevel !== 'All' && p.level !== filterLevel) return false;
     return true;
   });
+
+  // VOCAB BUILDER VIEW
+  if (view === 'vocab-builder') {
+    const allTopics = ARABIC_VOCAB_TOPICS;
+    if (!vocabTopic) {
+      // Topic selection grid
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setView('create')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> חזרה
+              </button>
+              <div>
+                <h1 className="text-base font-bold">🌙 Arabic Starter</h1>
+                <p className="text-xs text-gray-500">בחר נושא ללמוד</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-6">
+            <div className="grid grid-cols-2 gap-3">
+              {allTopics.map((topic, i) => (
+                <button key={i} onClick={() => { setVocabTopic(topic); setVocabMode('browse'); setQuizIndex(0); setQuizAnswered(null); setQuizScore(0); }}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-200 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-gray-400">{topic.words.length} מילים</span>
+                </button>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // Word list / quiz view
+    const topic = vocabTopic;
+    const word = topic.words[quizIndex];
+
+    const playAll = async () => {
+      setPlayAllActive(true);
+      for (const w of topic.words) {
+        await getVocabAudio(w);
+        await new Promise(r => setTimeout(r, 1800));
+      }
+      setPlayAllActive(false);
+    };
+
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+        <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+            <button onClick={() => setVocabTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+              <ArrowLeft size={16} /> נושאים
+            </button>
+            <div className="flex-1">
+              <h1 className="text-base font-bold">{topic.emoji} {topic.title}</h1>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setVocabMode('browse'); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'browse' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>מילים</button>
+              <button onClick={() => startQuiz(topic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>חידון</button>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-2xl mx-auto px-4 py-6">
+          {vocabMode === 'browse' ? (
+            <>
+              <div className="flex justify-end mb-4">
+                <button onClick={playAll} disabled={playAllActive} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-full hover:bg-amber-600 disabled:opacity-60 transition-all">
+                  {playAllActive ? <><Loader2 size={13} className="animate-spin" /> מנגן...</> : <><Volume2 size={13} /> השמע הכל</>}
+                </button>
+              </div>
+              <div className="space-y-3">
+                {topic.words.map((w, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                    <button onClick={() => getVocabAudio(w)} disabled={vocabAudioLoading[w.ar]} className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-amber-50 border border-amber-200 rounded-full hover:bg-amber-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading[w.ar] ? <Loader2 size={16} className="animate-spin text-amber-600" /> : <Volume2 size={16} className="text-amber-600" />}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xl font-bold text-gray-800 text-right" dir="rtl">{w.ar}</p>
+                      <p className="text-sm text-amber-700 font-mono">{w.translit}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-indigo-700">{w.he}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            // Quiz mode
+            quizIndex >= topic.words.length ? (
+              <div className="text-center py-16 space-y-4">
+                <div className="text-5xl">🎉</div>
+                <h2 className="text-2xl font-bold text-gray-800">סיימת!</h2>
+                <p className="text-lg text-gray-600">ענית נכון על <span className="font-bold text-amber-600">{quizScore}</span> מתוך <span className="font-bold">{topic.words.length}</span></p>
+                <div className="flex gap-3 justify-center mt-6">
+                  <button onClick={() => startQuiz(topic)} className="px-5 py-2.5 bg-amber-500 text-white font-bold rounded-full hover:bg-amber-600 transition-all">שחק שוב</button>
+                  <button onClick={() => setVocabMode('browse')} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-full hover:bg-gray-200 transition-all">חזור למילים</button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>{quizIndex + 1} / {topic.words.length}</span>
+                  <span>✅ {quizScore}</span>
+                </div>
+                <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8 text-center space-y-3">
+                  <button onClick={() => getVocabAudio(word)} className="mx-auto w-14 h-14 flex items-center justify-center bg-amber-50 border border-amber-200 rounded-full hover:bg-amber-100 transition-all">
+                    {vocabAudioLoading[word.ar] ? <Loader2 size={22} className="animate-spin text-amber-600" /> : <Volume2 size={22} className="text-amber-600" />}
+                  </button>
+                  <p className="text-4xl font-bold text-gray-800" dir="rtl">{word.ar}</p>
+                  <p className="text-base text-amber-700 font-mono">{word.translit}</p>
+                  <p className="text-xs text-gray-400">מה זה אומר בעברית?</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {quizOptions.map((opt, i) => {
+                    const isCorrect = opt === word.he;
+                    const isChosen = opt === quizAnswered;
+                    let cls = 'p-4 rounded-2xl border-2 text-sm font-bold transition-all text-center ';
+                    if (!quizAnswered) cls += 'bg-white border-gray-200 hover:border-amber-300 hover:bg-amber-50 cursor-pointer';
+                    else if (isCorrect) cls += 'bg-green-50 border-green-400 text-green-700';
+                    else if (isChosen) cls += 'bg-red-50 border-red-300 text-red-600';
+                    else cls += 'bg-white border-gray-100 text-gray-400';
+                    return (
+                      <button key={i} className={cls} disabled={!!quizAnswered} onClick={() => {
+                        setQuizAnswered(opt);
+                        if (isCorrect) setQuizScore(s => s + 1);
+                        setTimeout(() => {
+                          const next = quizIndex + 1;
+                          setQuizIndex(next);
+                          setQuizAnswered(null);
+                          if (next < topic.words.length) generateQuizOptions(topic, next);
+                        }, 1200);
+                      }}>
+                        {opt}
+                        {quizAnswered && isCorrect && ' ✓'}
+                        {quizAnswered && isChosen && !isCorrect && ' ✗'}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )
+          )}
+        </main>
+      </div>
+    );
+  }
 
   // LIBRARY VIEW
   if (view === 'library') {
@@ -1215,6 +1543,18 @@ export default function App() {
                     <button onClick={() => setLanguage('arabic')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'arabic' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇸🇾 Arabic</button>
                     <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
                   </div>
+                  {language === 'arabic' && (
+                    <button onClick={() => { setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌙</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-amber-800">Arabic Starter — לומדים ערבית מאפס</p>
+                          <p className="text-xs text-amber-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-amber-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
                   {language === 'spanish' && (
                     <div className="flex p-1 bg-gray-100 rounded-xl">
                       <button onClick={() => setSpanishDialect('spain')} className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${spanishDialect === 'spain' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spain</button>

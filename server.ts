@@ -654,6 +654,26 @@ Style this box attractively: rounded corners, a small 📋 copy button next to i
   });
 
 
+  // TTS for a single Arabic word (Vocabulary Builder)
+  app.post('/api/tts-word', async (req, res) => {
+    try {
+      const { word } = req.body;
+      const tts = new MsEdgeTTS();
+      await tts.setMetadata('ar-SY-AmanyNeural', OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+      const { audioStream } = await tts.toStream(word, { rate: 0.85 });
+      const chunks: Buffer[] = [];
+      await new Promise<void>((resolve, reject) => {
+        audioStream.on('data', (c: Buffer) => chunks.push(c));
+        audioStream.on('end', resolve);
+        audioStream.on('error', reject);
+      });
+      const buf = Buffer.concat(chunks);
+      res.json({ base64: buf.toString('base64') });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Translate a transcript to Hebrew
   app.post('/api/translate-hebrew', async (req, res) => {
     try {
