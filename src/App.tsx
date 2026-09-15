@@ -556,7 +556,9 @@ export default function App() {
   const handleToggleHebrew = async (overrideTranscript?: string) => {
     if (showHebrew) { setShowHebrew(false); return; }
     if (hebrewTranscript) { setShowHebrew(true); return; }
-    const textToTranslate = String(overrideTranscript ?? transcript).replace(/VOCABULARY CHART[\s\S]*/i, '').trim();
+    const raw = String(overrideTranscript ?? transcript);
+    const textToTranslate = raw.replace(/VOCABULARY CHART[\s\S]*/i, '').trim();
+    console.log('[Hebrew] raw length:', raw.length, 'after strip:', textToTranslate.length, 'preview:', textToTranslate.slice(0, 100));
     if (!textToTranslate) { alert('No transcript to translate.'); return; }
     setIsTranslatingHebrew(true);
     try {
@@ -566,9 +568,10 @@ export default function App() {
         body: JSON.stringify({ transcript: textToTranslate }),
       });
       const data = await res.json();
+      console.log('[Hebrew] response status:', res.status, 'has translated:', !!data.translated, 'error:', data.error);
       if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
-      else { alert('Failed to translate: ' + (data.error || 'Unknown error')); }
-    } catch (e: any) { alert('Failed to translate: ' + (typeof e?.message === 'string' ? e.message : String(e))); }
+      else { alert('Translation failed: ' + (data.error || 'Unknown error')); }
+    } catch (e: any) { alert('Translation failed: ' + (typeof e?.message === 'string' ? e.message : String(e))); }
     finally { setIsTranslatingHebrew(false); }
   };
 
