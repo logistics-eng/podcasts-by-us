@@ -260,14 +260,19 @@ export default function App() {
     setFilterLevel('All');
   }, [language]);
 
-  const handleGenerateWorksheet = async () => {
-    if (!vocabularyChart || !level) return;
+  const handleGenerateWorksheet = async (overrides?: { title?: string; vocabulary?: string; level?: string; grammarTips?: any[]; language?: string }) => {
+    const vocab = overrides?.vocabulary ?? vocabularyChart;
+    const lvl = overrides?.level ?? level;
+    const title = overrides?.title ?? generatedTitle;
+    const tips = overrides?.grammarTips ?? grammarTips;
+    const lang = overrides?.language ?? language;
+    if (!vocab || !lvl) return;
     setIsGeneratingWorksheet(true);
     try {
       const res = await fetch('/api/generate-worksheet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: generatedTitle, vocabulary: vocabularyChart, level, grammarTips, language }),
+        body: JSON.stringify({ title, vocabulary: vocab, level: lvl, grammarTips: tips, language: lang }),
       });
       const data = await res.json();
       if (data.html) {
@@ -277,7 +282,7 @@ export default function App() {
         if (!win) {
           const a = document.createElement('a');
           a.href = url;
-          a.download = `worksheet-${generatedTitle || 'podcast'}.html`;
+          a.download = `worksheet-${title || 'podcast'}.html`;
           a.click();
         }
       } else {
@@ -1000,14 +1005,23 @@ export default function App() {
             </div>
           )}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[600px]">
+            <div className="p-2 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 gap-1 flex-wrap">
+              <div className="flex items-center gap-1 flex-wrap">
+                <button onClick={() => setDetailActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
+                {selectedPodcast.vocabulary && (
+                  <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+                )}
+                {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
+                  <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+                )}
+              </div>
+              {selectedPodcast.vocabulary && selectedPodcast.level && (
+                <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english' })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 transition-all">
+                  {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>📄 Worksheet</>}
+                </button>
+              )}
+            </div>
             <div className="p-2 border-b border-gray-100 flex items-center bg-gray-50/50 gap-1 flex-wrap">
-              <button onClick={() => setDetailActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
-              {selectedPodcast.vocabulary && (
-                <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
-              )}
-              {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
-                <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
-              )}
               {detailActiveTab === 'vocabulary' && selectedPodcast.vocabulary && (
                 <button onClick={() => {
                   const text = selectedPodcast.vocabulary || '';
