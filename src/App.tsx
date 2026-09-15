@@ -1804,12 +1804,12 @@ export default function App() {
                     <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
                   </div>
                   {language === 'arabic' && (
-                    <button onClick={() => { setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
+                    <button onClick={() => { setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); setShowAlphabet(false); setSelectedLetter(null); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🌙</span>
                         <div className="text-left">
                           <p className="text-sm font-bold text-amber-800">Arabic Starter — לומדים ערבית מאפס</p>
-                          <p className="text-xs text-amber-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                          <p className="text-xs text-amber-600">אלפבית • מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-amber-600 rotate-180 group-hover:translate-x-1 transition-transform" />
