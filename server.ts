@@ -582,7 +582,6 @@ ${transcript}`;
     try {
       const { title, level, vocabulary, grammarTips, language } = req.body;
       const langName = language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic (Levantine)' : language === 'turkish' ? 'Turkish' : 'English';
-      const langNameHebrew = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : 'אנגלית';
 
       const levelDesc: Record<string, string> = {
         A1: 'complete beginners — very short sentences (max 6 words), present simple only, basic matching and fill-in-the-blank with word bank',
@@ -619,11 +618,6 @@ Create a complete HTML worksheet. Requirements:
 - Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
 - Include a @media print stylesheet that sets page margins to 1cm
 - Include a visible "🖨️ הדפס / Save as PDF" button at the top styled in blue that calls window.print()
-- At the very end of the worksheet (after all exercises), add a section titled "🎙️ פעילות דיבור עם בינה מלאכותית" with a light blue/grey background box containing this ready-to-copy prompt in Hebrew. Pick 3–5 of the most interesting words from the vocabulary list and insert them where indicated:
-
-"רוצה לתרגל ${langNameHebrew} ברמה ${level}. זה עתה האזנתי לפודקאסט בנושא: ${title}. שאל אותי שאלות אחת בכל פעם על הנושא ועל המילים הבאות: [3-5 מילים מרשימת האוצר מילים]. תן לי לענות, ואחרי שסיימנו — תגיה לי על הדקדוק ועל אוצר המילים שלי."
-
-Style this box attractively: rounded corners, a small 📋 copy button next to it (JS: navigator.clipboard.writeText(promptText)), and a note in small text below: "העתק את הטקסט הזה והדבק אותו לכלי AI כמו Claude, ChatGPT או כל עוזר AI אחר."
 - Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
 
       const response = await anthropic.messages.create({

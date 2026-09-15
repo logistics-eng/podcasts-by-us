@@ -371,7 +371,7 @@ export default function App() {
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
   const [transcript, setTranscript] = useState('');
   const [vocabularyChart, setVocabularyChart] = useState('');
-  const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar'>('transcript');
+  const [activeTab, setActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar' | 'speaking'>('transcript');
   const [grammarTips, setGrammarTips] = useState<{
     pattern: string;
     formula: string;
@@ -419,7 +419,7 @@ export default function App() {
   const [detailIsPlaying, setDetailIsPlaying] = useState(false);
   const [detailCurrentTime, setDetailCurrentTime] = useState(0);
   const [detailDuration, setDetailDuration] = useState(0);
-  const [detailActiveTab, setDetailActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar'>('transcript');
+  const [detailActiveTab, setDetailActiveTab] = useState<'transcript' | 'vocabulary' | 'grammar' | 'speaking'>('transcript');
   const detailAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const fetchLibrary = async () => {
@@ -1618,6 +1618,7 @@ export default function App() {
                 {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
                   <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                 )}
+                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ דיבור</button>
               </div>
               {selectedPodcast.vocabulary && selectedPodcast.level && (
                 <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english', podcastId: selectedPodcast.id, savedWorksheet: selectedPodcast.worksheet })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
@@ -1701,23 +1702,29 @@ export default function App() {
                       <div className="space-y-2">{tip.examples.map((ex, i) => (<p key={i} className="text-sm text-gray-700">{highlightWords(ex.sentence, ex.highlights)}</p>))}</div>
                     </div>
                   ))}
-                  {(selectedPodcast.grammar_tips || []).length > 0 && (() => {
-                    const langHe = (selectedPodcast.language || 'english') === 'spanish' ? 'ספרדית' : (selectedPodcast.language || 'english') === 'french' ? 'צרפתית' : (selectedPodcast.language || 'english') === 'arabic' ? 'ערבית' : (selectedPodcast.language || 'english') === 'turkish' ? 'טורקית' : 'אנגלית';
-                    const patternNames = (selectedPodcast.grammar_tips || []).map((t: any) => t.pattern).join(', ');
-                    const prompt = `רוצה לתרגל ${langHe} ברמה ${selectedPodcast.level}. למדתי את הדפוסים הדקדוקיים הבאים: ${patternNames}. שאל אותי שאלות אחת בכל פעם שידרשו ממני להשתמש בדפוסים האלה, תן לי לענות, ואחרי שסיימנו — תגיה לי על הדקדוק שלי.`;
-                    return (
-                      <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-2">
-                        <p className="text-xs font-bold text-blue-700">🎙️ פעילות דיבור עם בינה מלאכותית</p>
-                        <p className="text-sm text-gray-700 leading-relaxed" dir="rtl">{prompt}</p>
-                        <button onClick={() => navigator.clipboard.writeText(prompt)} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-all">
-                          <Copy size={12} /> העתק פרומפט
-                        </button>
-                        <p className="text-[10px] text-gray-400" dir="rtl">העתק את הטקסט הזה והדבק אותו לכלי AI כמו Claude, ChatGPT או כל עוזר AI אחר.</p>
-                      </div>
-                    );
-                  })()}
                 </div>
-              ) : (
+              ) : detailActiveTab === 'speaking' ? (() => {
+                const langHe = (selectedPodcast.language || 'english') === 'spanish' ? 'ספרדית' : (selectedPodcast.language || 'english') === 'french' ? 'צרפתית' : (selectedPodcast.language || 'english') === 'arabic' ? 'ערבית' : (selectedPodcast.language || 'english') === 'turkish' ? 'טורקית' : 'אנגלית';
+                const prompt = `רוצה לתרגל ${langHe} ברמה ${selectedPodcast.level}. זה עתה האזנתי לפודקאסט בנושא: "${selectedPodcast.title}". שאל אותי שאלות בשפה הזו על הנושא שנלמד. תן לי לענות, ותגיה לי את הדקדוק שלי אחרי כל תשובה.`;
+                return (
+                  <div className="space-y-5">
+                    <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
+                      <p className="text-sm font-bold text-indigo-800">מה זה?</p>
+                      <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
+                        העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — הוא ידבר איתך ב{langHe} על הנושא שהאזנת אליו, ויגיה לך את הדקדוק בזמן אמת.
+                      </p>
+                    </div>
+                    <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">הפרומפט שלך</p>
+                      <p className="text-base text-gray-800 leading-relaxed" dir="rtl">{prompt}</p>
+                      <button onClick={() => navigator.clipboard.writeText(prompt)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
+                        <Copy size={15} /> העתק פרומפט
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 text-center" dir="rtl">לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם</p>
+                  </div>
+                );
+              })() : (
                 <div className="space-y-4">
                   <h4 className="text-gray-900 font-bold mb-4">Vocabulary & Idioms</h4>
                   <div className="grid gap-3">
@@ -2080,6 +2087,7 @@ export default function App() {
                           {mode === 'generate' && (
                             <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                           )}
+                          <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ דיבור</button>
                         </div>
                         {vocabularyChart && level && (
                           <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
@@ -2197,7 +2205,29 @@ export default function App() {
                             })}
                           </div>
                         </div>
-                      ) : (
+                      ) : activeTab === 'speaking' ? (() => {
+                        const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : 'אנגלית';
+                        const topicLine = generatedTitle ? `זה עתה האזנתי לפודקאסט בנושא: "${generatedTitle}".` : '';
+                        const prompt = `רוצה לתרגל ${langHe} ברמה ${level}. ${topicLine} שאל אותי שאלות בשפה הזו על הנושא שנלמד. תן לי לענות, ותגיה לי את הדקדוק שלי אחרי כל תשובה.`;
+                        return (
+                          <div className="space-y-5">
+                            <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
+                              <p className="text-sm font-bold text-indigo-800">מה זה?</p>
+                              <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
+                                העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — הוא ידבר איתך ב{langHe} על הנושא שהאזנת אליו, ויגיה לך את הדקדוק בזמן אמת.
+                              </p>
+                            </div>
+                            <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
+                              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">הפרומפט שלך</p>
+                              <p className="text-base text-gray-800 leading-relaxed" dir="rtl">{prompt}</p>
+                              <button onClick={() => { navigator.clipboard.writeText(prompt); }} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
+                                <Copy size={15} /> העתק פרומפט
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-400 text-center" dir="rtl">לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם</p>
+                          </div>
+                        );
+                      })() : (
                         <div className="space-y-4">
                           <h4 className="text-gray-900 font-bold mb-4">Grammar Tips</h4>
                           {isGeneratingGrammar ? (
@@ -2239,21 +2269,6 @@ export default function App() {
                                   </div>
                                 </div>
                               ))}
-                              {grammarTips.length > 0 && (() => {
-                                const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : 'אנגלית';
-                                const patternNames = grammarTips.map(t => t.pattern).join(', ');
-                                const prompt = `רוצה לתרגל ${langHe} ברמה ${level}. למדתי את הדפוסים הדקדוקיים הבאים: ${patternNames}. שאל אותי שאלות אחת בכל פעם שידרשו ממני להשתמש בדפוסים האלה, תן לי לענות, ואחרי שסיימנו — תגיה לי על הדקדוק שלי.`;
-                                return (
-                                  <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-2">
-                                    <p className="text-xs font-bold text-blue-700">🎙️ פעילות דיבור עם בינה מלאכותית</p>
-                                    <p className="text-sm text-gray-700 leading-relaxed" dir="rtl">{prompt}</p>
-                                    <button onClick={() => navigator.clipboard.writeText(prompt)} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-all">
-                                      <Copy size={12} /> העתק פרומפט
-                                    </button>
-                                    <p className="text-[10px] text-gray-400" dir="rtl">העתק את הטקסט הזה והדבק אותו לכלי AI כמו Claude, ChatGPT או כל עוזר AI אחר.</p>
-                                  </div>
-                                );
-                              })()}
                             </div>
                           )}
                         </div>
