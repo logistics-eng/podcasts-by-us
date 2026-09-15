@@ -600,6 +600,10 @@ ${transcript}`;
         C1: '5 exercises: (1) advanced vocabulary — 10 words, define or use in a sentence, (2) error correction — 6 sentences, (3) paraphrase/transformation — 5 sentences, (4) discussion questions — 3 open questions related to the topic, (5) writing task — one paragraph arguing a point from the podcast',
         C2: '5 exercises: (1) vocabulary and idioms — 10 items, define or contrast, (2) stylistic/register analysis — 3 sentences to improve or transform, (3) complex sentence transformation — 5 sentences, (4) extended discussion questions — 3 analytical questions, (5) extended writing — one well-structured paragraph with argument and evidence',
       };
+      const arabicA1Note = language === 'arabic' && level === 'A1'
+        ? `\n- IMPORTANT: This is an Arabic A1 worksheet for beginners who CANNOT yet read Arabic script. For every Arabic word or sentence that appears in the exercises, you MUST show it in TWO ways: (1) the Arabic script, and (2) directly below it a Hebrew-letter transliteration (phonetic reading in Hebrew letters) so the student can pronounce it. Format: Arabic word on one line, then the Hebrew transliteration in parentheses on the next line, e.g. مَرْحَبًا and then (מַרְחַבַּן). Apply this to ALL Arabic text in ALL exercises.`
+        : '';
+
       const prompt = `You are creating a ${langName} language learning worksheet for level ${level} students.
 
 Podcast title: ${title}
@@ -608,7 +612,7 @@ Grammar tip: ${JSON.stringify(grammarTips?.[0] || {})}
 
 Create a complete HTML worksheet. Requirements:
 - All exercise instructions must be written in Hebrew
-- All ${langName} content (words, sentences, examples) must be in ${langName}
+- All ${langName} content (words, sentences, examples) must be in ${langName}${arabicA1Note}
 - The worksheet must be appropriate for ${level} level: ${levelDesc[level] || 'intermediate'}
 - Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
 - ${levelExercises[level] || levelExercises['B1']}
