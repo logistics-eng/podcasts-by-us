@@ -765,6 +765,20 @@ export default function App() {
 
   const copyToClipboard = () => { navigator.clipboard.writeText(transcript); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const copyVocabToClipboard = () => { navigator.clipboard.writeText(vocabularyChart); setVocabCopied(true); setTimeout(() => setVocabCopied(false), 2000); };
+  const shareViaWhatsApp = async (text: string, filename: string) => {
+    if (navigator.share) {
+      try {
+        const file = new File([text], filename, { type: 'text/plain' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: generatedTitle || 'Podcast' });
+        } else {
+          await navigator.share({ title: generatedTitle || 'Podcast', text: text.slice(0, 2000) });
+        }
+      } catch {}
+    } else {
+      window.open('https://wa.me/?text=' + encodeURIComponent(text.slice(0, 2000)), '_blank');
+    }
+  };
   const togglePlay = () => {
     if (audioRef.current) { isPlaying ? audioRef.current.pause() : audioRef.current.play(); setIsPlaying(!isPlaying); }
   };
@@ -1435,6 +1449,11 @@ export default function App() {
                             {copied ? 'Copied' : 'Copy Transcript'}
                           </button>
                           {transcript && (
+                            <button onClick={() => shareViaWhatsApp(transcript, `transcript-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition-all">
+                              💬 WhatsApp
+                            </button>
+                          )}
+                          {transcript && (
                             <button onClick={handleToggleHebrew} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50">
                               {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
                             </button>
@@ -1447,11 +1466,16 @@ export default function App() {
                         </div>
                       )}
                       {activeTab === 'vocabulary' && (
-                        <div className="flex justify-end">
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
                           <button onClick={copyVocabToClipboard} className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">
                             {vocabCopied ? <Check size={14} /> : <Copy size={14} />}
                             {vocabCopied ? 'Copied' : 'Copy Chart'}
                           </button>
+                          {vocabularyChart && (
+                            <button onClick={() => shareViaWhatsApp(vocabularyChart, `vocabulary-${generatedTitle || 'podcast'}.txt`)} className="flex items-center gap-1.5 text-xs font-bold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition-all">
+                              💬 WhatsApp
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
