@@ -117,6 +117,46 @@ const LEVELS = [
 // Arabic Vocabulary Builder — themed word lists for A1 beginners
 interface ArabicWord { ar: string; translit: string; he: string; }
 interface ArabicTopic { emoji: string; title: string; words: ArabicWord[]; }
+
+// Arabic Alphabet Trainer
+interface AlphabetLetter {
+  ar: string;       // isolated form
+  nameAr: string;   // name in Arabic (for TTS)
+  nameHe: string;   // name in Hebrew (for display)
+  sound: string;    // how it sounds, in Hebrew
+  connects: boolean; // connects to following letter (false = non-joining)
+  example: { ar: string; translit: string; he: string };
+}
+const ARABIC_ALPHABET: AlphabetLetter[] = [
+  { ar: 'ا', nameAr: 'أَلِف', nameHe: 'אָלִיף', sound: 'תנועה ניטרלית / א שקטה', connects: false, example: { ar: 'أرض', translit: 'אַרְד', he: 'אדמה' } },
+  { ar: 'ب', nameAr: 'بَاء', nameHe: 'בָּאא', sound: 'ב', connects: true, example: { ar: 'بيت', translit: 'בֵּית', he: 'בית' } },
+  { ar: 'ت', nameAr: 'تَاء', nameHe: 'תָּאא', sound: 'ת', connects: true, example: { ar: 'تفاح', translit: 'תוּפָּאח', he: 'תפוח' } },
+  { ar: 'ث', nameAr: 'ثَاء', nameHe: 'ת׳אא', sound: 'ת׳ (כמו th באנגלית)', connects: true, example: { ar: 'ثلاثة', translit: 'תְ׳לָּאתַ׳ה', he: 'שלושה' } },
+  { ar: 'ج', nameAr: 'جِيم', nameHe: 'ג׳ִים', sound: 'ג׳ (כמו j באנגלית)', connects: true, example: { ar: 'جميل', translit: 'ג׳מִיל', he: 'יפה' } },
+  { ar: 'ح', nameAr: 'حَاء', nameHe: 'חָּאא', sound: 'ח גרונית חזקה', connects: true, example: { ar: 'حلو', translit: 'חֵילוּ', he: 'מתוק / נחמד' } },
+  { ar: 'خ', nameAr: 'خَاء', nameHe: 'חַ׳אא', sound: 'כ׳ (כמו ch בגרמנית)', connects: true, example: { ar: 'خبز', translit: 'חֻ׳בֵּז', he: 'לחם' } },
+  { ar: 'د', nameAr: 'دَال', nameHe: 'דָּאל', sound: 'ד', connects: false, example: { ar: 'دكان', translit: 'דוּכָּאן', he: 'חנות' } },
+  { ar: 'ذ', nameAr: 'ذَال', nameHe: 'ד׳אל', sound: 'ד׳ (כמו th ב-the)', connects: false, example: { ar: 'ذهب', translit: 'ד׳הַב', he: 'זהב' } },
+  { ar: 'ر', nameAr: 'رَاء', nameHe: 'רָּאא', sound: 'ר מגולגל', connects: false, example: { ar: 'رجل', translit: 'רַג׳ַּל', he: 'איש' } },
+  { ar: 'ز', nameAr: 'زَاي', nameHe: 'זָּאי', sound: 'ז', connects: false, example: { ar: 'زيت', translit: 'זֵית', he: 'זית / שמן' } },
+  { ar: 'س', nameAr: 'سِين', nameHe: 'סִין', sound: 'ס', connects: true, example: { ar: 'سلام', translit: 'סלַּאם', he: 'שלום' } },
+  { ar: 'ش', nameAr: 'شِين', nameHe: 'שִׁין', sound: 'ש', connects: true, example: { ar: 'شمس', translit: 'שַׁמְס', he: 'שמש' } },
+  { ar: 'ص', nameAr: 'صَاد', nameHe: 'צָּאד', sound: 'ס אמפטית (כבדה)', connects: true, example: { ar: 'صباح', translit: 'צַּבָּאח', he: 'בוקר' } },
+  { ar: 'ض', nameAr: 'ضَاد', nameHe: 'דָּאד', sound: 'ד אמפטית (כבדה)', connects: true, example: { ar: 'ضيف', translit: 'דַּ׳יְף', he: 'אורח' } },
+  { ar: 'ط', nameAr: 'طَاء', nameHe: 'טָּאא', sound: 'ט אמפטית (כבדה)', connects: true, example: { ar: 'طيب', translit: 'טַּיִּב', he: 'טוב / בסדר' } },
+  { ar: 'ظ', nameAr: 'ظَاء', nameHe: 'ט׳אא', sound: 'ד׳ אמפטית (כבדה)', connects: true, example: { ar: 'ظهر', translit: 'ט׳הַר', he: 'גב / צהריים' } },
+  { ar: 'ع', nameAr: 'عَيْن', nameHe: 'עַיִן', sound: 'ע גרונית', connects: true, example: { ar: 'عين', translit: 'עֵין', he: 'עין' } },
+  { ar: 'غ', nameAr: 'غَيْن', nameHe: 'גַ׳יִן', sound: 'ר צרפתי / ר גרונית', connects: true, example: { ar: 'غريب', translit: 'גַ׳רִיב', he: 'מוזר / זר' } },
+  { ar: 'ف', nameAr: 'فَاء', nameHe: 'פָּאא', sound: 'פ', connects: true, example: { ar: 'فتح', translit: 'פַּתַח', he: 'פתיחה / ניצחון' } },
+  { ar: 'ق', nameAr: 'قَاف', nameHe: 'קָּאף', sound: 'ק עמוקה (מגרון)', connects: true, example: { ar: 'قهوة', translit: 'קַהְוֶה', he: 'קפה' } },
+  { ar: 'ك', nameAr: 'كَاف', nameHe: 'כָּאף', sound: 'כ', connects: true, example: { ar: 'كتاب', translit: 'כִּתָּאב', he: 'ספר' } },
+  { ar: 'ل', nameAr: 'لَام', nameHe: 'לָּאם', sound: 'ל', connects: true, example: { ar: 'لون', translit: 'לוֹן', he: 'צבע' } },
+  { ar: 'م', nameAr: 'مِيم', nameHe: 'מִים', sound: 'מ', connects: true, example: { ar: 'ماء', translit: 'מַאא', he: 'מים' } },
+  { ar: 'ن', nameAr: 'نُون', nameHe: 'נוּן', sound: 'נ', connects: true, example: { ar: 'نور', translit: 'נוּר', he: 'אור' } },
+  { ar: 'ه', nameAr: 'هَاء', nameHe: 'הָּאא', sound: 'ה', connects: true, example: { ar: 'هوا', translit: 'הַוָּא', he: 'אוויר / מזג אוויר' } },
+  { ar: 'و', nameAr: 'وَاو', nameHe: 'וָּאו', sound: 'ו או אוּ (תנועה)', connects: false, example: { ar: 'وقت', translit: 'וַּקְת', he: 'זמן' } },
+  { ar: 'ي', nameAr: 'يَاء', nameHe: 'יָּאא', sound: 'י או אִי (תנועה)', connects: true, example: { ar: 'يلا', translit: 'יַּלָּה', he: 'יאללה' } },
+];
 const ARABIC_VOCAB_TOPICS: ArabicTopic[] = [
   { emoji: '🔢', title: 'מספרים', words: [
     { ar: 'واحد', translit: 'וָאחֶד', he: 'אחד' },
@@ -270,6 +310,13 @@ export default function App() {
   const [quizAnswered, setQuizAnswered] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState(0);
   const [playAllActive, setPlayAllActive] = useState(false);
+  const [showAlphabet, setShowAlphabet] = useState(false);
+  const [selectedLetter, setSelectedLetter] = useState<AlphabetLetter | null>(null);
+  const [alphaQuizIndex, setAlphaQuizIndex] = useState(0);
+  const [alphaQuizOptions, setAlphaQuizOptions] = useState<string[]>([]);
+  const [alphaQuizAnswered, setAlphaQuizAnswered] = useState<string | null>(null);
+  const [alphaQuizScore, setAlphaQuizScore] = useState(0);
+  const [alphaMode, setAlphaMode] = useState<'grid' | 'quiz'>('grid');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
   const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish'>('english');
@@ -731,6 +778,52 @@ export default function App() {
     setQuizOptions(opts);
   };
 
+  const startAlphaQuiz = () => {
+    const shuffled = [...ARABIC_ALPHABET].sort(() => Math.random() - 0.5);
+    setAlphaQuizIndex(0);
+    setAlphaQuizAnswered(null);
+    setAlphaQuizScore(0);
+    setAlphaMode('quiz');
+    generateAlphaOptions(shuffled, 0);
+  };
+
+  const alphaQuizLetters = (() => {
+    // stable shuffle seeded per quiz session — use ref if needed, for now just shuffle once
+    return [...ARABIC_ALPHABET].sort(() => 0.5 - Math.random());
+  });
+
+  const generateAlphaOptions = (letters: AlphabetLetter[], idx: number) => {
+    const correct = letters[idx].nameHe;
+    const others = ARABIC_ALPHABET.map(l => l.nameHe).filter(n => n !== correct);
+    const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
+    setAlphaQuizOptions([...shuffled, correct].sort(() => Math.random() - 0.5));
+  };
+
+  const getLetterAudio = async (letter: AlphabetLetter) => {
+    const key = 'alpha_' + letter.ar;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: letter.nameAr }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
   const handleToggleHebrew = async (overrideTranscript?: string) => {
     if (showHebrew) { setShowHebrew(false); return; }
     if (hebrewTranscript) { setShowHebrew(true); return; }
@@ -1013,6 +1106,156 @@ export default function App() {
   // VOCAB BUILDER VIEW
   if (view === 'vocab-builder') {
     const allTopics = ARABIC_VOCAB_TOPICS;
+
+    // Stable shuffled list for alphabet quiz (kept in closure)
+    const alphaShuffled = [...ARABIC_ALPHABET].sort(() => 0.5 - Math.random());
+
+    if (showAlphabet) {
+      const quizLetter = alphaShuffled[alphaQuizIndex % alphaShuffled.length];
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => { setShowAlphabet(false); setSelectedLetter(null); }} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> נושאים
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">האלפבית הערבי</h1>
+                <p className="text-xs text-gray-500">28 אותיות</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setAlphaMode('grid'); setSelectedLetter(null); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${alphaMode === 'grid' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>אותיות</button>
+                <button onClick={() => { setAlphaMode('quiz'); setAlphaQuizIndex(0); setAlphaQuizAnswered(null); setAlphaQuizScore(0); generateAlphaOptions(alphaShuffled, 0); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${alphaMode === 'quiz' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>חידון</button>
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-2xl mx-auto px-4 py-6">
+            {alphaMode === 'grid' ? (
+              <>
+                {/* 28-letter grid */}
+                <div className="grid grid-cols-4 gap-2 mb-6">
+                  {ARABIC_ALPHABET.map((letter, i) => (
+                    <button key={i} onClick={() => { setSelectedLetter(letter); getLetterAudio(letter); }}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-2xl border transition-all ${selectedLetter?.ar === letter.ar ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-gray-100 hover:border-indigo-300 hover:shadow-sm'}`}>
+                      <span className="text-2xl font-bold" dir="rtl">{letter.ar}</span>
+                      <span className={`text-[10px] font-bold ${selectedLetter?.ar === letter.ar ? 'text-indigo-200' : 'text-gray-400'}`}>{letter.nameHe}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Detail card for selected letter */}
+                {selectedLetter && (
+                  <div className="bg-white border border-indigo-100 rounded-3xl shadow-sm p-6 space-y-5">
+                    <div className="flex items-center gap-5">
+                      <div className="flex-shrink-0 w-20 h-20 flex items-center justify-center bg-indigo-50 rounded-2xl">
+                        <span className="text-5xl font-bold text-indigo-700" dir="rtl">{selectedLetter.ar}</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <p className="text-xl font-bold text-gray-800">{selectedLetter.nameHe}</p>
+                          <button onClick={() => getLetterAudio(selectedLetter)} className="w-9 h-9 flex items-center justify-center bg-indigo-50 border border-indigo-200 rounded-full hover:bg-indigo-100 transition-all">
+                            {vocabAudioLoading['alpha_' + selectedLetter.ar] ? <Loader2 size={14} className="animate-spin text-indigo-600" /> : <Volume2 size={14} className="text-indigo-600" />}
+                          </button>
+                        </div>
+                        <p className="text-sm text-indigo-600 mt-1">🔊 {selectedLetter.sound}</p>
+                        {!selectedLetter.connects && <p className="text-xs text-amber-600 mt-1 font-semibold">⚠️ אות שאינה מתחברת לאות הבאה</p>}
+                      </div>
+                    </div>
+
+                    {/* 4 forms */}
+                    <div>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">צורות האות</p>
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        {[
+                          { label: 'בודדת', form: selectedLetter.ar },
+                          { label: 'בתחילה', form: selectedLetter.connects ? selectedLetter.ar + 'ـ' : selectedLetter.ar },
+                          { label: 'באמצע', form: selectedLetter.connects ? 'ـ' + selectedLetter.ar + 'ـ' : selectedLetter.ar },
+                          { label: 'בסוף', form: 'ـ' + selectedLetter.ar },
+                        ].map((f, i) => (
+                          <div key={i} className="p-2 bg-gray-50 rounded-xl">
+                            <p className="text-xl font-bold text-gray-800" dir="rtl">{f.form}</p>
+                            <p className="text-[10px] text-gray-400 mt-1">{f.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Example word */}
+                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                      <p className="text-xs font-bold text-amber-700 mb-2">דוגמה</p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-base font-mono text-amber-700">{selectedLetter.example.translit}</p>
+                          <p className="text-sm text-gray-600">{selectedLetter.example.he}</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-800" dir="rtl">{selectedLetter.example.ar}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!selectedLetter && (
+                  <p className="text-center text-sm text-gray-400 mt-2">לחץ על אות לפרטים ולהאזנה</p>
+                )}
+              </>
+            ) : (
+              /* Quiz mode */
+              alphaQuizIndex >= ARABIC_ALPHABET.length ? (
+                <div className="text-center py-16 space-y-4">
+                  <div className="text-5xl">🎉</div>
+                  <h2 className="text-2xl font-bold text-gray-800">סיימת!</h2>
+                  <p className="text-lg text-gray-600">ענית נכון על <span className="font-bold text-indigo-600">{alphaQuizScore}</span> מתוך <span className="font-bold">{ARABIC_ALPHABET.length}</span></p>
+                  <div className="flex gap-3 justify-center mt-6">
+                    <button onClick={() => { setAlphaQuizIndex(0); setAlphaQuizAnswered(null); setAlphaQuizScore(0); generateAlphaOptions(alphaShuffled, 0); }} className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-full hover:bg-indigo-700 transition-all">שחק שוב</button>
+                    <button onClick={() => { setAlphaMode('grid'); setSelectedLetter(null); }} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-full hover:bg-gray-200 transition-all">חזור לאותיות</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center text-xs text-gray-400">
+                    <span>{alphaQuizIndex + 1} / {ARABIC_ALPHABET.length}</span>
+                    <span>✅ {alphaQuizScore}</span>
+                  </div>
+                  <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-10 text-center space-y-3">
+                    <button onClick={() => getLetterAudio(quizLetter)} className="mx-auto w-14 h-14 flex items-center justify-center bg-indigo-50 border border-indigo-200 rounded-full hover:bg-indigo-100 transition-all">
+                      {vocabAudioLoading['alpha_' + quizLetter.ar] ? <Loader2 size={22} className="animate-spin text-indigo-600" /> : <Volume2 size={22} className="text-indigo-600" />}
+                    </button>
+                    <p className="text-7xl font-bold text-gray-800" dir="rtl">{quizLetter.ar}</p>
+                    <p className="text-xs text-gray-400">מה שם האות הזו?</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {alphaQuizOptions.map((opt, i) => {
+                      const isCorrect = opt === quizLetter.nameHe;
+                      const isChosen = opt === alphaQuizAnswered;
+                      let cls = 'p-4 rounded-2xl border-2 text-sm font-bold transition-all text-center ';
+                      if (!alphaQuizAnswered) cls += 'bg-white border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer';
+                      else if (isCorrect) cls += 'bg-green-50 border-green-400 text-green-700';
+                      else if (isChosen) cls += 'bg-red-50 border-red-300 text-red-600';
+                      else cls += 'bg-white border-gray-100 text-gray-400';
+                      return (
+                        <button key={i} className={cls} disabled={!!alphaQuizAnswered} onClick={() => {
+                          setAlphaQuizAnswered(opt);
+                          if (isCorrect) setAlphaQuizScore(s => s + 1);
+                          setTimeout(() => {
+                            const next = alphaQuizIndex + 1;
+                            setAlphaQuizIndex(next);
+                            setAlphaQuizAnswered(null);
+                            if (next < ARABIC_ALPHABET.length) generateAlphaOptions(alphaShuffled, next);
+                          }, 1200);
+                        }}>
+                          {opt}{alphaQuizAnswered && isCorrect && ' ✓'}{alphaQuizAnswered && isChosen && !isCorrect && ' ✗'}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )
+            )}
+          </main>
+        </div>
+      );
+    }
+
     if (!vocabTopic) {
       // Topic selection grid
       return (
@@ -1029,6 +1272,16 @@ export default function App() {
             </div>
           </header>
           <main className="max-w-2xl mx-auto px-4 py-6">
+            {/* Alphabet card — spans full width */}
+            <button onClick={() => { setShowAlphabet(true); setAlphaMode('grid'); setSelectedLetter(null); }}
+              className="w-full mb-3 flex items-center gap-4 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group">
+              <span className="text-4xl font-bold text-indigo-700 font-mono leading-none" style={{fontFamily: 'serif'}}>أ ب ت</span>
+              <div className="text-left flex-1">
+                <p className="text-sm font-bold text-indigo-800">האלפבית הערבי</p>
+                <p className="text-xs text-indigo-500">28 אותיות • צליל • צורות • חידון</p>
+              </div>
+              <ArrowLeft size={16} className="text-indigo-400 rotate-180 group-hover:translate-x-1 transition-transform" />
+            </button>
             <div className="grid grid-cols-2 gap-3">
               {allTopics.map((topic, i) => (
                 <button key={i} onClick={() => { setVocabTopic(topic); setVocabMode('browse'); setQuizIndex(0); setQuizAnswered(null); setQuizScore(0); }}
