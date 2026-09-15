@@ -65,6 +65,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'english'`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS content_mode TEXT DEFAULT 'podcast'`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS topic TEXT`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS worksheet TEXT`);
 }
 
 // Shared Gemini client defined on the server side
@@ -137,7 +138,7 @@ async function startServer() {
   app.get('/api/podcasts', async (req, res) => {
     try {
       const lang = (req.query.language as string) || 'english';
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic, worksheet FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -613,7 +614,6 @@ Create a complete HTML worksheet. Requirements:
 - Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
 - Include a @media print stylesheet that sets page margins to 1cm
 - Include a visible "🖨️ הדפס / Save as PDF" button at the top styled in blue that calls window.print()
-- Include <script>window.onload = function() { window.print(); }</script> so the print dialog opens automatically when the page loads
 - Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
 
       const response = await anthropic.messages.create({
@@ -626,6 +626,18 @@ Create a complete HTML worksheet. Requirements:
       const doctypeIdx = html.indexOf('<!DOCTYPE');
       if (doctypeIdx > 0) html = html.substring(doctypeIdx);
       res.json({ html });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+
+  // Save worksheet HTML to a podcast record
+  app.post('/api/save-worksheet/:id', async (req, res) => {
+    try {
+      const { html } = req.body;
+      await pool.query('UPDATE podcasts SET worksheet = $1 WHERE id = $2', [html, req.params.id]);
+      res.json({ ok: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

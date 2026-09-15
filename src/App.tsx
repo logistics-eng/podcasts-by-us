@@ -130,6 +130,7 @@ interface SavedPodcast {
   content_mode?: string;
   topic?: string;
   language?: string;
+  worksheet?: string;
 }
 
 export default function App() {
@@ -260,7 +261,21 @@ export default function App() {
     setFilterLevel('All');
   }, [language]);
 
-  const handleGenerateWorksheet = async (overrides?: { title?: string; vocabulary?: string; level?: string; grammarTips?: any[]; language?: string }) => {
+  const openWorksheetHtml = (html: string, title?: string) => {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (!win) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `worksheet-${title || 'podcast'}.html`;
+      a.click();
+    }
+  };
+
+  const handleGenerateWorksheet = async (overrides?: { title?: string; vocabulary?: string; level?: string; grammarTips?: any[]; language?: string; podcastId?: number; savedWorksheet?: string }) => {
+    // If a saved worksheet already exists, just open it
+    if (overrides?.savedWorksheet) { openWorksheetHtml(overrides.savedWorksheet, overrides.title); return; }
     const vocab = overrides?.vocabulary ?? vocabularyChart;
     const lvl = overrides?.level ?? level;
     const title = overrides?.title ?? generatedTitle;
@@ -276,14 +291,17 @@ export default function App() {
       });
       const data = await res.json();
       if (data.html) {
-        const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const win = window.open(url, '_blank');
-        if (!win) {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `worksheet-${title || 'podcast'}.html`;
-          a.click();
+        openWorksheetHtml(data.html, title);
+        // Save to library if this is a saved podcast
+        if (overrides?.podcastId) {
+          fetch(`/api/save-worksheet/${overrides.podcastId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: data.html }),
+          }).then(() => {
+            setLibrary(prev => prev.map(p => p.id === overrides.podcastId ? { ...p, worksheet: data.html } : p));
+            if (selectedPodcast?.id === overrides.podcastId) setSelectedPodcast(prev => prev ? { ...prev, worksheet: data.html } : prev);
+          }).catch(() => {});
         }
       } else {
         alert('Failed to generate worksheet: ' + (data.error || 'Unknown error'));
@@ -1018,8 +1036,8 @@ export default function App() {
                 )}
               </div>
               {selectedPodcast.vocabulary && selectedPodcast.level && (
-                <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english' })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
-                  {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>📄 Worksheet</>}
+                <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english', podcastId: selectedPodcast.id, savedWorksheet: selectedPodcast.worksheet })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
+                  {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>{selectedPodcast.worksheet ? '📄 Open Worksheet' : '📄 Worksheet'}</>}
                 </button>
               )}
             </div>
