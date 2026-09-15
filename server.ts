@@ -604,11 +604,8 @@ Create a complete HTML worksheet. Requirements:
 - Include a title line (the podcast title), a level indicator, and a name/date line in Hebrew at the top
 - ${levelExercises[level] || levelExercises['B1']}
 - Make it visually clean and printable: white background, clear black text, good spacing, suitable for printing on A4
-- Include a @media print stylesheet that hides ALL buttons and sets page margins to 1cm
-- At the very top of the page include a toolbar div (hidden on print) with these three buttons side by side:
-  1. "🖨️ הדפס / Save as PDF" — blue button, calls window.print()
-  2. "💬 שלח בוואטסאפ / WhatsApp" — green button, uses this JS: if(navigator.share){navigator.share({title:document.title,text:'דף עבודה: '+document.title}).catch(()=>{})}else{window.open('https://wa.me/?text='+encodeURIComponent('דף עבודה: '+document.title+' - שמור את הדף כ-PDF ושלח'),'_blank')}
-  3. "✕ חזור לפודקאסט / Back" — grey button, calls window.close()
+- Include a @media print stylesheet that sets page margins to 1cm
+- Include a visible "🖨️ הדפס / Save as PDF" button at the top styled in blue that calls window.print()
 - Include <script>window.onload = function() { window.print(); }</script> so the print dialog opens automatically when the page loads
 - Return ONLY the complete HTML document, nothing else. Start with <!DOCTYPE html>`;
 
