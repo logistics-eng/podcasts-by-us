@@ -1412,13 +1412,20 @@ export default function App() {
 
                   <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[600px]">
                     <div className="p-2 border-b border-gray-100 bg-gray-50/50 space-y-1">
-                      <div className="flex gap-1 flex-wrap">
-                        <button onClick={() => setActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
-                        {vocabularyChart && (
-                          <button onClick={() => setActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
-                        )}
-                        {mode === 'generate' && (
-                          <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+                      <div className="flex gap-1 flex-wrap items-center justify-between">
+                        <div className="flex gap-1 flex-wrap">
+                          <button onClick={() => setActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'transcript' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Transcript</button>
+                          {vocabularyChart && (
+                            <button onClick={() => setActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Vocabulary Chart</button>
+                          )}
+                          {mode === 'generate' && (
+                            <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
+                          )}
+                        </div>
+                        {vocabularyChart && level && (
+                          <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 transition-all">
+                            {isGeneratingWorksheet ? <><Loader2 size={13} className="animate-spin" />Generating...</> : <>📄 Worksheet</>}
+                          </button>
                         )}
                       </div>
                       {activeTab === 'transcript' && (
@@ -1520,13 +1527,6 @@ export default function App() {
                               );
                             })}
                           </div>
-                          {level && (
-                            <div className="flex justify-start mt-4 pt-4 border-t border-gray-100">
-                              <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all text-sm">
-                                {isGeneratingWorksheet ? <><Loader2 className="animate-spin" size={16} /> Generating Worksheet...</> : <>📄 Generate Worksheet</>}
-                              </button>
-                            </div>
-                          )}
                         </div>
                       ) : (
                         <div className="space-y-4">
