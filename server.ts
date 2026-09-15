@@ -635,7 +635,7 @@ Create a complete HTML worksheet. Requirements:
       const msg = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
         max_tokens: 8192,
-        messages: [{ role: 'user', content: `Translate the following podcast transcript to Hebrew. Keep the speaker names as-is (do not translate names). Keep the same format with speaker labels on each line. Return only the translated transcript, nothing else.\n\n${transcript}` }],
+        messages: [{ role: 'user', content: `Translate the following podcast transcript into Hebrew. Rules:\n- Translate ALL spoken content into Hebrew, regardless of what language it is in\n- Keep speaker names exactly as they appear (do not translate names)\n- Keep the same format: one line per speaker with the speaker label\n- If the text already contains some Hebrew words or phrases, translate the surrounding non-Hebrew content and keep the structure\n- Do NOT include vocabulary charts, headers, or metadata — only the dialogue lines\n- Return only the translated dialogue, nothing else\n\nTranscript:\n${transcript}` }],
       });
       const translated = (msg.content[0] as any).text.trim();
       res.json({ translated });

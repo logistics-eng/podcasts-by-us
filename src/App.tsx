@@ -538,7 +538,7 @@ export default function App() {
       const res = await fetch('/api/translate-hebrew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: String(overrideTranscript ?? transcript) }),
+        body: JSON.stringify({ transcript: String(overrideTranscript ?? transcript).replace(/VOCABULARY CHART[\s\S]*/i, '').trim() }),
       });
       const data = await res.json();
       if (data.translated) { setHebrewTranscript(data.translated); setShowHebrew(true); }
