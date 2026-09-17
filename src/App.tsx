@@ -118,6 +118,10 @@ const LEVELS = [
 interface ArabicWord { ar: string; translit: string; he: string; }
 interface ArabicTopic { emoji: string; title: string; words: ArabicWord[]; }
 
+// Spanish Vocabulary Builder
+interface SpanishWord { es: string; he: string; }
+interface SpanishTopic { emoji: string; title: string; words: SpanishWord[]; }
+
 // Arabic Alphabet Trainer
 interface AlphabetLetter {
   ar: string;       // isolated form
@@ -280,6 +284,129 @@ const ARABIC_VOCAB_TOPICS: ArabicTopic[] = [
   ]},
 ];
 
+const SPANISH_VOCAB_TOPICS: SpanishTopic[] = [
+  { emoji: '🔢', title: 'מספרים', words: [
+    { es: 'uno', he: 'אחד' },
+    { es: 'dos', he: 'שניים' },
+    { es: 'tres', he: 'שלושה' },
+    { es: 'cuatro', he: 'ארבעה' },
+    { es: 'cinco', he: 'חמישה' },
+    { es: 'seis', he: 'שישה' },
+    { es: 'siete', he: 'שבעה' },
+    { es: 'ocho', he: 'שמונה' },
+    { es: 'nueve', he: 'תשעה' },
+    { es: 'diez', he: 'עשרה' },
+  ]},
+  { emoji: '👋', title: 'ברכות', words: [
+    { es: 'hola', he: 'שלום' },
+    { es: 'buenos días', he: 'בוקר טוב' },
+    { es: 'buenas tardes', he: 'אחר הצהריים טובים' },
+    { es: 'buenas noches', he: 'לילה טוב' },
+    { es: '¿cómo estás?', he: 'מה שלומך?' },
+    { es: 'muy bien', he: 'מצוין' },
+    { es: 'gracias', he: 'תודה' },
+    { es: 'de nada', he: 'בבקשה' },
+    { es: 'adiós', he: 'להתראות' },
+    { es: 'hasta luego', he: 'נתראה בקרוב' },
+  ]},
+  { emoji: '👨‍👩‍👧‍👦', title: 'משפחה', words: [
+    { es: 'padre', he: 'אבא' },
+    { es: 'madre', he: 'אמא' },
+    { es: 'hermano', he: 'אח' },
+    { es: 'hermana', he: 'אחות' },
+    { es: 'abuelo', he: 'סבא' },
+    { es: 'abuela', he: 'סבתא' },
+    { es: 'hijo', he: 'בן' },
+    { es: 'hija', he: 'בת' },
+    { es: 'tío', he: 'דוד' },
+    { es: 'esposo', he: 'בעל' },
+  ]},
+  { emoji: '🎨', title: 'צבעים', words: [
+    { es: 'rojo', he: 'אדום' },
+    { es: 'azul', he: 'כחול' },
+    { es: 'verde', he: 'ירוק' },
+    { es: 'amarillo', he: 'צהוב' },
+    { es: 'blanco', he: 'לבן' },
+    { es: 'negro', he: 'שחור' },
+    { es: 'morado', he: 'סגול' },
+    { es: 'naranja', he: 'כתום' },
+    { es: 'rosa', he: 'ורוד' },
+    { es: 'marrón', he: 'חום' },
+  ]},
+  { emoji: '😊', title: 'רגשות', words: [
+    { es: 'feliz', he: 'שמח' },
+    { es: 'triste', he: 'עצוב' },
+    { es: 'enojado', he: 'כועס' },
+    { es: 'asustado', he: 'מפחד' },
+    { es: 'cansado', he: 'עייף' },
+    { es: 'hambriento', he: 'רעב' },
+    { es: 'emocionado', he: 'נרגש' },
+    { es: 'nervioso', he: 'עצבני' },
+    { es: 'aburrido', he: 'משועמם' },
+    { es: 'orgulloso', he: 'גאה' },
+  ]},
+  { emoji: '🍕', title: 'אוכל', words: [
+    { es: 'pan', he: 'לחם' },
+    { es: 'agua', he: 'מים' },
+    { es: 'café', he: 'קפה' },
+    { es: 'leche', he: 'חלב' },
+    { es: 'manzana', he: 'תפוח' },
+    { es: 'pollo', he: 'עוף' },
+    { es: 'arroz', he: 'אורז' },
+    { es: 'queso', he: 'גבינה' },
+    { es: 'huevo', he: 'ביצה' },
+    { es: 'chocolate', he: 'שוקולד' },
+  ]},
+  { emoji: '🏠', title: 'מקומות', words: [
+    { es: 'casa', he: 'בית' },
+    { es: 'escuela', he: 'בית ספר' },
+    { es: 'mercado', he: 'שוק' },
+    { es: 'hospital', he: 'בית חולים' },
+    { es: 'restaurante', he: 'מסעדה' },
+    { es: 'calle', he: 'רחוב' },
+    { es: 'playa', he: 'חוף ים' },
+    { es: 'tienda', he: 'חנות' },
+    { es: 'parque', he: 'פארק' },
+    { es: 'ciudad', he: 'עיר' },
+  ]},
+  { emoji: '⏰', title: 'זמן', words: [
+    { es: 'hoy', he: 'היום' },
+    { es: 'mañana', he: 'מחר' },
+    { es: 'ayer', he: 'אתמול' },
+    { es: 'ahora', he: 'עכשיו' },
+    { es: 'tarde', he: 'אחר הצהריים / מאוחר' },
+    { es: 'noche', he: 'לילה' },
+    { es: 'semana', he: 'שבוע' },
+    { es: 'mes', he: 'חודש' },
+    { es: 'año', he: 'שנה' },
+    { es: 'minuto', he: 'דקה' },
+  ]},
+  { emoji: '🏃', title: 'פעלים בסיסיים', words: [
+    { es: 'quiero', he: 'אני רוצה' },
+    { es: 'hablo', he: 'אני מדבר' },
+    { es: 'bebo', he: 'אני שותה' },
+    { es: 'como', he: 'אני אוכל' },
+    { es: 'voy', he: 'אני הולך' },
+    { es: 'viene', he: 'הוא/היא בא/ה' },
+    { es: 'trabajo', he: 'אני עובד' },
+    { es: 'duermo', he: 'אני ישן' },
+    { es: 'amo', he: 'אני אוהב' },
+    { es: 'no entiendo', he: 'לא הבנתי' },
+  ]},
+  { emoji: '🧍', title: 'גוף', words: [
+    { es: 'cabeza', he: 'ראש' },
+    { es: 'ojo', he: 'עין' },
+    { es: 'mano', he: 'יד' },
+    { es: 'pie', he: 'רגל' },
+    { es: 'corazón', he: 'לב' },
+    { es: 'oreja', he: 'אוזן' },
+    { es: 'nariz', he: 'אף' },
+    { es: 'pelo', he: 'שיער' },
+    { es: 'hombro', he: 'כתף' },
+    { es: 'barriga', he: 'בטן' },
+  ]},
+];
+
 interface SavedPodcast {
   id: number;
   title: string;
@@ -301,7 +428,8 @@ interface SavedPodcast {
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
-  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | null>(null);
+  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish'>('arabic');
+  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | null>(null);
   const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
   const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
   const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
@@ -719,6 +847,16 @@ export default function App() {
     return duration;
   };
 
+  const getSpeakingPrompt = (langHe: string, level: string, title: string): string => {
+    const variants = [
+      `זה עתה האזנתי לפודקאסט על "${title}" ב${langHe} ברמה ${level}. אני רוצה לספר לך על הפודקאסט, ואתה תקשיב ותשאל אותי שאלות בסוף. תתקן לי את ה${langHe} שלי רק אחרי שנסיים לדון בפודקאסט.`,
+      `הרגע סיימתי לשמוע פודקאסט בנושא "${title}" ב${langHe}, רמה ${level}. אני אספר לך מה למדתי ואתה תשאל אותי שאלות אחרי שאסיים. תגיה לי את השפה רק בסוף השיחה, לא באמצע.`,
+      `זה עתה שמעתי פודקאסט על "${title}" ב${langHe} (רמה ${level}). אני רוצה לשתף אותך במה שהאזנתי, ובסוף תשאל אותי שאלות על הנושא. אנא תתקן את הטעויות שלי ב${langHe} רק אחרי שנגמור לדון בפודקאסט.`,
+      `הזה עתה האזנתי לפודקאסט בנושא "${title}" ב${langHe}, רמה ${level}. אני רוצה לשוחח איתך על מה ששמעתי — אני אספר ואתה תשאל שאלות בסוף. את התיקונים ב${langHe} שמור לסוף, אחרי שנסיים את הדיון.`,
+    ];
+    return variants[Math.floor(Math.random() * variants.length)];
+  };
+
   const highlightWords = (text: string, highlights: string[]): JSX.Element => {
     if (!highlights.length) return <>{text}</>;
     const pattern = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
@@ -760,7 +898,32 @@ export default function App() {
     }
   };
 
-  const startQuiz = (topic: ArabicTopic) => {
+  const getSpanishVocabAudio = async (word: SpanishWord) => {
+    const key = 'es_' + word.es;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.es, voice: 'es-ES-ElviraNeural' }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const startQuiz = (topic: ArabicTopic | SpanishTopic) => {
     setQuizIndex(0);
     setQuizAnswered(null);
     setQuizScore(0);
@@ -768,11 +931,12 @@ export default function App() {
     generateQuizOptions(topic, 0);
   };
 
-  const generateQuizOptions = (topic: ArabicTopic, idx: number) => {
+  const generateQuizOptions = (topic: ArabicTopic | SpanishTopic, idx: number) => {
     const correct = topic.words[idx].he;
-    const others = ARABIC_VOCAB_TOPICS
-      .flatMap(t => t.words.map(w => w.he))
-      .filter(h => h !== correct);
+    const allWords = vocabBuilderLanguage === 'spanish'
+      ? SPANISH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : ARABIC_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he));
+    const others = allWords.filter(h => h !== correct);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
     const opts = [...shuffled, correct].sort(() => Math.random() - 0.5);
     setQuizOptions(opts);
@@ -1105,12 +1269,13 @@ export default function App() {
 
   // VOCAB BUILDER VIEW
   if (view === 'vocab-builder') {
-    const allTopics = ARABIC_VOCAB_TOPICS;
+    const isSpanish = vocabBuilderLanguage === 'spanish';
+    const allTopics = isSpanish ? SPANISH_VOCAB_TOPICS : ARABIC_VOCAB_TOPICS;
 
     // Stable shuffled list for alphabet quiz (kept in closure)
     const alphaShuffled = [...ARABIC_ALPHABET].sort(() => 0.5 - Math.random());
 
-    if (showAlphabet) {
+    if (showAlphabet && !isSpanish) {
       const quizLetter = alphaShuffled[alphaQuizIndex % alphaShuffled.length];
       return (
         <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
@@ -1266,22 +1431,24 @@ export default function App() {
                 <ArrowLeft size={16} /> חזרה
               </button>
               <div>
-                <h1 className="text-base font-bold">🌙 Arabic Starter</h1>
+                <h1 className="text-base font-bold">{isSpanish ? '🇪🇸 Spanish Starter' : '🌙 Arabic Starter'}</h1>
                 <p className="text-xs text-gray-500">בחר נושא ללמוד</p>
               </div>
             </div>
           </header>
           <main className="max-w-2xl mx-auto px-4 py-6">
-            {/* Alphabet card — spans full width */}
-            <button onClick={() => { setShowAlphabet(true); setAlphaMode('grid'); setSelectedLetter(null); }}
-              className="w-full mb-3 flex items-center gap-4 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group">
-              <span className="text-4xl font-bold text-indigo-700 font-mono leading-none" style={{fontFamily: 'serif'}}>أ ب ت</span>
-              <div className="text-left flex-1">
-                <p className="text-sm font-bold text-indigo-800">האלפבית הערבי</p>
-                <p className="text-xs text-indigo-500">28 אותיות • צליל • צורות • חידון</p>
-              </div>
-              <ArrowLeft size={16} className="text-indigo-400 rotate-180 group-hover:translate-x-1 transition-transform" />
-            </button>
+            {/* Alphabet card — Arabic only */}
+            {!isSpanish && (
+              <button onClick={() => { setShowAlphabet(true); setAlphaMode('grid'); setSelectedLetter(null); }}
+                className="w-full mb-3 flex items-center gap-4 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group">
+                <span className="text-4xl font-bold text-indigo-700 font-mono leading-none" style={{fontFamily: 'serif'}}>أ ب ت</span>
+                <div className="text-left flex-1">
+                  <p className="text-sm font-bold text-indigo-800">האלפבית הערבי</p>
+                  <p className="text-xs text-indigo-500">28 אותיות • צליל • צורות • חידון</p>
+                </div>
+                <ArrowLeft size={16} className="text-indigo-400 rotate-180 group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
             <div className="grid grid-cols-2 gap-3">
               {allTopics.map((topic, i) => (
                 <button key={i} onClick={() => { setVocabTopic(topic); setVocabMode('browse'); setQuizIndex(0); setQuizAnswered(null); setQuizScore(0); }}
@@ -1300,11 +1467,16 @@ export default function App() {
     // Word list / quiz view
     const topic = vocabTopic;
     const word = topic.words[quizIndex];
+    const wordKey = isSpanish ? 'es_' + (word as SpanishWord).es : (word as ArabicWord).ar;
+    const accentCls = isSpanish
+      ? { btn: 'bg-red-500 text-white hover:bg-red-600', btnOutline: 'bg-red-50 border-red-200 hover:bg-red-100', text: 'text-red-600', hover: 'hover:border-red-300 hover:bg-red-50' }
+      : { btn: 'bg-amber-500 text-white hover:bg-amber-600', btnOutline: 'bg-amber-50 border-amber-200 hover:bg-amber-100', text: 'text-amber-600', hover: 'hover:border-amber-300 hover:bg-amber-50' };
 
     const playAll = async () => {
       setPlayAllActive(true);
       for (const w of topic.words) {
-        await getVocabAudio(w);
+        if (isSpanish) await getSpanishVocabAudio(w as SpanishWord);
+        else await getVocabAudio(w as ArabicWord);
         await new Promise(r => setTimeout(r, 1800));
       }
       setPlayAllActive(false);
@@ -1321,8 +1493,8 @@ export default function App() {
               <h1 className="text-base font-bold">{topic.emoji} {topic.title}</h1>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => { setVocabMode('browse'); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'browse' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>מילים</button>
-              <button onClick={() => startQuiz(topic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>חידון</button>
+              <button onClick={() => { setVocabMode('browse'); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'browse' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>מילים</button>
+              <button onClick={() => startQuiz(topic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>חידון</button>
             </div>
           </div>
         </header>
@@ -1331,25 +1503,34 @@ export default function App() {
           {vocabMode === 'browse' ? (
             <>
               <div className="flex justify-end mb-4">
-                <button onClick={playAll} disabled={playAllActive} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-full hover:bg-amber-600 disabled:opacity-60 transition-all">
+                <button onClick={playAll} disabled={playAllActive} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full disabled:opacity-60 transition-all ${accentCls.btn}`}>
                   {playAllActive ? <><Loader2 size={13} className="animate-spin" /> מנגן...</> : <><Volume2 size={13} /> השמע הכל</>}
                 </button>
               </div>
               <div className="space-y-3">
-                {topic.words.map((w, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm">
-                    <button onClick={() => getVocabAudio(w)} disabled={vocabAudioLoading[w.ar]} className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-amber-50 border border-amber-200 rounded-full hover:bg-amber-100 transition-all disabled:opacity-50">
-                      {vocabAudioLoading[w.ar] ? <Loader2 size={16} className="animate-spin text-amber-600" /> : <Volume2 size={16} className="text-amber-600" />}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xl font-bold text-gray-800 text-right" dir="rtl">{w.ar}</p>
-                      <p className="text-sm text-amber-700 font-mono">{w.translit}</p>
+                {topic.words.map((w, i) => {
+                  const wKey = isSpanish ? 'es_' + (w as SpanishWord).es : (w as ArabicWord).ar;
+                  return (
+                    <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                      <button onClick={() => isSpanish ? getSpanishVocabAudio(w as SpanishWord) : getVocabAudio(w as ArabicWord)} disabled={vocabAudioLoading[wKey]} className={`flex-shrink-0 w-10 h-10 flex items-center justify-center border rounded-full transition-all disabled:opacity-50 ${accentCls.btnOutline}`}>
+                        {vocabAudioLoading[wKey] ? <Loader2 size={16} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={16} className={accentCls.text} />}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        {isSpanish ? (
+                          <p className="text-xl font-bold text-gray-800">{(w as SpanishWord).es}</p>
+                        ) : (
+                          <>
+                            <p className="text-xl font-bold text-gray-800 text-right" dir="rtl">{(w as ArabicWord).ar}</p>
+                            <p className="text-sm text-amber-700 font-mono">{(w as ArabicWord).translit}</p>
+                          </>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-indigo-700">{w.he}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-indigo-700">{w.he}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           ) : (
@@ -1358,9 +1539,9 @@ export default function App() {
               <div className="text-center py-16 space-y-4">
                 <div className="text-5xl">🎉</div>
                 <h2 className="text-2xl font-bold text-gray-800">סיימת!</h2>
-                <p className="text-lg text-gray-600">ענית נכון על <span className="font-bold text-amber-600">{quizScore}</span> מתוך <span className="font-bold">{topic.words.length}</span></p>
+                <p className="text-lg text-gray-600">ענית נכון על <span className={`font-bold ${accentCls.text}`}>{quizScore}</span> מתוך <span className="font-bold">{topic.words.length}</span></p>
                 <div className="flex gap-3 justify-center mt-6">
-                  <button onClick={() => startQuiz(topic)} className="px-5 py-2.5 bg-amber-500 text-white font-bold rounded-full hover:bg-amber-600 transition-all">שחק שוב</button>
+                  <button onClick={() => startQuiz(topic)} className={`px-5 py-2.5 font-bold rounded-full transition-all ${accentCls.btn}`}>שחק שוב</button>
                   <button onClick={() => setVocabMode('browse')} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-full hover:bg-gray-200 transition-all">חזור למילים</button>
                 </div>
               </div>
@@ -1371,11 +1552,17 @@ export default function App() {
                   <span>✅ {quizScore}</span>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8 text-center space-y-3">
-                  <button onClick={() => getVocabAudio(word)} className="mx-auto w-14 h-14 flex items-center justify-center bg-amber-50 border border-amber-200 rounded-full hover:bg-amber-100 transition-all">
-                    {vocabAudioLoading[word.ar] ? <Loader2 size={22} className="animate-spin text-amber-600" /> : <Volume2 size={22} className="text-amber-600" />}
+                  <button onClick={() => isSpanish ? getSpanishVocabAudio(word as SpanishWord) : getVocabAudio(word as ArabicWord)} className={`mx-auto w-14 h-14 flex items-center justify-center border rounded-full transition-all ${accentCls.btnOutline}`}>
+                    {vocabAudioLoading[wordKey] ? <Loader2 size={22} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={22} className={accentCls.text} />}
                   </button>
-                  <p className="text-4xl font-bold text-gray-800" dir="rtl">{word.ar}</p>
-                  <p className="text-base text-amber-700 font-mono">{word.translit}</p>
+                  {isSpanish ? (
+                    <p className="text-4xl font-bold text-gray-800">{(word as SpanishWord).es}</p>
+                  ) : (
+                    <>
+                      <p className="text-4xl font-bold text-gray-800" dir="rtl">{(word as ArabicWord).ar}</p>
+                      <p className="text-base text-amber-700 font-mono">{(word as ArabicWord).translit}</p>
+                    </>
+                  )}
                   <p className="text-xs text-gray-400">מה זה אומר בעברית?</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1383,7 +1570,7 @@ export default function App() {
                     const isCorrect = opt === word.he;
                     const isChosen = opt === quizAnswered;
                     let cls = 'p-4 rounded-2xl border-2 text-sm font-bold transition-all text-center ';
-                    if (!quizAnswered) cls += 'bg-white border-gray-200 hover:border-amber-300 hover:bg-amber-50 cursor-pointer';
+                    if (!quizAnswered) cls += `bg-white border-gray-200 ${accentCls.hover} cursor-pointer`;
                     else if (isCorrect) cls += 'bg-green-50 border-green-400 text-green-700';
                     else if (isChosen) cls += 'bg-red-50 border-red-300 text-red-600';
                     else cls += 'bg-white border-gray-100 text-gray-400';
@@ -1705,13 +1892,13 @@ export default function App() {
                 </div>
               ) : detailActiveTab === 'speaking' ? (() => {
                 const langHe = (selectedPodcast.language || 'english') === 'spanish' ? 'ספרדית' : (selectedPodcast.language || 'english') === 'french' ? 'צרפתית' : (selectedPodcast.language || 'english') === 'arabic' ? 'ערבית' : (selectedPodcast.language || 'english') === 'turkish' ? 'טורקית' : 'אנגלית';
-                const prompt = `רוצה לתרגל ${langHe} ברמה ${selectedPodcast.level}. זה עתה האזנתי לפודקאסט בנושא: "${selectedPodcast.title}". שאל אותי שאלות בשפה הזו על הנושא שנלמד. תן לי לענות, ותגיה לי את הדקדוק שלי אחרי כל תשובה.`;
+                const prompt = getSpeakingPrompt(langHe, selectedPodcast.level || '', selectedPodcast.title || '');
                 return (
                   <div className="space-y-5">
                     <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
                       <p className="text-sm font-bold text-indigo-800">מה זה?</p>
                       <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
-                        העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — הוא ידבר איתך ב{langHe} על הנושא שהאזנת אליו, ויגיה לך את הדקדוק בזמן אמת.
+                        העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
                       </p>
                     </div>
                     <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
@@ -1804,7 +1991,7 @@ export default function App() {
                     <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
                   </div>
                   {language === 'arabic' && (
-                    <button onClick={() => { setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); setShowAlphabet(false); setSelectedLetter(null); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
+                    <button onClick={() => { setVocabBuilderLanguage('arabic'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); setShowAlphabet(false); setSelectedLetter(null); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🌙</span>
                         <div className="text-left">
@@ -1813,6 +2000,18 @@ export default function App() {
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-amber-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'spanish' && (
+                    <button onClick={() => { setVocabBuilderLanguage('spanish'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-red-50 to-yellow-50 border border-red-200 rounded-2xl hover:from-red-100 hover:to-yellow-100 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🇪🇸</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-red-800">Spanish Starter — לומדים ספרדית מאפס</p>
+                          <p className="text-xs text-red-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-red-500 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
                   {language === 'spanish' && (
@@ -2207,14 +2406,13 @@ export default function App() {
                         </div>
                       ) : activeTab === 'speaking' ? (() => {
                         const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : 'אנגלית';
-                        const topicLine = generatedTitle ? `זה עתה האזנתי לפודקאסט בנושא: "${generatedTitle}".` : '';
-                        const prompt = `רוצה לתרגל ${langHe} ברמה ${level}. ${topicLine} שאל אותי שאלות בשפה הזו על הנושא שנלמד. תן לי לענות, ותגיה לי את הדקדוק שלי אחרי כל תשובה.`;
+                        const prompt = getSpeakingPrompt(langHe, level, generatedTitle || 'הפודקאסט');
                         return (
                           <div className="space-y-5">
                             <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
                               <p className="text-sm font-bold text-indigo-800">מה זה?</p>
                               <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
-                                העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — הוא ידבר איתך ב{langHe} על הנושא שהאזנת אליו, ויגיה לך את הדקדוק בזמן אמת.
+                                העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
                               </p>
                             </div>
                             <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
