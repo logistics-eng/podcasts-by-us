@@ -235,8 +235,8 @@ async function startServer() {
         spanishDialect,
       } = req.body;
 
-      const defaultHost1 = language === 'turkish' ? 'Elif' : language === 'spanish' && spanishDialect === 'argentina' ? 'Valentina' : language === 'spanish' ? 'Isabel' : language === 'french' ? 'Camille' : language === 'arabic' ? 'Layla' : language === 'italian' ? 'Giulia' : 'Alex';
-      const defaultHost2 = language === 'turkish' ? 'Mehmet' : language === 'spanish' && spanishDialect === 'argentina' ? 'Matías' : language === 'spanish' ? 'Alejandro' : language === 'french' ? 'Lucas' : language === 'arabic' ? 'Omar' : language === 'italian' ? 'Marco' : 'Sam';
+      const defaultHost1 = language === 'turkish' ? 'Elif' : language === 'spanish' && spanishDialect === 'argentina' ? 'Valentina' : language === 'spanish' ? 'Isabel' : language === 'french' ? 'Camille' : language === 'arabic' ? 'Layla' : language === 'italian' ? 'Giulia' : language === 'dutch' ? 'Fleur' : 'Alex';
+      const defaultHost2 = language === 'turkish' ? 'Mehmet' : language === 'spanish' && spanishDialect === 'argentina' ? 'Matías' : language === 'spanish' ? 'Alejandro' : language === 'french' ? 'Lucas' : language === 'arabic' ? 'Omar' : language === 'italian' ? 'Marco' : language === 'dutch' ? 'Joost' : 'Sam';
       const host1 = speakerNames?.host1 || defaultHost1;
       const host2 = speakerNames?.host2 || defaultHost2;
 
@@ -320,7 +320,7 @@ ${contentMode === 'roleplay' || contentMode === 'phonecall'
 ${contentMode !== 'roleplay' && contentMode !== 'phonecall' ? `Today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Use this to correctly describe whether events are past, happening now, or upcoming — but do NOT mention or state the date in the script itself.` : ''}
 
 IMPORTANT:
-1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ` Write the title in ${language === 'arabic' ? 'Arabic' : language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'italian' ? 'Italian' : 'Turkish'} first, then on the next line write "TITLE_EN: [English translation of the title]".` : ''}
+1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ` Write the title in ${language === 'arabic' ? 'Arabic' : language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'italian' ? 'Italian' : language === 'dutch' ? 'Dutch' : 'Turkish'} first, then on the next line write "TITLE_EN: [English translation of the title]".` : ''}
 2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled exactly "VOCABULARY CHART" (always in English, never translated) containing exactly ${language === 'spanish' && (level === 'B1' || level === 'B2' || level === 'C1') ? '15' : '10'} interesting words, phrases, or idioms used in the script.
 ${language === 'italian'
@@ -328,10 +328,10 @@ ${language === 'italian'
   : (level === 'A1' || level === 'A2')
     ? (language === 'arabic'
       ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום עברי של המילה עצמה".`
-      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
+      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : language === 'dutch' ? 'Dutch' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
     : (language === 'arabic'
       ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic and (2) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — תרגום עברי של המילה עצמה".`
-      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
+      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : language === 'dutch' ? 'Dutch' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
 }
 
 Format:
@@ -359,6 +359,8 @@ Keep the conversation natural and engaging. Do not include any stage directions 
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Turkish (Istanbul dialect). All dialogue, vocabulary chart, and content must be in Turkish.'
         : language === 'italian'
         ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Italian. All dialogue, vocabulary chart, and content must be in Italian.'
+        : language === 'dutch'
+        ? userPrompt + '\n\nIMPORTANT: Write the ENTIRE podcast script in Dutch. All dialogue, vocabulary chart, and content must be in Dutch.'
         : userPrompt;
 
       const scriptMsg = await anthropic.messages.create({
@@ -437,7 +439,7 @@ STRICT RULES:
 - examples must always contain exactly 3 items: one positive, one negative, one question — in that order.
 - highlights must include the auxiliary/main verb words that show the grammar pattern (e.g. for negative present simple: "doesn't"/"don't" AND the main verb; for questions: the auxiliary "do/does/is/are/have" AND the main verb).
 - Return ONLY a raw JSON array, no markdown, no code fences, no extra text.
-${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : language === 'french' ? '- The podcast is in FRENCH. The podcastExample must be a French sentence from the transcript. All 3 example sentences (positive, negative, question) must be in French. Explanations (formula, whenToUse) stay in English.' : language === 'arabic' ? '- The podcast is in ARABIC. The podcastExample must be an Arabic sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Arabic. Explanations (formula, whenToUse) stay in English.' : language === 'turkish' ? '- The podcast is in TURKISH. The podcastExample must be a Turkish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Turkish. Explanations (formula, whenToUse) stay in English.' : language === 'italian' ? '- The podcast is in ITALIAN. The podcastExample must be an Italian sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Italian. Explanations (formula, whenToUse) stay in English.' : ''}
+${language === 'spanish' ? '- The podcast is in SPANISH. The podcastExample must be a Spanish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Spanish. Explanations (formula, whenToUse) stay in English.' : language === 'french' ? '- The podcast is in FRENCH. The podcastExample must be a French sentence from the transcript. All 3 example sentences (positive, negative, question) must be in French. Explanations (formula, whenToUse) stay in English.' : language === 'arabic' ? '- The podcast is in ARABIC. The podcastExample must be an Arabic sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Arabic. Explanations (formula, whenToUse) stay in English.' : language === 'turkish' ? '- The podcast is in TURKISH. The podcastExample must be a Turkish sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Turkish. Explanations (formula, whenToUse) stay in English.' : language === 'italian' ? '- The podcast is in ITALIAN. The podcastExample must be an Italian sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Italian. Explanations (formula, whenToUse) stay in English.' : language === 'dutch' ? '- The podcast is in DUTCH. The podcastExample must be a Dutch sentence from the transcript. All 3 example sentences (positive, negative, question) must be in Dutch. Explanations (formula, whenToUse) stay in English.' : ''}
 
 [
   {
@@ -512,6 +514,8 @@ ${transcript}`;
       const VOICE_MALE_TR   = 'tr-TR-AhmetNeural';
       const VOICE_FEMALE_IT = 'it-IT-ElsaNeural';
       const VOICE_MALE_IT   = 'it-IT-DiegoNeural';
+      const VOICE_FEMALE_NL = 'nl-NL-ColetteNeural';
+      const VOICE_MALE_NL   = 'nl-NL-MaartenNeural';
 
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
@@ -535,6 +539,10 @@ ${transcript}`;
         if (language === 'italian') {
           if (hostCount === 'one') return VOICE_FEMALE_IT;
           return speaker === host1Name ? VOICE_FEMALE_IT : VOICE_MALE_IT;
+        }
+        if (language === 'dutch') {
+          if (hostCount === 'one') return VOICE_FEMALE_NL;
+          return speaker === host1Name ? VOICE_FEMALE_NL : VOICE_MALE_NL;
         }
         if (hostCount === 'one') return VOICE_FEMALE_GB;
         if (level === 'A1' || level === 'A2') return speaker === host1Name ? VOICE_FEMALE_US_SLOW : VOICE_MALE_US_SLOW;
@@ -605,7 +613,7 @@ ${transcript}`;
   app.post('/api/generate-worksheet', async (req, res) => {
     try {
       const { title, level, vocabulary, grammarTips, language } = req.body;
-      const langName = language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic (Levantine)' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : 'English';
+      const langName = language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic (Levantine)' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : language === 'dutch' ? 'Dutch' : 'English';
 
       const levelDesc: Record<string, string> = {
         A1: 'complete beginners — very short sentences (max 6 words), present simple only, basic matching and fill-in-the-blank with word bank',

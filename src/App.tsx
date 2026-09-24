@@ -1881,13 +1881,14 @@ interface SavedPodcast {
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
-  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian' | 'turkish' | 'french' | 'arabic2' | 'spanish2' | 'italian2' | 'turkish2' | 'french2'>('arabic');
-  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | null>(null);
+  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian' | 'turkish' | 'french' | 'dutch' | 'arabic2' | 'spanish2' | 'italian2' | 'turkish2' | 'french2' | 'dutch2'>('arabic');
+  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | DutchTopic | null>(null);
   const [activeVerbTopic, setActiveVerbTopic] = useState<ArabicVerbConjTopic | null>(null);
   const [activeSpanishVerbTopic, setActiveSpanishVerbTopic] = useState<SpanishVerbConjTopic | null>(null);
   const [activeItalianVerbTopic, setActiveItalianVerbTopic] = useState<ItalianVerbConjTopic | null>(null);
   const [activeTurkishVerbTopic, setActiveTurkishVerbTopic] = useState<TurkishVerbConjTopic | null>(null);
   const [activeFrenchVerbTopic, setActiveFrenchVerbTopic] = useState<FrenchVerbConjTopic | null>(null);
+  const [activeDutchVerbTopic, setActiveDutchVerbTopic] = useState<DutchVerbConjTopic | null>(null);
   const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
   const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
   const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
@@ -1905,7 +1906,7 @@ export default function App() {
   const [alphaMode, setAlphaMode] = useState<'grid' | 'quiz'>('grid');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
-  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish' | 'italian'>('english');
+  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish' | 'italian' | 'dutch'>('english');
   const [showHebrew, setShowHebrew] = useState(false);
   const [hebrewTranscript, setHebrewTranscript] = useState('');
   const [isTranslatingHebrew, setIsTranslatingHebrew] = useState(false);
@@ -2470,7 +2471,32 @@ export default function App() {
     }
   };
 
-  const startQuiz = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic) => {
+  const getDutchVocabAudio = async (word: DutchWord) => {
+    const key = 'nl_' + word.nl;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.nl, voice: 'nl-NL-ColetteNeural' }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const startQuiz = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | DutchTopic) => {
     setQuizIndex(0);
     setQuizAnswered(null);
     setQuizScore(0);
@@ -2478,11 +2504,12 @@ export default function App() {
     generateQuizOptions(topic, 0);
   };
 
-  const generateQuizOptions = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic, idx: number) => {
+  const generateQuizOptions = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | DutchTopic, idx: number) => {
     const isItalianTopic = vocabBuilderLanguage === 'italian' || vocabBuilderLanguage === 'italian2';
     const isTurkishTopic = vocabBuilderLanguage === 'turkish' || vocabBuilderLanguage === 'turkish2';
     const isFrenchTopic = vocabBuilderLanguage === 'french' || vocabBuilderLanguage === 'french2';
-    const correct = isItalianTopic ? (topic.words[idx] as ItalianWord).en : (topic.words[idx] as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he;
+    const isDutchTopic = vocabBuilderLanguage === 'dutch' || vocabBuilderLanguage === 'dutch2';
+    const correct = isItalianTopic ? (topic.words[idx] as ItalianWord).en : (topic.words[idx] as ArabicWord | SpanishWord | TurkishWord | FrenchWord | DutchWord).he;
     const allWords = vocabBuilderLanguage === 'spanish2'
       ? SPANISH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : vocabBuilderLanguage === 'spanish'
@@ -2499,6 +2526,10 @@ export default function App() {
       ? FRENCH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : isFrenchTopic
       ? FRENCH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : vocabBuilderLanguage === 'dutch2'
+      ? DUTCH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
+      : isDutchTopic
+      ? DUTCH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
       : vocabBuilderLanguage === 'arabic2'
       ? ARABIC_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : ARABIC_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he));
@@ -2889,8 +2920,9 @@ export default function App() {
     const isItalian = vocabBuilderLanguage === 'italian' || vocabBuilderLanguage === 'italian2';
     const isTurkish = vocabBuilderLanguage === 'turkish' || vocabBuilderLanguage === 'turkish2';
     const isFrench = vocabBuilderLanguage === 'french' || vocabBuilderLanguage === 'french2';
-    const isLevel2 = vocabBuilderLanguage === 'arabic2' || vocabBuilderLanguage === 'spanish2' || vocabBuilderLanguage === 'italian2' || vocabBuilderLanguage === 'turkish2' || vocabBuilderLanguage === 'french2';
-    const isLatin = isSpanish || isItalian || isTurkish || isFrench;
+    const isDutch = vocabBuilderLanguage === 'dutch' || vocabBuilderLanguage === 'dutch2';
+    const isLevel2 = vocabBuilderLanguage === 'arabic2' || vocabBuilderLanguage === 'spanish2' || vocabBuilderLanguage === 'italian2' || vocabBuilderLanguage === 'turkish2' || vocabBuilderLanguage === 'french2' || vocabBuilderLanguage === 'dutch2';
+    const isLatin = isSpanish || isItalian || isTurkish || isFrench || isDutch;
     const allTopics = vocabBuilderLanguage === 'spanish2' ? SPANISH_VOCAB_TOPICS_2
       : vocabBuilderLanguage === 'spanish' ? SPANISH_VOCAB_TOPICS
       : vocabBuilderLanguage === 'italian2' ? ITALIAN_VOCAB_TOPICS_2
@@ -2899,6 +2931,8 @@ export default function App() {
       : vocabBuilderLanguage === 'turkish' ? TURKISH_VOCAB_TOPICS
       : vocabBuilderLanguage === 'french2' ? FRENCH_VOCAB_TOPICS_2
       : vocabBuilderLanguage === 'french' ? FRENCH_VOCAB_TOPICS
+      : vocabBuilderLanguage === 'dutch2' ? DUTCH_VOCAB_TOPICS_2
+      : vocabBuilderLanguage === 'dutch' ? DUTCH_VOCAB_TOPICS
       : vocabBuilderLanguage === 'arabic2' ? ARABIC_VOCAB_TOPICS_2
       : ARABIC_VOCAB_TOPICS;
 
@@ -3096,6 +3130,61 @@ export default function App() {
                     <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
                     <button onClick={() => getSpanishVocabAudio({ es: pair.pastEs, he: '' })} disabled={vocabAudioLoading['es_' + pair.pastEs]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
                       {vocabAudioLoading['es_' + pair.pastEs] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    if (activeDutchVerbTopic) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveDutchVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> נושאים
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeDutchVerbTopic.emoji} {activeDutchVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">הווה מול עבר בהולנדית</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-orange-50 border border-orange-200 rounded-2xl">
+                <span className="text-sm font-bold text-orange-700">הווה</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">↔</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-amber-50 border border-amber-200 rounded-2xl">
+                <span className="text-sm font-bold text-amber-700">עבר</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {activeDutchVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  <div className="bg-orange-50 border border-orange-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-orange-900 leading-tight">{pair.presentNl}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentHe}</p>
+                    <button onClick={() => getDutchVocabAudio({ nl: pair.presentNl, he: '' })} disabled={vocabAudioLoading['nl_' + pair.presentNl]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-orange-200 rounded-full hover:bg-orange-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['nl_' + pair.presentNl] ? <Loader2 size={12} className="animate-spin text-orange-600" /> : <Volume2 size={12} className="text-orange-600" />}
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-amber-900 leading-tight">{pair.pastNl}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
+                    <button onClick={() => getDutchVocabAudio({ nl: pair.pastNl, he: '' })} disabled={vocabAudioLoading['nl_' + pair.pastNl]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-amber-200 rounded-full hover:bg-amber-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['nl_' + pair.pastNl] ? <Loader2 size={12} className="animate-spin text-amber-600" /> : <Volume2 size={12} className="text-amber-600" />}
                     </button>
                   </div>
                 </div>
@@ -3348,7 +3437,7 @@ export default function App() {
                 <ArrowLeft size={16} /> {isItalian ? 'Back' : 'חזרה'}
               </button>
               <div>
-                <h1 className="text-base font-bold">{vocabBuilderLanguage === 'spanish2' ? '🇪🇸 Spanish A2' : vocabBuilderLanguage === 'spanish' ? '🇪🇸 Spanish Starter' : vocabBuilderLanguage === 'italian2' ? '🇮🇹 Italian A2' : vocabBuilderLanguage === 'italian' ? '🇮🇹 Italian Starter' : vocabBuilderLanguage === 'turkish2' ? '🇹🇷 Turkish A2' : vocabBuilderLanguage === 'turkish' ? '🇹🇷 Turkish Starter' : vocabBuilderLanguage === 'french2' ? '🇫🇷 French A2' : vocabBuilderLanguage === 'french' ? '🇫🇷 French Starter' : vocabBuilderLanguage === 'arabic2' ? '🌟 Arabic A2' : '🌙 Arabic Starter'}</h1>
+                <h1 className="text-base font-bold">{vocabBuilderLanguage === 'spanish2' ? '🇪🇸 Spanish A2' : vocabBuilderLanguage === 'spanish' ? '🇪🇸 Spanish Starter' : vocabBuilderLanguage === 'italian2' ? '🇮🇹 Italian A2' : vocabBuilderLanguage === 'italian' ? '🇮🇹 Italian Starter' : vocabBuilderLanguage === 'turkish2' ? '🇹🇷 Turkish A2' : vocabBuilderLanguage === 'turkish' ? '🇹🇷 Turkish Starter' : vocabBuilderLanguage === 'french2' ? '🇫🇷 French A2' : vocabBuilderLanguage === 'french' ? '🇫🇷 French Starter' : vocabBuilderLanguage === 'dutch2' ? '🇳🇱 Dutch A2' : vocabBuilderLanguage === 'dutch' ? '🇳🇱 Dutch Starter' : vocabBuilderLanguage === 'arabic2' ? '🌟 Arabic A2' : '🌙 Arabic Starter'}</h1>
                 <p className="text-xs text-gray-500">{isItalian ? 'Choose a topic to learn' : 'בחר נושא ללמוד'}</p>
               </div>
             </div>
@@ -3416,6 +3505,14 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">הווה ↔ עבר</span>
                 </button>
               ))}
+              {isDutch && (vocabBuilderLanguage === 'dutch2' ? DUTCH_VERB_TOPICS_2 : DUTCH_VERB_TOPICS).map((topic, i) => (
+                <button key={'dverbz_' + i} onClick={() => setActiveDutchVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-md hover:border-orange-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-orange-500 font-semibold">הווה ↔ עבר</span>
+                </button>
+              ))}
             </div>
           </main>
         </div>
@@ -3425,7 +3522,7 @@ export default function App() {
     // Word list / quiz view
     const topic = vocabTopic;
     const word = topic.words[quizIndex];
-    const wordKey = isSpanish ? 'es_' + (word as SpanishWord).es : isItalian ? 'it_' + (word as ItalianWord).it : isTurkish ? 'tr_' + (word as TurkishWord).tr : isFrench ? 'fr_' + (word as FrenchWord).fr : (word as ArabicWord).ar;
+    const wordKey = isSpanish ? 'es_' + (word as SpanishWord).es : isItalian ? 'it_' + (word as ItalianWord).it : isTurkish ? 'tr_' + (word as TurkishWord).tr : isFrench ? 'fr_' + (word as FrenchWord).fr : isDutch ? 'nl_' + (word as DutchWord).nl : (word as ArabicWord).ar;
     const accentCls = isSpanish
       ? { btn: 'bg-red-500 text-white hover:bg-red-600', btnOutline: 'bg-red-50 border-red-200 hover:bg-red-100', text: 'text-red-600', hover: 'hover:border-red-300 hover:bg-red-50' }
       : isItalian
@@ -3434,6 +3531,8 @@ export default function App() {
       ? { btn: 'bg-red-600 text-white hover:bg-red-700', btnOutline: 'bg-red-50 border-red-200 hover:bg-red-100', text: 'text-red-600', hover: 'hover:border-red-300 hover:bg-red-50' }
       : isFrench
       ? { btn: 'bg-blue-600 text-white hover:bg-blue-700', btnOutline: 'bg-blue-50 border-blue-200 hover:bg-blue-100', text: 'text-blue-600', hover: 'hover:border-blue-300 hover:bg-blue-50' }
+      : isDutch
+      ? { btn: 'bg-orange-500 text-white hover:bg-orange-600', btnOutline: 'bg-orange-50 border-orange-200 hover:bg-orange-100', text: 'text-orange-600', hover: 'hover:border-orange-300 hover:bg-orange-50' }
       : { btn: 'bg-amber-500 text-white hover:bg-amber-600', btnOutline: 'bg-amber-50 border-amber-200 hover:bg-amber-100', text: 'text-amber-600', hover: 'hover:border-amber-300 hover:bg-amber-50' };
 
     const playAll = async () => {
@@ -3443,6 +3542,7 @@ export default function App() {
         else if (isItalian) await getItalianVocabAudio(w as ItalianWord);
         else if (isTurkish) await getTurkishVocabAudio(w as TurkishWord);
         else if (isFrench) await getFrenchVocabAudio(w as FrenchWord);
+        else if (isDutch) await getDutchVocabAudio(w as DutchWord);
         else await getVocabAudio(w as ArabicWord);
         await new Promise(r => setTimeout(r, 1800));
       }
@@ -3461,7 +3561,7 @@ export default function App() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setVocabMode('browse'); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'browse' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Words' : 'מילים'}</button>
-              <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Quiz' : 'חידון'}</button>
+              <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | DutchTopic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Quiz' : 'חידון'}</button>
             </div>
           </div>
         </header>
@@ -3476,10 +3576,10 @@ export default function App() {
               </div>
               <div className="space-y-3">
                 {topic.words.map((w, i) => {
-                  const wKey = isSpanish ? 'es_' + (w as SpanishWord).es : isItalian ? 'it_' + (w as ItalianWord).it : isTurkish ? 'tr_' + (w as TurkishWord).tr : isFrench ? 'fr_' + (w as FrenchWord).fr : (w as ArabicWord).ar;
+                  const wKey = isSpanish ? 'es_' + (w as SpanishWord).es : isItalian ? 'it_' + (w as ItalianWord).it : isTurkish ? 'tr_' + (w as TurkishWord).tr : isFrench ? 'fr_' + (w as FrenchWord).fr : isDutch ? 'nl_' + (w as DutchWord).nl : (w as ArabicWord).ar;
                   return (
                     <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm">
-                      <button onClick={() => isSpanish ? getSpanishVocabAudio(w as SpanishWord) : isItalian ? getItalianVocabAudio(w as ItalianWord) : isTurkish ? getTurkishVocabAudio(w as TurkishWord) : isFrench ? getFrenchVocabAudio(w as FrenchWord) : getVocabAudio(w as ArabicWord)} disabled={vocabAudioLoading[wKey]} className={`flex-shrink-0 w-10 h-10 flex items-center justify-center border rounded-full transition-all disabled:opacity-50 ${accentCls.btnOutline}`}>
+                      <button onClick={() => isSpanish ? getSpanishVocabAudio(w as SpanishWord) : isItalian ? getItalianVocabAudio(w as ItalianWord) : isTurkish ? getTurkishVocabAudio(w as TurkishWord) : isFrench ? getFrenchVocabAudio(w as FrenchWord) : isDutch ? getDutchVocabAudio(w as DutchWord) : getVocabAudio(w as ArabicWord)} disabled={vocabAudioLoading[wKey]} className={`flex-shrink-0 w-10 h-10 flex items-center justify-center border rounded-full transition-all disabled:opacity-50 ${accentCls.btnOutline}`}>
                         {vocabAudioLoading[wKey] ? <Loader2 size={16} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={16} className={accentCls.text} />}
                       </button>
                       <div className="flex-1 min-w-0">
@@ -3491,6 +3591,8 @@ export default function App() {
                           <p className="text-xl font-bold text-gray-800">{(w as TurkishWord).tr}</p>
                         ) : isFrench ? (
                           <p className="text-xl font-bold text-gray-800">{(w as FrenchWord).fr}</p>
+                        ) : isDutch ? (
+                          <p className="text-xl font-bold text-gray-800">{(w as DutchWord).nl}</p>
                         ) : (
                           <>
                             <p className="text-xl font-bold text-gray-800 text-right" dir="rtl">{(w as ArabicWord).ar}</p>
@@ -3499,7 +3601,7 @@ export default function App() {
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-700">{isItalian ? (w as ItalianWord).en : (w as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he}</p>
+                        <p className="text-sm font-bold text-indigo-700">{isItalian ? (w as ItalianWord).en : (w as ArabicWord | SpanishWord | TurkishWord | FrenchWord | DutchWord).he}</p>
                       </div>
                     </div>
                   );
@@ -3518,7 +3620,7 @@ export default function App() {
                   <p className="text-lg text-gray-600">ענית נכון על <span className={`font-bold ${accentCls.text}`}>{quizScore}</span> מתוך <span className="font-bold">{topic.words.length}</span></p>
                 )}
                 <div className="flex gap-3 justify-center mt-6">
-                  <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic)} className={`px-5 py-2.5 font-bold rounded-full transition-all ${accentCls.btn}`}>{isItalian ? 'Play again' : 'שחק שוב'}</button>
+                  <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | DutchTopic)} className={`px-5 py-2.5 font-bold rounded-full transition-all ${accentCls.btn}`}>{isItalian ? 'Play again' : 'שחק שוב'}</button>
                   <button onClick={() => setVocabMode('browse')} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-full hover:bg-gray-200 transition-all">{isItalian ? 'Back to words' : 'חזור למילים'}</button>
                 </div>
               </div>
@@ -3529,7 +3631,7 @@ export default function App() {
                   <span>✅ {quizScore}</span>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8 text-center space-y-3">
-                  <button onClick={() => isSpanish ? getSpanishVocabAudio(word as SpanishWord) : isItalian ? getItalianVocabAudio(word as ItalianWord) : isTurkish ? getTurkishVocabAudio(word as TurkishWord) : isFrench ? getFrenchVocabAudio(word as FrenchWord) : getVocabAudio(word as ArabicWord)} className={`mx-auto w-14 h-14 flex items-center justify-center border rounded-full transition-all ${accentCls.btnOutline}`}>
+                  <button onClick={() => isSpanish ? getSpanishVocabAudio(word as SpanishWord) : isItalian ? getItalianVocabAudio(word as ItalianWord) : isTurkish ? getTurkishVocabAudio(word as TurkishWord) : isFrench ? getFrenchVocabAudio(word as FrenchWord) : isDutch ? getDutchVocabAudio(word as DutchWord) : getVocabAudio(word as ArabicWord)} className={`mx-auto w-14 h-14 flex items-center justify-center border rounded-full transition-all ${accentCls.btnOutline}`}>
                     {vocabAudioLoading[wordKey] ? <Loader2 size={22} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={22} className={accentCls.text} />}
                   </button>
                   {isSpanish ? (
@@ -3540,6 +3642,8 @@ export default function App() {
                     <p className="text-4xl font-bold text-gray-800">{(word as TurkishWord).tr}</p>
                   ) : isFrench ? (
                     <p className="text-4xl font-bold text-gray-800">{(word as FrenchWord).fr}</p>
+                  ) : isDutch ? (
+                    <p className="text-4xl font-bold text-gray-800">{(word as DutchWord).nl}</p>
                   ) : (
                     <>
                       <p className="text-4xl font-bold text-gray-800" dir="rtl">{(word as ArabicWord).ar}</p>
@@ -3550,7 +3654,7 @@ export default function App() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {quizOptions.map((opt, i) => {
-                    const isCorrect = opt === (isItalian ? (word as ItalianWord).en : (word as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he);
+                    const isCorrect = opt === (isItalian ? (word as ItalianWord).en : (word as ArabicWord | SpanishWord | TurkishWord | FrenchWord | DutchWord).he);
                     const isChosen = opt === quizAnswered;
                     let cls = 'p-4 rounded-2xl border-2 text-sm font-bold transition-all text-center ';
                     if (!quizAnswered) cls += `bg-white border-gray-200 ${accentCls.hover} cursor-pointer`;
@@ -3989,6 +4093,7 @@ export default function App() {
                     <button onClick={() => setLanguage('arabic')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'arabic' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇸🇾 Arabic</button>
                     <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
                     <button onClick={() => setLanguage('italian')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'italian' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇹 Italian</button>
+                    <button onClick={() => setLanguage('dutch')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'dutch' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇳🇱 Dutch</button>
                   </div>
                   {language === 'arabic' && (
                     <button onClick={() => { setVocabBuilderLanguage('arabic'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); setShowAlphabet(false); setSelectedLetter(null); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
@@ -4114,6 +4219,30 @@ export default function App() {
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-sky-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'dutch' && (
+                    <button onClick={() => { setVocabBuilderLanguage('dutch'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-2xl hover:from-orange-100 hover:to-orange-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🇳🇱</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-orange-800">Dutch Starter A1 — ללמוד הולנדית</p>
+                          <p className="text-xs text-orange-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-orange-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'dutch' && (
+                    <button onClick={() => { setVocabBuilderLanguage('dutch2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-300 rounded-2xl hover:from-orange-200 hover:to-amber-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-orange-900">Dutch Level A2 — הולנדית שלב ב׳</p>
+                          <p className="text-xs text-orange-700">קניות • כיוונים • מזג אוויר • בריאות • ועוד</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-orange-700 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
 
