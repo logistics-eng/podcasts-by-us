@@ -2802,7 +2802,7 @@ export default function App() {
     setTranscript(scriptText);
 
     try {
-      await generateAudio(scriptText, scriptHostCount, scriptSpeed, 'B2', true, { host1: 'Alex', host2: 'Sam' });
+      await generateAudio(scriptText, scriptHostCount, scriptSpeed, 'B2', true, { host1: '', host2: '' });
     } catch (error: any) {
       console.error("Generation failed:", error);
       if (error?.message?.includes('429') || error?.status === 429) {
