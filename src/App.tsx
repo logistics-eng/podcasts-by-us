@@ -3099,8 +3099,9 @@ export default function App() {
             </div>
             <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
                       </div>
-          <button onClick={() => setView('library')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition-all">
-            <Library size={16} /> My Podcasts{library.length > 0 && <span className="bg-indigo-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">{library.length}</span>}
+          <button onClick={() => setView('library')} title="My Podcasts" className="relative flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all">
+            <Library size={18} />
+            {library.length > 0 && <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">{library.length}</span>}
           </button>
         </div>
       </header>
