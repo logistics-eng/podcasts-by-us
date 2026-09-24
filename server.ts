@@ -541,10 +541,22 @@ ${transcript}`;
       const baseRate = (speechSpeed ?? 100) / 100;
       const rate = (level === 'A1' || level === 'A2') ? Math.min(baseRate, 0.8) : baseRate;
 
+      // Phonetic substitutions for names the English TTS mispronounces
+      const PRONUNCIATION_FIXES: [RegExp, string][] = [
+        [/\bEli\b/g, 'Ellie'],          // "EE-lye" → "EH-lee"
+        [/\bMossad\b/g, 'Moh-sahd'],
+        [/\bNetanyahu\b/g, 'Netanyahu'], // usually fine; keep as fallback
+        [/\bTzahal\b/gi, 'Tza-hal'],
+        [/\bkibutz\b/gi, 'kibootz'],
+        [/\bIDF\b/g, 'I D F'],
+      ];
+      const applyPronunciationFixes = (text: string) =>
+        PRONUNCIATION_FIXES.reduce((t, [re, rep]) => t.replace(re, rep), text);
+
       const edgeTtsLine = async (voice: string, text: string): Promise<Buffer> => {
         const tts = new MsEdgeTTS();
         await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-        const { audioStream } = await tts.toStream(text, { rate });
+        const { audioStream } = await tts.toStream(applyPronunciationFixes(text), { rate });
         return new Promise((resolve, reject) => {
           const chunks: Buffer[] = [];
           audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));

@@ -677,6 +677,7 @@ export default function App() {
   const [vocabCopied, setVocabCopied] = useState(false);
   const [detailCopied, setDetailCopied] = useState(false);
   const [detailVocabCopied, setDetailVocabCopied] = useState(false);
+  const [speakingCopied, setSpeakingCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -1006,12 +1007,21 @@ export default function App() {
     return duration;
   };
 
-  const getSpeakingPrompt = (langHe: string, level: string, title: string): string => {
+  const getSpeakingPrompt = (langHe: string, level: string, title: string, langCode?: string): string => {
+    if (langCode === 'italian') {
+      const variants = [
+        `I just listened to an Italian podcast about "${title}" at ${level} level. I want to tell you about it — I'll share what I heard, and please ask me questions at the end. Only correct my Italian after we've finished discussing.`,
+        `I've just finished listening to an Italian podcast on "${title}" (level ${level}). I'm going to tell you what I learned, and I'd like you to ask me questions when I'm done. Please save any language corrections for after our discussion.`,
+        `I just listened to a podcast in Italian about "${title}", level ${level}. I want to share what I heard with you, and at the end please ask me questions about the topic. Correct my Italian only once we've finished talking about the podcast.`,
+        `I've just heard an Italian podcast about "${title}" at ${level} level. I'd like to tell you about it — I'll speak and you ask me questions at the end. Keep any Italian corrections for after we finish the discussion.`,
+      ];
+      return variants[Math.floor(Math.random() * variants.length)];
+    }
     const variants = [
       `זה עתה האזנתי לפודקאסט על "${title}" ב${langHe} ברמה ${level}. אני רוצה לספר לך על הפודקאסט, ואתה תקשיב ותשאל אותי שאלות בסוף. תתקן לי את ה${langHe} שלי רק אחרי שנסיים לדון בפודקאסט.`,
       `הרגע סיימתי לשמוע פודקאסט בנושא "${title}" ב${langHe}, רמה ${level}. אני אספר לך מה למדתי ואתה תשאל אותי שאלות אחרי שאסיים. תגיה לי את השפה רק בסוף השיחה, לא באמצע.`,
       `זה עתה שמעתי פודקאסט על "${title}" ב${langHe} (רמה ${level}). אני רוצה לשתף אותך במה שהאזנתי, ובסוף תשאל אותי שאלות על הנושא. אנא תתקן את הטעויות שלי ב${langHe} רק אחרי שנגמור לדון בפודקאסט.`,
-      `הזה עתה האזנתי לפודקאסט בנושא "${title}" ב${langHe}, רמה ${level}. אני רוצה לשוחח איתך על מה ששמעתי — אני אספר ואתה תשאל שאלות בסוף. את התיקונים ב${langHe} שמור לסוף, אחרי שנסיים את הדיון.`,
+      `זה עתה האזנתי לפודקאסט בנושא "${title}" ב${langHe}, רמה ${level}. אני רוצה לשוחח איתך על מה ששמעתי — אני אספר ואתה תשאל שאלות בסוף. את התיקונים ב${langHe} שמור לסוף, אחרי שנסיים את הדיון.`,
     ];
     return variants[Math.floor(Math.random() * variants.length)];
   };
@@ -1441,6 +1451,14 @@ export default function App() {
   };
 
   const copyToClipboard = () => { navigator.clipboard.writeText(transcript); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+  const copySpeakingPrompt = (text: string) => {
+    const done = () => { setSpeakingCopied(true); setTimeout(() => setSpeakingCopied(false), 2000); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(done).catch(() => { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); done(); });
+    } else {
+      const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); done();
+    }
+  };
   const copyVocabToClipboard = () => { navigator.clipboard.writeText(vocabularyChart); setVocabCopied(true); setTimeout(() => setVocabCopied(false), 2000); };
   const shareViaWhatsApp = async (text: string, filename: string) => {
     if (navigator.share) {
@@ -2108,7 +2126,7 @@ export default function App() {
                 {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
                   <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                 )}
-                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ דיבור</button>
+                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ {selectedPodcast.language === 'italian' ? 'Speaking' : 'דיבור'}</button>
               </div>
               {selectedPodcast.vocabulary && selectedPodcast.level && (
                 <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english', podcastId: selectedPodcast.id, savedWorksheet: selectedPodcast.worksheet })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
@@ -2194,24 +2212,37 @@ export default function App() {
                   ))}
                 </div>
               ) : detailActiveTab === 'speaking' ? (() => {
-                const langHe = (selectedPodcast.language || 'english') === 'spanish' ? 'ספרדית' : (selectedPodcast.language || 'english') === 'french' ? 'צרפתית' : (selectedPodcast.language || 'english') === 'arabic' ? 'ערבית' : (selectedPodcast.language || 'english') === 'turkish' ? 'טורקית' : (selectedPodcast.language || 'english') === 'italian' ? 'איטלקית' : 'אנגלית';
-                const prompt = getSpeakingPrompt(langHe, selectedPodcast.level || '', selectedPodcast.title || '');
+                const podLang = selectedPodcast.language || 'english';
+                const langHe = podLang === 'spanish' ? 'ספרדית' : podLang === 'french' ? 'צרפתית' : podLang === 'arabic' ? 'ערבית' : podLang === 'turkish' ? 'טורקית' : podLang === 'italian' ? 'איטלקית' : 'אנגלית';
+                const isItalianPod = podLang === 'italian';
+                const prompt = getSpeakingPrompt(langHe, selectedPodcast.level || '', selectedPodcast.title || '', podLang);
                 return (
                   <div className="space-y-5">
                     <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
-                      <p className="text-sm font-bold text-indigo-800">מה זה?</p>
-                      <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
-                        העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
-                      </p>
+                      {isItalianPod ? (
+                        <>
+                          <p className="text-sm font-bold text-indigo-800">How to use this?</p>
+                          <p className="text-sm text-indigo-700 leading-relaxed">
+                            Copy the prompt below and paste it into an AI tool like <strong>Claude</strong> or <strong>ChatGPT</strong> — tell it about the podcast you listened to, it will ask you questions at the end, and correct your Italian only after you've finished discussing.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-bold text-indigo-800">מה זה?</p>
+                          <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
+                            העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
+                          </p>
+                        </>
+                      )}
                     </div>
                     <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">הפרומפט שלך</p>
-                      <p className="text-base text-gray-800 leading-relaxed" dir="rtl">{prompt}</p>
-                      <button onClick={() => navigator.clipboard.writeText(prompt)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
-                        <Copy size={15} /> העתק פרומפט
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">{isItalianPod ? 'Your prompt' : 'הפרומפט שלך'}</p>
+                      <p className="text-base text-gray-800 leading-relaxed" dir={isItalianPod ? undefined : 'rtl'}>{prompt}</p>
+                      <button onClick={() => copySpeakingPrompt(prompt)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
+                        {speakingCopied ? <><Check size={15} /> {isItalianPod ? 'Copied!' : 'הועתק!'}</> : <><Copy size={15} /> {isItalianPod ? 'Copy prompt' : 'העתק פרומפט'}</>}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-400 text-center" dir="rtl">לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם</p>
+                    <p className="text-xs text-gray-400 text-center" dir={isItalianPod ? undefined : 'rtl'}>{isItalianPod ? 'After copying — open Claude, ChatGPT or any AI assistant and paste it there' : 'לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם'}</p>
                   </div>
                 );
               })() : (
@@ -2602,7 +2633,7 @@ export default function App() {
                           {mode === 'generate' && (
                             <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                           )}
-                          <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ דיבור</button>
+                          <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ {language === 'italian' ? 'Speaking' : 'דיבור'}</button>
                         </div>
                         {vocabularyChart && level && (
                           <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
@@ -2722,23 +2753,35 @@ export default function App() {
                         </div>
                       ) : activeTab === 'speaking' ? (() => {
                         const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : language === 'italian' ? 'איטלקית' : 'אנגלית';
-                        const prompt = getSpeakingPrompt(langHe, level, generatedTitle || 'הפודקאסט');
+                        const isItalianPod = language === 'italian';
+                        const prompt = getSpeakingPrompt(langHe, level, generatedTitle || (isItalianPod ? 'the podcast' : 'הפודקאסט'), language);
                         return (
                           <div className="space-y-5">
                             <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
-                              <p className="text-sm font-bold text-indigo-800">מה זה?</p>
-                              <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
-                                העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
-                              </p>
+                              {isItalianPod ? (
+                                <>
+                                  <p className="text-sm font-bold text-indigo-800">How to use this?</p>
+                                  <p className="text-sm text-indigo-700 leading-relaxed">
+                                    Copy the prompt below and paste it into an AI tool like <strong>Claude</strong> or <strong>ChatGPT</strong> — tell it about the podcast you listened to, it will ask you questions at the end, and correct your Italian only after you've finished discussing.
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-bold text-indigo-800">מה זה?</p>
+                                  <p className="text-sm text-indigo-700 leading-relaxed" dir="rtl">
+                                    העתק את הפרומפט למטה והדבק אותו לכלי AI כמו <strong>Claude</strong> או <strong>ChatGPT</strong> — ספר לו על הפודקאסט שהאזנת, הוא ישאל אותך שאלות בסוף, ויגיה לך את ה{langHe} רק אחרי שתסיים לדון.
+                                  </p>
+                                </>
+                              )}
                             </div>
                             <div className="p-5 bg-white border-2 border-indigo-200 rounded-2xl space-y-4">
-                              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">הפרומפט שלך</p>
-                              <p className="text-base text-gray-800 leading-relaxed" dir="rtl">{prompt}</p>
-                              <button onClick={() => { navigator.clipboard.writeText(prompt); }} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
-                                <Copy size={15} /> העתק פרומפט
+                              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">{isItalianPod ? 'Your prompt' : 'הפרומפט שלך'}</p>
+                              <p className="text-base text-gray-800 leading-relaxed" dir={isItalianPod ? undefined : 'rtl'}>{prompt}</p>
+                              <button onClick={() => copySpeakingPrompt(prompt)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm">
+                                {speakingCopied ? <><Check size={15} /> {isItalianPod ? 'Copied!' : 'הועתק!'}</> : <><Copy size={15} /> {isItalianPod ? 'Copy prompt' : 'העתק פרומפט'}</>}
                               </button>
                             </div>
-                            <p className="text-xs text-gray-400 text-center" dir="rtl">לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם</p>
+                            <p className="text-xs text-gray-400 text-center" dir={isItalianPod ? undefined : 'rtl'}>{isItalianPod ? 'After copying — open Claude, ChatGPT or any AI assistant and paste it there' : 'לאחר ההעתקה — פתח Claude, ChatGPT או כל עוזר AI אחר והדבק שם'}</p>
                           </div>
                         );
                       })() : (
