@@ -154,6 +154,14 @@ interface FrenchTopic { emoji: string; title: string; words: FrenchWord[]; }
 interface FrenchVerbPair { emoji: string; presentFr: string; presentHe: string; pastFr: string; pastHe: string; }
 interface FrenchVerbConjTopic { emoji: string; title: string; pairs: FrenchVerbPair[]; }
 
+// Dutch Vocabulary Builder — targets Hebrew speakers, glosses in Hebrew
+interface DutchWord { nl: string; he: string; }
+interface DutchTopic { emoji: string; title: string; words: DutchWord[]; }
+
+// Dutch Verb Conjugation — present (ik) vs. past (ik)
+interface DutchVerbPair { emoji: string; presentNl: string; presentHe: string; pastNl: string; pastHe: string; }
+interface DutchVerbConjTopic { emoji: string; title: string; pairs: DutchVerbPair[]; }
+
 // Arabic Alphabet Trainer
 interface AlphabetLetter {
   ar: string;       // isolated form
@@ -1038,6 +1046,112 @@ const FRENCH_VERB_TOPICS: FrenchVerbConjTopic[] = [
   ]},
 ];
 
+const DUTCH_VOCAB_TOPICS: DutchTopic[] = [
+  { emoji: '👋', title: 'ברכות והיכרות', words: [
+    { nl: 'hallo', he: 'שלום' }, { nl: 'goedemorgen', he: 'בוקר טוב' }, { nl: 'goedemiddag', he: 'צהריים טובים' },
+    { nl: 'goedenavond', he: 'ערב טוב' }, { nl: 'tot ziens', he: 'להתראות' }, { nl: 'dank je wel', he: 'תודה' },
+    { nl: 'alsjeblieft', he: 'בבקשה' }, { nl: 'sorry', he: 'סליחה' }, { nl: 'hoe gaat het?', he: 'מה שלומך?' }, { nl: 'goed', he: 'טוב' },
+  ]},
+  { emoji: '👨‍👩‍👧‍👦', title: 'משפחה', words: [
+    { nl: 'vader', he: 'אבא' }, { nl: 'moeder', he: 'אמא' }, { nl: 'broer', he: 'אח' },
+    { nl: 'zus', he: 'אחות' }, { nl: 'opa', he: 'סבא' }, { nl: 'oma', he: 'סבתא' },
+    { nl: 'zoon', he: 'בן' }, { nl: 'dochter', he: 'בת' }, { nl: 'oom', he: 'דוד' }, { nl: 'man', he: 'בעל' },
+  ]},
+  { emoji: '🍕', title: 'אוכל ושתייה', words: [
+    { nl: 'brood', he: 'לחם' }, { nl: 'water', he: 'מים' }, { nl: 'koffie', he: 'קפה' },
+    { nl: 'melk', he: 'חלב' }, { nl: 'kaas', he: 'גבינה' }, { nl: 'kip', he: 'עוף' },
+    { nl: 'rijst', he: 'אורז' }, { nl: 'ei', he: 'ביצה' }, { nl: 'chocolade', he: 'שוקולד' }, { nl: 'appel', he: 'תפוח' },
+  ]},
+  { emoji: '🔢', title: 'מספרים וזמן', words: [
+    { nl: 'één', he: 'אחד' }, { nl: 'twee', he: 'שניים' }, { nl: 'drie', he: 'שלושה' },
+    { nl: 'vier', he: 'ארבעה' }, { nl: 'vijf', he: 'חמישה' }, { nl: 'vandaag', he: 'היום' },
+    { nl: 'morgen', he: 'מחר' }, { nl: 'gisteren', he: 'אתמול' }, { nl: 'uur', he: 'שעה' }, { nl: 'minuut', he: 'דקה' },
+  ]},
+  { emoji: '🎨', title: 'צבעים ותארים', words: [
+    { nl: 'rood', he: 'אדום' }, { nl: 'blauw', he: 'כחול' }, { nl: 'groen', he: 'ירוק' },
+    { nl: 'geel', he: 'צהוב' }, { nl: 'wit', he: 'לבן' }, { nl: 'zwart', he: 'שחור' },
+    { nl: 'groot', he: 'גדול' }, { nl: 'klein', he: 'קטן' }, { nl: 'mooi', he: 'יפה' }, { nl: 'oud', he: 'ישן/זקן' },
+  ]},
+  { emoji: '🏠', title: 'הבית', words: [
+    { nl: 'huis', he: 'בית' }, { nl: 'kamer', he: 'חדר' }, { nl: 'keuken', he: 'מטבח' },
+    { nl: 'badkamer', he: 'אמבטיה' }, { nl: 'slaapkamer', he: 'חדר שינה' }, { nl: 'deur', he: 'דלת' },
+    { nl: 'raam', he: 'חלון' }, { nl: 'tafel', he: 'שולחן' }, { nl: 'stoel', he: 'כיסא' }, { nl: 'bed', he: 'מיטה' },
+  ]},
+  { emoji: '🏙️', title: 'עיר ותחבורה', words: [
+    { nl: 'stad', he: 'עיר' }, { nl: 'straat', he: 'רחוב' }, { nl: 'winkel', he: 'חנות' },
+    { nl: 'school', he: 'בית ספר' }, { nl: 'ziekenhuis', he: 'בית חולים' }, { nl: 'trein', he: 'רכבת' },
+    { nl: 'bus', he: 'אוטובוס' }, { nl: 'fiets', he: 'אופניים' }, { nl: 'auto', he: 'מכונית' }, { nl: 'station', he: 'תחנה' },
+  ]},
+  { emoji: '🛒', title: 'קניות', words: [
+    { nl: 'geld', he: 'כסף' }, { nl: 'prijs', he: 'מחיר' }, { nl: 'goedkoop', he: 'זול' },
+    { nl: 'duur', he: 'יקר' }, { nl: 'kopen', he: 'לקנות' }, { nl: 'verkopen', he: 'למכור' },
+    { nl: 'betalen', he: 'לשלם' }, { nl: 'rekening', he: 'חשבון' }, { nl: 'korting', he: 'הנחה' }, { nl: 'kassabon', he: 'קבלה' },
+  ]},
+  { emoji: '🧍', title: 'גוף ובריאות', words: [
+    { nl: 'hoofd', he: 'ראש' }, { nl: 'oog', he: 'עין' }, { nl: 'hand', he: 'יד' },
+    { nl: 'voet', he: 'רגל' }, { nl: 'hart', he: 'לב' }, { nl: 'oor', he: 'אוזן' },
+    { nl: 'neus', he: 'אף' }, { nl: 'ziek', he: 'חולה' }, { nl: 'pijn', he: 'כאב' }, { nl: 'gezond', he: 'בריא' },
+  ]},
+  { emoji: '😊', title: 'רגשות ותחביבים', words: [
+    { nl: 'blij', he: 'שמח' }, { nl: 'verdrietig', he: 'עצוב' }, { nl: 'boos', he: 'כועס' },
+    { nl: 'moe', he: 'עייף' }, { nl: 'honger', he: 'רעב' }, { nl: 'muziek', he: 'מוזיקה' },
+    { nl: 'sport', he: 'ספורט' }, { nl: 'lezen', he: 'לקרוא' }, { nl: 'reizen', he: 'לטייל' }, { nl: 'koken', he: 'לבשל' },
+  ]},
+];
+
+const DUTCH_VERB_TOPICS: DutchVerbConjTopic[] = [
+  { emoji: '🏃', title: 'פעלים: פעולות יומיום', pairs: [
+    { emoji: '🛏️', presentNl: 'ik slaap', presentHe: 'אני ישן/ה', pastNl: 'ik sliep', pastHe: 'אני ישנתי' },
+    { emoji: '🍽️', presentNl: 'ik eet', presentHe: 'אני אוכל/ת', pastNl: 'ik at', pastHe: 'אני אכלתי' },
+    { emoji: '🥤', presentNl: 'ik drink', presentHe: 'אני שותה', pastNl: 'ik dronk', pastHe: 'אני שתיתי' },
+    { emoji: '🚿', presentNl: 'ik was me', presentHe: 'אני מתרחץ/ת', pastNl: 'ik waste me', pastHe: 'אני התרחצתי' },
+    { emoji: '👔', presentNl: 'ik kleed me aan', presentHe: 'אני מתלבש/ת', pastNl: 'ik kleedde me aan', pastHe: 'אני התלבשתי' },
+    { emoji: '📺', presentNl: 'ik kijk', presentHe: 'אני צופה', pastNl: 'ik keek', pastHe: 'אני צפיתי' },
+    { emoji: '🎵', presentNl: 'ik luister', presentHe: 'אני מקשיב/ה', pastNl: 'ik luisterde', pastHe: 'אני הקשבתי' },
+    { emoji: '🧹', presentNl: 'ik poets', presentHe: 'אני מנקה', pastNl: 'ik poetste', pastHe: 'אני ניקיתי' },
+  ]},
+  { emoji: '🚶', title: 'פעלים: תנועה ונסיעה', pairs: [
+    { emoji: '🚶', presentNl: 'ik loop', presentHe: 'אני הולך/ת', pastNl: 'ik liep', pastHe: 'אני הלכתי' },
+    { emoji: '🏃', presentNl: 'ik ren', presentHe: 'אני רץ/ה', pastNl: 'ik rende', pastHe: 'אני רצתי' },
+    { emoji: '🚂', presentNl: 'ik reis', presentHe: 'אני נוסע/ת', pastNl: 'ik reisde', pastHe: 'אני נסעתי' },
+    { emoji: '🚗', presentNl: 'ik rijd', presentHe: 'אני נוהג/ת', pastNl: 'ik reed', pastHe: 'אני נהגתי' },
+    { emoji: '✈️', presentNl: 'ik vlieg', presentHe: 'אני טס/ה', pastNl: 'ik vloog', pastHe: 'אני טסתי' },
+    { emoji: '🏁', presentNl: 'ik kom aan', presentHe: 'אני מגיע/ה', pastNl: 'ik kwam aan', pastHe: 'אני הגעתי' },
+    { emoji: '🚪', presentNl: 'ik vertrek', presentHe: 'אני יוצא/ת', pastNl: 'ik vertrok', pastHe: 'אני יצאתי' },
+    { emoji: '🔄', presentNl: 'ik keer terug', presentHe: 'אני חוזר/ת', pastNl: 'ik keerde terug', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '💬', title: 'פעלים: תקשורת', pairs: [
+    { emoji: '🗣️', presentNl: 'ik spreek', presentHe: 'אני מדבר/ת', pastNl: 'ik sprak', pastHe: 'אני דיברתי' },
+    { emoji: '👂', presentNl: 'ik luister', presentHe: 'אני מקשיב/ה', pastNl: 'ik luisterde', pastHe: 'אני הקשבתי' },
+    { emoji: '📖', presentNl: 'ik lees', presentHe: 'אני קורא/ת', pastNl: 'ik las', pastHe: 'אני קראתי' },
+    { emoji: '✍️', presentNl: 'ik schrijf', presentHe: 'אני כותב/ת', pastNl: 'ik schreef', pastHe: 'אני כתבתי' },
+    { emoji: '📱', presentNl: 'ik bel', presentHe: 'אני מתקשר/ת', pastNl: 'ik belde', pastHe: 'אני התקשרתי' },
+    { emoji: '📲', presentNl: 'ik antwoord', presentHe: 'אני עונה', pastNl: 'ik antwoordde', pastHe: 'אני עניתי' },
+    { emoji: '📤', presentNl: 'ik stuur', presentHe: 'אני שולח/ת', pastNl: 'ik stuurde', pastHe: 'אני שלחתי' },
+    { emoji: '📥', presentNl: 'ik ontvang', presentHe: 'אני מקבל/ת', pastNl: 'ik ontving', pastHe: 'אני קיבלתי' },
+  ]},
+  { emoji: '🍳', title: 'פעלים: בישול ואכילה', pairs: [
+    { emoji: '👨‍🍳', presentNl: 'ik kook', presentHe: 'אני מבשל/ת', pastNl: 'ik kookte', pastHe: 'אני בישלתי' },
+    { emoji: '🥘', presentNl: 'ik bak', presentHe: 'אני אופה/מטגן', pastNl: 'ik bakte', pastHe: 'אני אפיתי' },
+    { emoji: '🛒', presentNl: 'ik koop', presentHe: 'אני קונה', pastNl: 'ik kocht', pastHe: 'אני קניתי' },
+    { emoji: '🍽️', presentNl: 'ik proef', presentHe: 'אני טועם/ת', pastNl: 'ik proefde', pastHe: 'אני טעמתי' },
+    { emoji: '🧂', presentNl: 'ik voeg toe', presentHe: 'אני מוסיף/ה', pastNl: 'ik voegde toe', pastHe: 'אני הוספתי' },
+    { emoji: '🥗', presentNl: 'ik snijd', presentHe: 'אני חותך/ת', pastNl: 'ik sneed', pastHe: 'אני חתכתי' },
+    { emoji: '🍵', presentNl: 'ik zet thee', presentHe: 'אני מכין/ה תה', pastNl: 'ik zette thee', pastHe: 'אני הכנתי תה' },
+    { emoji: '🧹', presentNl: 'ik ruim op', presentHe: 'אני מסדר/ת', pastNl: 'ik ruimde op', pastHe: 'אני סידרתי' },
+  ]},
+  { emoji: '💼', title: 'פעלים: עבודה ולימוד', pairs: [
+    { emoji: '💼', presentNl: 'ik werk', presentHe: 'אני עובד/ת', pastNl: 'ik werkte', pastHe: 'אני עבדתי' },
+    { emoji: '📚', presentNl: 'ik studeer', presentHe: 'אני לומד/ת', pastNl: 'ik studeerde', pastHe: 'אני למדתי' },
+    { emoji: '👨‍🏫', presentNl: 'ik geef les', presentHe: 'אני מלמד/ת', pastNl: 'ik gaf les', pastHe: 'אני לימדתי' },
+    { emoji: '✅', presentNl: 'ik maak af', presentHe: 'אני מסיים/ת', pastNl: 'ik maakte af', pastHe: 'אני סיימתי' },
+    { emoji: '🚀', presentNl: 'ik begin', presentHe: 'אני מתחיל/ה', pastNl: 'ik begon', pastHe: 'אני התחלתי' },
+    { emoji: '🤝', presentNl: 'ik help', presentHe: 'אני עוזר/ת', pastNl: 'ik hielp', pastHe: 'אני עזרתי' },
+    { emoji: '📋', presentNl: 'ik plan', presentHe: 'אני מתכנן/ת', pastNl: 'ik plande', pastHe: 'אני תכננתי' },
+    { emoji: '💰', presentNl: 'ik verdien', presentHe: 'אני מרוויח/ה', pastNl: 'ik verdiende', pastHe: 'אני הרווחתי' },
+  ]},
+];
+
 // ── LEVEL 2 STARTER PACKS ─────────────────────────────────────────────────
 
 const ARABIC_VOCAB_TOPICS_2: ArabicTopic[] = [
@@ -1637,6 +1751,112 @@ const FRENCH_VERB_TOPICS_2: FrenchVerbConjTopic[] = [
     { emoji: '💡', presentFr: 'je suggère', presentHe: 'אני מציע', pastFr: "j'ai suggéré", pastHe: 'הצעתי' },
     { emoji: '👍', presentFr: 'je recommande', presentHe: 'אני ממליץ', pastFr: "j'ai recommandé", pastHe: 'המלצתי' },
     { emoji: '📖', presentFr: "j'explique", presentHe: 'אני מסביר', pastFr: "j'ai expliqué", pastHe: 'הסברתי' },
+  ]},
+];
+
+const DUTCH_VOCAB_TOPICS_2: DutchTopic[] = [
+  { emoji: '🛒', title: 'קניות', words: [
+    { nl: 'winkelcentrum', he: 'קניון' }, { nl: 'kassa', he: 'קופה' }, { nl: 'creditcard', he: 'כרטיס אשראי' },
+    { nl: 'wisselgeld', he: 'עודף' }, { nl: 'uitverkoop', he: 'מכירה' }, { nl: 'maat', he: 'מידה' },
+    { nl: 'passen', he: 'למדוד' }, { nl: 'bon', he: 'קבלה' }, { nl: 'reserveren', he: 'להזמין' }, { nl: 'levering', he: 'משלוח' },
+  ]},
+  { emoji: '🗺️', title: 'הנחיות ומיקום', words: [
+    { nl: 'rechtdoor', he: 'ישר' }, { nl: 'linksaf', he: 'שמאלה' }, { nl: 'rechtsaf', he: 'ימינה' },
+    { nl: 'hoek', he: 'פינה' }, { nl: 'brug', he: 'גשר' }, { nl: 'rotonde', he: 'כיכר תנועה' },
+    { nl: 'ver', he: 'רחוק' }, { nl: 'dichtbij', he: 'קרוב' }, { nl: 'kaart', he: 'מפה' }, { nl: 'adres', he: 'כתובת' },
+  ]},
+  { emoji: '🌤️', title: 'מזג אוויר', words: [
+    { nl: 'warm', he: 'חם' }, { nl: 'koud', he: 'קר' }, { nl: 'regen', he: 'גשם' },
+    { nl: 'sneeuw', he: 'שלג' }, { nl: 'zon', he: 'שמש' }, { nl: 'wind', he: 'רוח' },
+    { nl: 'bewolkt', he: 'מעונן' }, { nl: 'temperatuur', he: 'טמפרטורה' }, { nl: 'voorspelling', he: 'תחזית' }, { nl: 'nat', he: 'רטוב' },
+  ]},
+  { emoji: '🏥', title: 'בריאות', words: [
+    { nl: 'arts', he: 'רופא' }, { nl: 'apotheek', he: 'בית מרקחת' }, { nl: 'medicijn', he: 'תרופה' },
+    { nl: 'koorts', he: 'חום' }, { nl: 'hoesten', he: 'שיעול' }, { nl: 'allergie', he: 'אלרגיה' },
+    { nl: 'afspraak', he: 'תור' }, { nl: 'verzekering', he: 'ביטוח' }, { nl: 'operatie', he: 'ניתוח' }, { nl: 'herstel', he: 'החלמה' },
+  ]},
+  { emoji: '🚌', title: 'תחבורה', words: [
+    { nl: 'vertrek', he: 'יציאה' }, { nl: 'aankomst', he: 'הגעה' }, { nl: 'kaartje', he: 'כרטיס' },
+    { nl: 'perron', he: 'רציף' }, { nl: 'vertraging', he: 'עיכוב' }, { nl: 'instappen', he: 'לעלות' },
+    { nl: 'uitstappen', he: 'לרדת' }, { nl: 'overstappen', he: 'להחליף' }, { nl: 'parkeren', he: 'לחנות' }, { nl: 'rijbewijs', he: 'רישיון נהיגה' },
+  ]},
+  { emoji: '🍽️', title: 'מסעדה', words: [
+    { nl: 'menu', he: 'תפריט' }, { nl: 'bestellen', he: 'להזמין' }, { nl: 'rekening', he: 'חשבון' },
+    { nl: 'fooi', he: 'טיפ' }, { nl: 'vegetarisch', he: 'צמחוני' }, { nl: 'allergie', he: 'אלרגיה' },
+    { nl: 'aanbeveling', he: 'המלצה' }, { nl: 'tafel reserveren', he: 'להזמין שולחן' }, { nl: 'voorgerecht', he: 'מנה ראשונה' }, { nl: 'nagerecht', he: 'קינוח' },
+  ]},
+  { emoji: '📅', title: 'שגרה יומית', words: [
+    { nl: 'opstaan', he: 'לקום' }, { nl: 'ontbijt', he: 'ארוחת בוקר' }, { nl: 'gewoonlijk', he: 'בדרך כלל' },
+    { nl: 'soms', he: 'לפעמים' }, { nl: 'altijd', he: 'תמיד' }, { nl: 'nooit', he: 'אף פעם לא' },
+    { nl: 'avondeten', he: 'ארוחת ערב' }, { nl: 'slapen gaan', he: 'ללכת לישון' }, { nl: 'vrije tijd', he: 'זמן פנוי' }, { nl: 'druk', he: 'עמוס' },
+  ]},
+  { emoji: '💬', title: 'דעות', words: [
+    { nl: 'ik denk dat', he: 'אני חושב/ת ש' }, { nl: 'ik vind', he: 'לדעתי' }, { nl: 'het lijkt me', he: 'נדמה לי' },
+    { nl: 'ik ben het eens', he: 'אני מסכים/ה' }, { nl: 'ik ben het niet eens', he: 'אני לא מסכים/ה' }, { nl: 'misschien', he: 'אולי' },
+    { nl: 'zeker', he: 'בטוח' }, { nl: 'belangrijk', he: 'חשוב' }, { nl: 'interessant', he: 'מעניין' }, { nl: 'moeilijk', he: 'קשה' },
+  ]},
+  { emoji: '🏠', title: 'בית ומגורים', words: [
+    { nl: 'woonkamer', he: 'סלון' }, { nl: 'verwarming', he: 'חימום' }, { nl: 'huur', he: 'שכירות' },
+    { nl: 'buren', he: 'שכנים' }, { nl: 'verhuizen', he: 'לעבור דירה' }, { nl: 'schoon', he: 'נקי' },
+    { nl: 'rommel', he: 'בלגן' }, { nl: 'reparatie', he: 'תיקון' }, { nl: 'meubels', he: 'רהיטים' }, { nl: 'lift', he: 'מעלית' },
+  ]},
+  { emoji: '💼', title: 'עבודה ולימודים', words: [
+    { nl: 'solliciteren', he: 'להגיש מועמדות' }, { nl: 'cv', he: 'קורות חיים' }, { nl: 'salaris', he: 'משכורת' },
+    { nl: 'vergadering', he: 'פגישה' }, { nl: 'deadline', he: 'דדליין' }, { nl: 'collega', he: 'עמית' },
+    { nl: 'universiteit', he: 'אוניברסיטה' }, { nl: 'diploma', he: 'תעודה' }, { nl: 'stage', he: 'סטאז׳' }, { nl: 'promotie', he: 'קידום' },
+  ]},
+];
+
+const DUTCH_VERB_TOPICS_2: DutchVerbConjTopic[] = [
+  { emoji: '🛒', title: 'פעלים: קניות', pairs: [
+    { emoji: '🛒', presentNl: 'ik bestel', presentHe: 'אני מזמין/ה', pastNl: 'ik bestelde', pastHe: 'אני הזמנתי' },
+    { emoji: '💳', presentNl: 'ik betaal', presentHe: 'אני משלם/ת', pastNl: 'ik betaalde', pastHe: 'אני שילמתי' },
+    { emoji: '🔄', presentNl: 'ik ruil', presentHe: 'אני מחליף/ה', pastNl: 'ik ruilde', pastHe: 'אני החלפתי' },
+    { emoji: '📦', presentNl: 'ik lever', presentHe: 'אני מספק/ת', pastNl: 'ik leverde', pastHe: 'אני סיפקתי' },
+    { emoji: '🏷️', presentNl: 'ik zoek', presentHe: 'אני מחפש/ת', pastNl: 'ik zocht', pastHe: 'אני חיפשתי' },
+    { emoji: '💰', presentNl: 'ik spaar', presentHe: 'אני חוסך/ת', pastNl: 'ik spaarde', pastHe: 'אני חסכתי' },
+    { emoji: '🎁', presentNl: 'ik geef', presentHe: 'אני נותן/ת', pastNl: 'ik gaf', pastHe: 'אני נתתי' },
+    { emoji: '📋', presentNl: 'ik vergelijk', presentHe: 'אני משווה', pastNl: 'ik vergeleek', pastHe: 'אני השוויתי' },
+  ]},
+  { emoji: '👥', title: 'פעלים: חברתי', pairs: [
+    { emoji: '🤝', presentNl: 'ik ontmoet', presentHe: 'אני פוגש/ת', pastNl: 'ik ontmoette', pastHe: 'אני פגשתי' },
+    { emoji: '🎉', presentNl: 'ik vier', presentHe: 'אני חוגג/ת', pastNl: 'ik vierde', pastHe: 'אני חגגתי' },
+    { emoji: '💬', presentNl: 'ik chat', presentHe: 'אני משוחח/ת', pastNl: 'ik chatte', pastHe: 'אני שוחחתי' },
+    { emoji: '📷', presentNl: 'ik maak een foto', presentHe: 'אני מצלם/ת', pastNl: 'ik maakte een foto', pastHe: 'אני צילמתי' },
+    { emoji: '🎭', presentNl: 'ik nodig uit', presentHe: 'אני מזמין/ה', pastNl: 'ik nodigde uit', pastHe: 'אני הזמנתי' },
+    { emoji: '🙏', presentNl: 'ik bedank', presentHe: 'אני מודה', pastNl: 'ik bedankte', pastHe: 'אני הודיתי' },
+    { emoji: '😄', presentNl: 'ik lach', presentHe: 'אני צוחק/ת', pastNl: 'ik lachte', pastHe: 'אני צחקתי' },
+    { emoji: '🤗', presentNl: 'ik verwelkom', presentHe: 'אני מקבל/ת בברכה', pastNl: 'ik verwelkomde', pastHe: 'אני קיבלתי בברכה' },
+  ]},
+  { emoji: '💻', title: 'פעלים: דיגיטל', pairs: [
+    { emoji: '💻', presentNl: 'ik zoek op', presentHe: 'אני מחפש/ת', pastNl: 'ik zocht op', pastHe: 'אני חיפשתי' },
+    { emoji: '📱', presentNl: 'ik download', presentHe: 'אני מוריד/ה', pastNl: 'ik downloadde', pastHe: 'אני הורדתי' },
+    { emoji: '📤', presentNl: 'ik upload', presentHe: 'אני מעלה', pastNl: 'ik uploadde', pastHe: 'אני העלתי' },
+    { emoji: '🔔', presentNl: 'ik ontvang', presentHe: 'אני מקבל/ת', pastNl: 'ik ontving', pastHe: 'אני קיבלתי' },
+    { emoji: '🖥️', presentNl: 'ik typ', presentHe: 'אני מקליד/ה', pastNl: 'ik typte', pastHe: 'אני הקלדתי' },
+    { emoji: '📧', presentNl: 'ik mail', presentHe: 'אני שולח/ת מייל', pastNl: 'ik mailde', pastHe: 'אני שלחתי מייל' },
+    { emoji: '🔒', presentNl: 'ik log in', presentHe: 'אני מתחבר/ת', pastNl: 'ik logde in', pastHe: 'אני התחברתי' },
+    { emoji: '🖨️', presentNl: 'ik druk af', presentHe: 'אני מדפיס/ה', pastNl: 'ik drukte af', pastHe: 'אני הדפסתי' },
+  ]},
+  { emoji: '✈️', title: 'פעלים: נסיעות', pairs: [
+    { emoji: '🎫', presentNl: 'ik boek', presentHe: 'אני מזמין/ה', pastNl: 'ik boekte', pastHe: 'אני הזמנתי' },
+    { emoji: '🧳', presentNl: 'ik pak in', presentHe: 'אני אורז/ת', pastNl: 'ik pakte in', pastHe: 'אני ארזתי' },
+    { emoji: '🛬', presentNl: 'ik land', presentHe: 'אני נוחת/ת', pastNl: 'ik landde', pastHe: 'אני נחתתי' },
+    { emoji: '🏨', presentNl: 'ik logeer', presentHe: 'אני לן', pastNl: 'ik logeerde', pastHe: 'אני לנתי' },
+    { emoji: '🗺️', presentNl: 'ik verken', presentHe: 'אני חוקר/ת', pastNl: 'ik verkende', pastHe: 'אני חקרתי' },
+    { emoji: '📸', presentNl: 'ik fotografeer', presentHe: 'אני מצלם/ת', pastNl: 'ik fotografeerde', pastHe: 'אני צילמתי' },
+    { emoji: '🚕', presentNl: 'ik neem een taxi', presentHe: 'אני לוקח/ת מונית', pastNl: 'ik nam een taxi', pastHe: 'אני לקחתי מונית' },
+    { emoji: '🔙', presentNl: 'ik keer terug', presentHe: 'אני חוזר/ת', pastNl: 'ik keerde terug', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: דעות', pairs: [
+    { emoji: '🤔', presentNl: 'ik denk', presentHe: 'אני חושב/ת', pastNl: 'ik dacht', pastHe: 'אני חשבתי' },
+    { emoji: '✅', presentNl: 'ik stem in', presentHe: 'אני מסכים/ה', pastNl: 'ik stemde in', pastHe: 'אני הסכמתי' },
+    { emoji: '❌', presentNl: 'ik weiger', presentHe: 'אני מסרב/ת', pastNl: 'ik weigerde', pastHe: 'אני סירבתי' },
+    { emoji: '💡', presentNl: 'ik stel voor', presentHe: 'אני מציע/ה', pastNl: 'ik stelde voor', pastHe: 'אני הצעתי' },
+    { emoji: '🌟', presentNl: 'ik aanbeveel', presentHe: 'אני ממליץ/ה', pastNl: 'ik beval aan', pastHe: 'אני המלצתי' },
+    { emoji: '🎯', presentNl: 'ik kies', presentHe: 'אני בוחר/ת', pastNl: 'ik koos', pastHe: 'אני בחרתי' },
+    { emoji: '🔍', presentNl: 'ik analyseer', presentHe: 'אני מנתח/ת', pastNl: 'ik analyseerde', pastHe: 'אני ניתחתי' },
+    { emoji: '📝', presentNl: 'ik noteer', presentHe: 'אני רושם/ת', pastNl: 'ik noteerde', pastHe: 'אני רשמתי' },
   ]},
 ];
 
@@ -3907,7 +4127,7 @@ export default function App() {
                   {contentMode === 'roleplay' || contentMode === 'phonecall' ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-gray-600">Scenario</label>
+                        <label className="text-sm font-bold text-gray-800">Scenario</label>
                         <button
                           type="button"
                           onClick={() => setSubject(pickRandom(ROLEPLAY_SCENARIOS))}
@@ -3927,7 +4147,7 @@ export default function App() {
 
                   {sourceType === 'subject' ? (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-600">Topic</label>
+                      <label className="text-sm font-bold text-gray-800">Topic</label>
                       <input autoFocus type="text" placeholder="e.g. The history of jazz, Quantum computing..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={subject} onChange={(e) => setSubject(e.target.value)} />
                     </div>
                   ) : (
@@ -3939,22 +4159,22 @@ export default function App() {
                       {articleSourceType === 'text' ? (
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-600">Article 1 Text</label>
+                            <label className="text-sm font-bold text-gray-800">Article 1 Text</label>
                             <textarea placeholder="Paste your first article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText} onChange={(e) => setArticleText(e.target.value)} />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-600">Article 2 Text (Optional)</label>
+                            <label className="text-sm font-bold text-gray-800">Article 2 Text (Optional)</label>
                             <textarea placeholder="Paste your second article content here..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[120px] resize-none" value={articleText2} onChange={(e) => setArticleText2(e.target.value)} />
                           </div>
                         </div>
                       ) : (
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-600">Article 1 URL</label>
+                            <label className="text-sm font-bold text-gray-800">Article 1 URL</label>
                             <input type="url" placeholder="https://example.com/article-1" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl} onChange={(e) => setArticleUrl(e.target.value)} />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-600">Article 2 URL (Optional)</label>
+                            <label className="text-sm font-bold text-gray-800">Article 2 URL (Optional)</label>
                             <input type="url" placeholder="https://example.com/article-2" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl2} onChange={(e) => setArticleUrl2(e.target.value)} />
                           </div>
                           <p className="text-[10px] text-gray-400 italic px-1">Tip: Use direct links instead of shortened "share" links for better results.</p>
@@ -3966,13 +4186,13 @@ export default function App() {
                   )}
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Include specific words (optional)</label>
+                    <label className="text-sm font-bold text-gray-800">Include specific words (optional)</label>
                     <input type="text" placeholder="e.g. innovation, synergy, paradigm shift..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={specificWords} onChange={(e) => setSpecificWords(e.target.value)} />
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
+                      <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
                       <span className="text-xs font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{speechSpeed}%</span>
                     </div>
                     <input type="range" min="80" max="100" step="5" value={speechSpeed} onChange={(e) => setSpeechSpeed(parseInt(e.target.value))} className="w-full accent-indigo-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
@@ -3983,7 +4203,7 @@ export default function App() {
 
                   {contentMode === 'podcast' && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Narrators</label>
+                    <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><Users size={14} /> Narrators</label>
                     <div className="flex bg-gray-100 rounded-xl p-1">
                       <button onClick={() => setHostCount('one')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'one' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>One Host</button>
                       <button onClick={() => setHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${hostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Hosts</button>
@@ -3993,14 +4213,14 @@ export default function App() {
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Clock size={14} /> Length</label>
+                      <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><Clock size={14} /> Length</label>
                       <span className="text-sm font-bold text-indigo-600">{length} min</span>
                     </div>
                     <input type="range" min="1" max="6" step="1" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" value={length} onChange={(e) => setLength(parseInt(e.target.value))} />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : 'English'} Level</label>
+                    <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><BarChart size={14} /> {language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : 'English'} Level</label>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map((l) => (
                         <button key={l.id} onClick={() => setLevel(l.id)} className={`py-2 rounded-lg text-sm font-medium transition-all ${level === l.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>{l.label}</button>
@@ -4026,7 +4246,7 @@ export default function App() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Title <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <label className="text-sm font-bold text-gray-800">Title <span className="text-gray-400 font-normal">(optional)</span></label>
                     <input
                       type="text"
                       placeholder="e.g. My roleplay conversation..."
@@ -4037,7 +4257,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Users size={14} /> Speakers</label>
+                    <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><Users size={14} /> Speakers</label>
                     <div className="flex bg-gray-100 rounded-xl p-1">
                       <button onClick={() => setScriptHostCount('one')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${scriptHostCount === 'one' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>One Speaker</button>
                       <button onClick={() => setScriptHostCount('two')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${scriptHostCount === 'two' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Two Speakers</button>
@@ -4052,7 +4272,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Paste your script</label>
+                    <label className="text-sm font-bold text-gray-800">Paste your script</label>
                     <textarea
                       placeholder={scriptHostCount === 'two'
                         ? "Alex: Welcome to the show!\nSam: Thanks for having me.\nAlex: Today we're talking about..."
@@ -4065,7 +4285,7 @@ export default function App() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium text-gray-600 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
+                      <label className="text-sm font-bold text-gray-800 flex items-center gap-1"><Gauge size={14} /> Speech Speed</label>
                       <span className="text-xs font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{scriptSpeed}%</span>
                     </div>
                     <input type="range" min="80" max="100" step="5" value={scriptSpeed} onChange={(e) => setScriptSpeed(parseInt(e.target.value))} className="w-full accent-indigo-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
