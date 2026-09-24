@@ -323,11 +323,15 @@ IMPORTANT:
 1. Start your response with a short, catchy title for this podcast episode on the first line, formatted as "TITLE: [Your Title]".${language !== 'english' ? ` Write the title in ${language === 'arabic' ? 'Arabic' : language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'italian' ? 'Italian' : 'Turkish'} first, then on the next line write "TITLE_EN: [English translation of the title]".` : ''}
 2. On the very next line, write the DESCRIPTION formatted as "DESCRIPTION: [Your Description]". ${isSubjectMode ? 'Write the topic/subject in NO MORE THAN 6 WORDS.' : 'Write ONLY the original title of the article (as it appears in the source), nothing else.'}
 3. After the ${hostCount === 'two' ? 'dialogue' : 'monologue'}, include a section titled exactly "VOCABULARY CHART" (always in English, never translated) containing exactly ${language === 'spanish' && (level === 'B1' || level === 'B2' || level === 'C1') ? '15' : '10'} interesting words, phrases, or idioms used in the script.
-${(level === 'A1' || level === 'A2')
-  ? (language === 'arabic'
-    ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום עברי של המילה עצמה".`
-    : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
-  : `3. For each vocabulary item, provide a simple explanation/definition in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'arabic' ? 'Arabic' : language === 'turkish' ? 'Turkish' : language === 'italian' ? 'Italian' : 'English'} in the format: "Word/Phrase = Explanation".`
+${language === 'italian'
+  ? `3. For each vocabulary item, provide a simple explanation/definition in Italian in the format: "Word/Phrase = Explanation".`
+  : (level === 'A1' || level === 'A2')
+    ? (language === 'arabic'
+      ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic, (2) the Arabic word/phrase written phonetically using Hebrew letters so Hebrew speakers can pronounce it, and (3) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — פונטיקה בעברית — תרגום עברי של המילה עצמה".`
+      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
+    : (language === 'arabic'
+      ? `3. For each vocabulary item, provide (1) a simple explanation in Levantine Arabic and (2) a Hebrew translation of the word/phrase itself (not the explanation). Format: "Word/Phrase = Arabic explanation — תרגום עברי של המילה עצמה".`
+      : `3. For each vocabulary item, provide a simple explanation in ${language === 'spanish' ? 'Spanish' : language === 'french' ? 'French' : language === 'turkish' ? 'Turkish' : 'English'} and then a Hebrew translation of the word/phrase itself (not the explanation), in this format: "Word/Phrase = Explanation — תרגום עברי של המילה עצמה".`)
 }
 
 Format:

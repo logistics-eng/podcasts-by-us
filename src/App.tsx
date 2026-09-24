@@ -1038,6 +1038,608 @@ const FRENCH_VERB_TOPICS: FrenchVerbConjTopic[] = [
   ]},
 ];
 
+// ── LEVEL 2 STARTER PACKS ─────────────────────────────────────────────────
+
+const ARABIC_VOCAB_TOPICS_2: ArabicTopic[] = [
+  { emoji: '🛒', title: 'קניות', words: [
+    { ar: 'دكان', translit: 'דוּכּאן', he: 'חנות' },
+    { ar: 'سعر', translit: 'סַעְר', he: 'מחיר' },
+    { ar: 'رخيص', translit: 'רְחִ׳יס', he: 'זול' },
+    { ar: 'غالي', translit: 'ר׳אלי', he: 'יקר' },
+    { ar: 'اشترى', translit: 'אִשְׁתְּרָה', he: 'קנה' },
+    { ar: 'باع', translit: 'בַּאע', he: 'מכר' },
+    { ar: 'كاش', translit: 'כַּאש', he: 'מזומן' },
+    { ar: 'بطاقة', translit: 'בִּטַּאקַה', he: 'כרטיס' },
+    { ar: 'فاتورة', translit: 'פַּאתוּרַה', he: 'קבלה' },
+    { ar: 'مقاس', translit: 'מַּקַּאס', he: 'מידה' },
+  ]},
+  { emoji: '🗺️', title: 'כיוונים', words: [
+    { ar: 'شمال', translit: 'שְׁמַאל', he: 'שמאל' },
+    { ar: 'يمين', translit: 'יְמִין', he: 'ימין' },
+    { ar: 'دغري', translit: 'דוּר׳רי', he: 'ישר' },
+    { ar: 'قريب', translit: 'קְרִיב', he: 'קרוב' },
+    { ar: 'بعيد', translit: 'בְּעִיד', he: 'רחוק' },
+    { ar: 'شارع', translit: 'שָׁארִע', he: 'רחוב' },
+    { ar: 'زاوية', translit: 'זָאוִויַה', he: 'פינה' },
+    { ar: 'خريطة', translit: 'ח׳רִיטַה', he: 'מפה' },
+    { ar: 'ضايع', translit: 'דָּאיִּע', he: 'אבוד' },
+    { ar: 'وصل', translit: 'וֻצַּל', he: 'הגיע' },
+  ]},
+  { emoji: '🌤️', title: 'מזג אוויר', words: [
+    { ar: 'حار', translit: 'חַאר', he: 'חם' },
+    { ar: 'بارد', translit: 'בַּארִד', he: 'קר' },
+    { ar: 'مطر', translit: 'מַטַר', he: 'גשם' },
+    { ar: 'شمس', translit: 'שַׁמְס', he: 'שמש' },
+    { ar: 'ريح', translit: 'רִיח', he: 'רוח' },
+    { ar: 'غيم', translit: 'ר׳יִם', he: 'עננים' },
+    { ar: 'ثلج', translit: 'תַּלְג׳', he: 'שלג' },
+    { ar: 'درجة حرارة', translit: 'דַּרַג׳ה חַרַארַה', he: 'טמפרטורה' },
+    { ar: 'توقع جو', translit: 'תַּוַּקֻּע ג׳וּ', he: 'תחזית' },
+    { ar: 'فصل', translit: 'פַצְל', he: 'עונה' },
+  ]},
+  { emoji: '🏥', title: 'בריאות', words: [
+    { ar: 'دكتور', translit: 'דוּכְּתוּר', he: 'רופא' },
+    { ar: 'دوا', translit: 'דַּוַא', he: 'תרופה' },
+    { ar: 'وجع', translit: 'וַּג׳َע', he: 'כאב' },
+    { ar: 'حمى', translit: 'חֻמַּה', he: 'חום' },
+    { ar: 'مريض', translit: 'מְרִיד', he: 'חולה' },
+    { ar: 'صيدلية', translit: 'צֵיְדַלִיֵּה', he: 'בית מרקחת' },
+    { ar: 'موعد', translit: 'מַוְעִד', he: 'תור' },
+    { ar: 'راحة', translit: 'רַאחַה', he: 'מנוחה' },
+    { ar: 'بتوجع', translit: 'בְּתוּג׳ַּע', he: 'כואב' },
+    { ar: 'أحسن', translit: 'אַחְסַן', he: 'טוב יותר' },
+  ]},
+  { emoji: '🚌', title: 'תחבורה', words: [
+    { ar: 'باص', translit: 'בַּאס', he: 'אוטובוס' },
+    { ar: 'قطار', translit: 'קִטַּאר', he: 'רכבת' },
+    { ar: 'تاكسي', translit: 'תַּאכְּסִי', he: 'מונית' },
+    { ar: 'تذكرة', translit: 'תַּזְכַּרַה', he: 'כרטיס' },
+    { ar: 'محطة', translit: 'מַחַטַּה', he: 'תחנה' },
+    { ar: 'مطار', translit: 'מַטַּאר', he: 'שדה תעופה' },
+    { ar: 'متأخر', translit: 'מְתַאַח׳ר', he: 'מאחר' },
+    { ar: 'رصيف', translit: 'רַצִּיף', he: 'פלטפורמה' },
+    { ar: 'كرسي', translit: 'כֻּרְסִי', he: 'מושב' },
+    { ar: 'سواق', translit: 'סַוַּאק', he: 'נהג' },
+  ]},
+  { emoji: '🍽️', title: 'אכילה בחוץ', words: [
+    { ar: 'قائمة', translit: 'קַאאִמַה', he: 'תפריט' },
+    { ar: 'طلب', translit: 'טָלַב', he: 'הזמין' },
+    { ar: 'نادل', translit: 'נַאדִל', he: 'מלצר' },
+    { ar: 'حساب', translit: 'חִסַּאב', he: 'חשבון' },
+    { ar: 'حجز', translit: 'חַג׳ַז', he: 'הזמנה' },
+    { ar: 'طاولة', translit: 'טַאוְלַה', he: 'שולחן' },
+    { ar: 'مقبلات', translit: 'מֻקַּבִּלַאת', he: 'מנה ראשונה' },
+    { ar: 'حلو', translit: 'חֻלּוּ', he: 'קינוח' },
+    { ar: 'بقشيش', translit: 'בַּקְשִׁיש', he: 'טיפ' },
+    { ar: 'لذيذ', translit: 'לַּזִּיז', he: 'טעים' },
+  ]},
+  { emoji: '📅', title: 'שגרה יומית', words: [
+    { ar: 'صحي', translit: 'צְחִי', he: 'התעורר' },
+    { ar: 'استحمم', translit: 'אִסְתַּחַמַּם', he: 'התקלח' },
+    { ar: 'فطور', translit: 'פְּטוּר', he: 'ארוחת בוקר' },
+    { ar: 'روح عالشغل', translit: 'רוּח עַאשְׁשַׁר׳ל', he: 'יצא לעבודה' },
+    { ar: 'غدا', translit: 'ר׳דַא', he: 'ארוחת צהריים' },
+    { ar: 'شتغل', translit: 'שְׁתַּר׳ַל', he: 'עבד' },
+    { ar: 'عشا', translit: 'עַשָּׁא', he: 'ארוחת ערב' },
+    { ar: 'ارتاح', translit: 'אִרְתַּאח', he: 'נח' },
+    { ar: 'نام', translit: 'נַאם', he: 'ישן' },
+    { ar: 'خطط', translit: 'חַטַּט', he: 'תכנן' },
+  ]},
+  { emoji: '💬', title: 'דעות', words: [
+    { ar: 'فكّر', translit: 'פַּכַּר', he: 'חשב' },
+    { ar: 'آمن', translit: 'אָמַן', he: 'האמין' },
+    { ar: 'وافق', translit: 'וַּאפַק', he: 'הסכים' },
+    { ar: 'ما وافق', translit: 'מַא וַּאפַק', he: 'לא הסכים' },
+    { ar: 'ممكن', translit: 'מֻמְכִן', he: 'אולי' },
+    { ar: 'مهم', translit: 'מֻהִמּ', he: 'חשוב' },
+    { ar: 'مثير', translit: 'מֻתִּיר', he: 'מעניין' },
+    { ar: 'ممل', translit: 'מֻמִּל', he: 'משעמם' },
+    { ar: 'فضّل', translit: 'פַּדַּל', he: 'העדיף' },
+    { ar: 'رأي', translit: 'רַאיּ', he: 'דעה' },
+  ]},
+  { emoji: '🏠', title: 'בית ומחייה', words: [
+    { ar: 'إيجار', translit: 'אִיג׳ַאר', he: 'שכירות' },
+    { ar: 'جار', translit: 'ג׳אר', he: 'שכן' },
+    { ar: 'طابق', translit: 'טַאבִּק', he: 'קומה' },
+    { ar: 'مفتاح', translit: 'מִפְתַּאח', he: 'מפתח' },
+    { ar: 'أثاث', translit: 'אַתַּאת', he: 'רהיטים' },
+    { ar: 'نظّف', translit: 'נַּדַּף', he: 'ניקה' },
+    { ar: 'مكسور', translit: 'מַכְּסוּר', he: 'שבור' },
+    { ar: 'صلّح', translit: 'צַּלַּח', he: 'תיקן' },
+    { ar: 'مريح', translit: 'מְרִיח', he: 'נוח' },
+    { ar: 'انتقل', translit: 'אִנְתַּקַל', he: 'עבר דירה' },
+  ]},
+  { emoji: '💼', title: 'עבודה ולימודים', words: [
+    { ar: 'شغل', translit: 'שַׁר׳ַל', he: 'עבודה' },
+    { ar: 'مكتب', translit: 'מַכְּתַּב', he: 'משרד' },
+    { ar: 'اجتماع', translit: 'אִג׳ְתִּמָאע', he: 'ישיבה' },
+    { ar: 'موعد نهائي', translit: 'מַוְעִד נִהַאאִי', he: 'דד-ליין' },
+    { ar: 'زميل', translit: 'זְמִיל', he: 'עמית' },
+    { ar: 'امتحان', translit: 'אִמְתִּחָאן', he: 'מבחן' },
+    { ar: 'علامة', translit: 'עַלַאמַה', he: 'ציון' },
+    { ar: 'واجب', translit: 'וַּאג׳ִב', he: 'שיעורי בית' },
+    { ar: 'مشروع', translit: 'מַשְׁרוּע', he: 'פרויקט' },
+    { ar: 'تعلّم', translit: 'תַּעַלַּם', he: 'למד' },
+  ]},
+];
+
+const ARABIC_VERB_TOPICS_2: ArabicVerbConjTopic[] = [
+  { emoji: '🛍️', title: 'פעלים: קניות', pairs: [
+    { emoji: '🛒', presentAr: 'عم يشتري', presentTranslit: 'עַם יִשְׁתְּרִי', presentHe: 'קונה', pastAr: 'اشترى', pastTranslit: 'אִשְׁתְּרָה', pastHe: 'קנה' },
+    { emoji: '💰', presentAr: 'عم يبيع', presentTranslit: 'עַם יִבִּיע', presentHe: 'מוכר', pastAr: 'باع', pastTranslit: 'בַּאע', pastHe: 'מכר' },
+    { emoji: '💳', presentAr: 'عم يدفع', presentTranslit: 'עַם יִדְפַע', presentHe: 'משלם', pastAr: 'دفع', pastTranslit: 'דַּפַע', pastHe: 'שילם' },
+    { emoji: '💵', presentAr: 'عم يكلف', presentTranslit: 'עַם יִכַּלִּף', presentHe: 'עולה', pastAr: 'كلّف', pastTranslit: 'כַּלַּף', pastHe: 'עלה' },
+    { emoji: '🏦', presentAr: 'عم يوفّر', presentTranslit: 'עַם יְוַּפִּר', presentHe: 'חוסך', pastAr: 'وفّر', pastTranslit: 'וַּפַּר', pastHe: 'חסך' },
+    { emoji: '💸', presentAr: 'عم ينفق', presentTranslit: 'עַם יִנְפֻּק', presentHe: 'מוציא', pastAr: 'نفق', pastTranslit: 'נַפַק', pastHe: 'הוציא' },
+    { emoji: '🤝', presentAr: 'عم يستعير', presentTranslit: 'עַם יִסְתַּעִיר', presentHe: 'שואל', pastAr: 'استعار', pastTranslit: 'אִסְתַּעַאר', pastHe: 'שאל' },
+    { emoji: '↩️', presentAr: 'عم يرجع', presentTranslit: 'עַם יִרְג׳ַע', presentHe: 'מחזיר', pastAr: 'رجّع', pastTranslit: 'רַג׳ַּע', pastHe: 'החזיר' },
+  ]},
+  { emoji: '🤝', title: 'פעלים: חברתי', pairs: [
+    { emoji: '🤗', presentAr: 'عم يلتقي', presentTranslit: 'עַם יִלְתַּקִּי', presentHe: 'נפגש', pastAr: 'التقى', pastTranslit: 'אִלְתַּקַה', pastHe: 'נפגש' },
+    { emoji: '💌', presentAr: 'عم يدعو', presentTranslit: 'עַם יִדְעוּ', presentHe: 'מזמין', pastAr: 'دعا', pastTranslit: 'דַּעַה', pastHe: 'הזמין' },
+    { emoji: '🏠', presentAr: 'عم يزور', presentTranslit: 'עַם יְזוּר', presentHe: 'מבקר', pastAr: 'زار', pastTranslit: 'זַּאר', pastHe: 'ביקר' },
+    { emoji: '👋', presentAr: 'عم يعرّف', presentTranslit: 'עַם יְעַרִּף', presentHe: 'מציג', pastAr: 'عرّف', pastTranslit: 'עַרַּף', pastHe: 'הציג' },
+    { emoji: '🎉', presentAr: 'عم يحتفل', presentTranslit: 'עַם יִחְתַּפִּל', presentHe: 'חוגג', pastAr: 'احتفل', pastTranslit: 'אִחְתַּפַל', pastHe: 'חגג' },
+    { emoji: '🙏', presentAr: 'عم يشكر', presentTranslit: 'עַם יִשְׁכֻר', presentHe: 'מודה', pastAr: 'شكر', pastTranslit: 'שַׁכַר', pastHe: 'הודה' },
+    { emoji: '😔', presentAr: 'عم يعتذر', presentTranslit: 'עַם יַעְתַּזִּר', presentHe: 'מתנצל', pastAr: 'اعتذر', pastTranslit: 'אִעְתַּזַר', pastHe: 'התנצל' },
+    { emoji: '🎊', presentAr: 'عم يبارك', presentTranslit: 'עַם יְבַּארִך', presentHe: 'מברך', pastAr: 'بارك', pastTranslit: 'בַּארַך', pastHe: 'בירך' },
+  ]},
+  { emoji: '📱', title: 'פעלים: דיגיטל', pairs: [
+    { emoji: '🔍', presentAr: 'عم يبحث', presentTranslit: 'עַם יִבְחַת', presentHe: 'מחפש', pastAr: 'بحث', pastTranslit: 'בַּחַת', pastHe: 'חיפש' },
+    { emoji: '⬇️', presentAr: 'عم ينزّل', presentTranslit: 'עַם יְנַּזִּל', presentHe: 'מוריד', pastAr: 'نزّل', pastTranslit: 'נַּזַּל', pastHe: 'הוריד' },
+    { emoji: '💬', presentAr: 'عم يراسل', presentTranslit: 'עַם יְרַאסִל', presentHe: 'שולח הודעה', pastAr: 'راسل', pastTranslit: 'רַאסַל', pastHe: 'שלח הודעה' },
+    { emoji: '📤', presentAr: 'عم ينشر', presentTranslit: 'עַם יִנְשֻׁר', presentHe: 'מפרסם', pastAr: 'نشر', pastTranslit: 'נַּשַׁר', pastHe: 'פרסם' },
+    { emoji: '📅', presentAr: 'عم يحجز', presentTranslit: 'עַם יִחְג׳ִז', presentHe: 'מזמין', pastAr: 'حجز', pastTranslit: 'חַג׳ַז', pastHe: 'הזמין' },
+    { emoji: '❌', presentAr: 'عم يلغي', presentTranslit: 'עַם יִלְר׳ִּי', presentHe: 'מבטל', pastAr: 'لغى', pastTranslit: 'לַר׳ה', pastHe: 'ביטל' },
+    { emoji: '🔋', presentAr: 'عم يشحن', presentTranslit: 'עַם יִשְׁחַן', presentHe: 'טוען', pastAr: 'شحن', pastTranslit: 'שַׁחַן', pastHe: 'טעון' },
+    { emoji: '🔗', presentAr: 'عم يتواصل', presentTranslit: 'עַם יִתְוַּאסַל', presentHe: 'מתחבר', pastAr: 'تواصل', pastTranslit: 'תַּוַּאסַל', pastHe: 'התחבר' },
+  ]},
+  { emoji: '✈️', title: 'פעלים: נסיעות', pairs: [
+    { emoji: '✈️', presentAr: 'عم يسافر', presentTranslit: 'עַם יְסַאפִר', presentHe: 'נוסע', pastAr: 'سافر', pastTranslit: 'סַאפַר', pastHe: 'נסע' },
+    { emoji: '🏁', presentAr: 'عم يوصل', presentTranslit: 'עַם יוּצַּל', presentHe: 'מגיע', pastAr: 'وصل', pastTranslit: 'וֻצַּל', pastHe: 'הגיע' },
+    { emoji: '🚪', presentAr: 'عم يطلع', presentTranslit: 'עַם יִטְלַע', presentHe: 'יוצא', pastAr: 'طلع', pastTranslit: 'טִלַע', pastHe: 'יצא' },
+    { emoji: '🧳', presentAr: 'عم يحزّم', presentTranslit: 'עַם יְחַּזִּם', presentHe: 'ארוז', pastAr: 'حزّم', pastTranslit: 'חַּזַּם', pastHe: 'ארז' },
+    { emoji: '🗺️', presentAr: 'عم يستكشف', presentTranslit: 'עַם יִסְתַּכְשִׁף', presentHe: 'מחקר', pastAr: 'استكشف', pastTranslit: 'אִסְתַּכְשַׁף', pastHe: 'חקר' },
+    { emoji: '🏨', presentAr: 'عم يسجّل', presentTranslit: 'עַם יְסַּג׳ִּל', presentHe: "מצ'ק-אין", pastAr: 'سجّل', pastTranslit: 'סַּג׳ַּל', pastHe: "צ'ק-אין" },
+    { emoji: '🔄', presentAr: 'عم يرجع', presentTranslit: 'עַם יִרְג׳ַע', presentHe: 'חוזר', pastAr: 'رجع', pastTranslit: 'רַג׳ַע', pastHe: 'חזר' },
+    { emoji: '📋', presentAr: 'عم يخطّط', presentTranslit: 'עַם יְחַּטִּט', presentHe: 'מתכנן', pastAr: 'خطّط', pastTranslit: 'חַּטַּט', pastHe: 'תכנן' },
+  ]},
+  { emoji: '💭', title: 'פעלים: דעות', pairs: [
+    { emoji: '🤔', presentAr: 'عم يفكّر', presentTranslit: 'עַם יְפַּכִּר', presentHe: 'חושב', pastAr: 'فكّر', pastTranslit: 'פַּכַּר', pastHe: 'חשב' },
+    { emoji: '🙏', presentAr: 'عم يؤمن', presentTranslit: 'עַם יְאַּמִּן', presentHe: 'מאמין', pastAr: 'آمن', pastTranslit: 'אָמַן', pastHe: 'האמין' },
+    { emoji: '⭐', presentAr: 'عم يفضّل', presentTranslit: 'עַם יְפַּדִּל', presentHe: 'מעדיף', pastAr: 'فضّل', pastTranslit: 'פַּדַּל', pastHe: 'העדיף' },
+    { emoji: '✅', presentAr: 'عم يوافق', presentTranslit: 'עַם יְוַּאפִק', presentHe: 'מסכים', pastAr: 'وافق', pastTranslit: 'וַּאפַק', pastHe: 'הסכים' },
+    { emoji: '❌', presentAr: 'ما عم يوافق', presentTranslit: 'מַא עַם יְוַּאפִק', presentHe: 'לא מסכים', pastAr: 'ما وافق', pastTranslit: 'מַא וַּאפַק', pastHe: 'לא הסכים' },
+    { emoji: '💡', presentAr: 'عم يقترح', presentTranslit: 'עַם יִקְתְּרִח', presentHe: 'מציע', pastAr: 'اقترح', pastTranslit: 'אִקְתְּרַח', pastHe: 'הציע' },
+    { emoji: '👍', presentAr: 'عم ينصح', presentTranslit: 'עַם יִנְצַח', presentHe: 'ממליץ', pastAr: 'نصح', pastTranslit: 'נַצַח', pastHe: 'המליץ' },
+    { emoji: '📖', presentAr: 'عم يشرح', presentTranslit: 'עַם יִשְׁרַח', presentHe: 'מסביר', pastAr: 'شرح', pastTranslit: 'שַׁרַח', pastHe: 'הסביר' },
+  ]},
+];
+
+const SPANISH_VOCAB_TOPICS_2: SpanishTopic[] = [
+  { emoji: '🛒', title: 'קניות', words: [
+    { es: 'tienda', he: 'חנות' }, { es: 'precio', he: 'מחיר' }, { es: 'barato', he: 'זול' },
+    { es: 'caro', he: 'יקר' }, { es: 'comprar', he: 'לקנות' }, { es: 'vender', he: 'למכור' },
+    { es: 'efectivo', he: 'מזומן' }, { es: 'tarjeta', he: 'כרטיס' }, { es: 'recibo', he: 'קבלה' }, { es: 'talla', he: 'מידה' },
+  ]},
+  { emoji: '🗺️', title: 'כיוונים', words: [
+    { es: 'izquierda', he: 'שמאל' }, { es: 'derecha', he: 'ימין' }, { es: 'recto', he: 'ישר' },
+    { es: 'cerca', he: 'קרוב' }, { es: 'lejos', he: 'רחוק' }, { es: 'calle', he: 'רחוב' },
+    { es: 'esquina', he: 'פינה' }, { es: 'mapa', he: 'מפה' }, { es: 'perdido', he: 'אבוד' }, { es: 'llegar', he: 'להגיע' },
+  ]},
+  { emoji: '🌤️', title: 'מזג אוויר', words: [
+    { es: 'caliente', he: 'חם' }, { es: 'frío', he: 'קר' }, { es: 'lluvia', he: 'גשם' },
+    { es: 'sol', he: 'שמש' }, { es: 'viento', he: 'רוח' }, { es: 'nube', he: 'ענן' },
+    { es: 'nieve', he: 'שלג' }, { es: 'temperatura', he: 'טמפרטורה' }, { es: 'pronóstico', he: 'תחזית' }, { es: 'estación', he: 'עונה' },
+  ]},
+  { emoji: '🏥', title: 'בריאות', words: [
+    { es: 'médico', he: 'רופא' }, { es: 'medicina', he: 'תרופה' }, { es: 'dolor', he: 'כאב' },
+    { es: 'fiebre', he: 'חום' }, { es: 'enfermo', he: 'חולה' }, { es: 'farmacia', he: 'בית מרקחת' },
+    { es: 'cita', he: 'תור' }, { es: 'descanso', he: 'מנוחה' }, { es: 'duele', he: 'כואב' }, { es: 'mejor', he: 'טוב יותר' },
+  ]},
+  { emoji: '🚌', title: 'תחבורה', words: [
+    { es: 'autobús', he: 'אוטובוס' }, { es: 'tren', he: 'רכבת' }, { es: 'taxi', he: 'מונית' },
+    { es: 'billete', he: 'כרטיס' }, { es: 'estación', he: 'תחנה' }, { es: 'aeropuerto', he: 'שדה תעופה' },
+    { es: 'tarde', he: 'מאחר' }, { es: 'andén', he: 'פלטפורמה' }, { es: 'asiento', he: 'מושב' }, { es: 'conductor', he: 'נהג' },
+  ]},
+  { emoji: '🍽️', title: 'אכילה בחוץ', words: [
+    { es: 'menú', he: 'תפריט' }, { es: 'pedir', he: 'להזמין' }, { es: 'camarero', he: 'מלצר' },
+    { es: 'cuenta', he: 'חשבון' }, { es: 'reserva', he: 'הזמנה' }, { es: 'mesa', he: 'שולחן' },
+    { es: 'entrante', he: 'מנה ראשונה' }, { es: 'postre', he: 'קינוח' }, { es: 'propina', he: 'טיפ' }, { es: 'delicioso', he: 'טעים' },
+  ]},
+  { emoji: '📅', title: 'שגרה יומית', words: [
+    { es: 'despertar', he: 'להתעורר' }, { es: 'ducha', he: 'מקלחת' }, { es: 'desayuno', he: 'ארוחת בוקר' },
+    { es: 'ir al trabajo', he: 'לצאת לעבודה' }, { es: 'almuerzo', he: 'ארוחת צהריים' }, { es: 'trabajar', he: 'לעבוד' },
+    { es: 'cena', he: 'ארוחת ערב' }, { es: 'relajarse', he: 'להירגע' }, { es: 'dormir', he: 'לישון' }, { es: 'planificar', he: 'לתכנן' },
+  ]},
+  { emoji: '💬', title: 'דעות', words: [
+    { es: 'pensar', he: 'לחשוב' }, { es: 'creer', he: 'להאמין' }, { es: 'estar de acuerdo', he: 'להסכים' },
+    { es: 'discrepar', he: 'לא להסכים' }, { es: 'quizás', he: 'אולי' }, { es: 'importante', he: 'חשוב' },
+    { es: 'interesante', he: 'מעניין' }, { es: 'aburrido', he: 'משעמם' }, { es: 'preferir', he: 'להעדיף' }, { es: 'opinión', he: 'דעה' },
+  ]},
+  { emoji: '🏠', title: 'בית ומחייה', words: [
+    { es: 'alquiler', he: 'שכירות' }, { es: 'vecino', he: 'שכן' }, { es: 'piso', he: 'קומה' },
+    { es: 'llave', he: 'מפתח' }, { es: 'muebles', he: 'רהיטים' }, { es: 'limpiar', he: 'לנקות' },
+    { es: 'roto', he: 'שבור' }, { es: 'arreglar', he: 'לתקן' }, { es: 'cómodo', he: 'נוח' }, { es: 'mudarse', he: 'לעבור דירה' },
+  ]},
+  { emoji: '💼', title: 'עבודה ולימודים', words: [
+    { es: 'trabajo', he: 'עבודה' }, { es: 'oficina', he: 'משרד' }, { es: 'reunión', he: 'ישיבה' },
+    { es: 'plazo', he: 'דד-ליין' }, { es: 'colega', he: 'עמית' }, { es: 'examen', he: 'מבחן' },
+    { es: 'nota', he: 'ציון' }, { es: 'deberes', he: 'שיעורי בית' }, { es: 'proyecto', he: 'פרויקט' }, { es: 'aprender', he: 'ללמוד' },
+  ]},
+];
+
+const SPANISH_VERB_TOPICS_2: SpanishVerbConjTopic[] = [
+  { emoji: '🛍️', title: 'פעלים: קניות', pairs: [
+    { emoji: '🛒', presentEs: 'compro', presentHe: 'אני קונה', pastEs: 'compré', pastHe: 'קניתי' },
+    { emoji: '💰', presentEs: 'vendo', presentHe: 'אני מוכר', pastEs: 'vendí', pastHe: 'מכרתי' },
+    { emoji: '💳', presentEs: 'pago', presentHe: 'אני משלם', pastEs: 'pagué', pastHe: 'שילמתי' },
+    { emoji: '💵', presentEs: 'cuesta', presentHe: 'זה עולה', pastEs: 'costó', pastHe: 'עלה' },
+    { emoji: '🏦', presentEs: 'ahorro', presentHe: 'אני חוסך', pastEs: 'ahorré', pastHe: 'חסכתי' },
+    { emoji: '💸', presentEs: 'gasto', presentHe: 'אני מוציא', pastEs: 'gasté', pastHe: 'הוצאתי' },
+    { emoji: '🤝', presentEs: 'presto', presentHe: 'אני מלווה', pastEs: 'presté', pastHe: 'הלוויתי' },
+    { emoji: '↩️', presentEs: 'devuelvo', presentHe: 'אני מחזיר', pastEs: 'devolví', pastHe: 'החזרתי' },
+  ]},
+  { emoji: '🤝', title: 'פעלים: חברתי', pairs: [
+    { emoji: '🤗', presentEs: 'me encuentro', presentHe: 'אני נפגש', pastEs: 'me encontré', pastHe: 'נפגשתי' },
+    { emoji: '💌', presentEs: 'invito', presentHe: 'אני מזמין', pastEs: 'invité', pastHe: 'הזמנתי' },
+    { emoji: '🏠', presentEs: 'visito', presentHe: 'אני מבקר', pastEs: 'visité', pastHe: 'ביקרתי' },
+    { emoji: '👋', presentEs: 'presento', presentHe: 'אני מציג', pastEs: 'presenté', pastHe: 'הצגתי' },
+    { emoji: '🎉', presentEs: 'celebro', presentHe: 'אני חוגג', pastEs: 'celebré', pastHe: 'חגגתי' },
+    { emoji: '🙏', presentEs: 'agradezco', presentHe: 'אני מודה', pastEs: 'agradecí', pastHe: 'הודיתי' },
+    { emoji: '😔', presentEs: 'me disculpo', presentHe: 'אני מתנצל', pastEs: 'me disculpé', pastHe: 'התנצלתי' },
+    { emoji: '🎊', presentEs: 'felicito', presentHe: 'אני מברך', pastEs: 'felicité', pastHe: 'ברכתי' },
+  ]},
+  { emoji: '📱', title: 'פעלים: דיגיטל', pairs: [
+    { emoji: '🔍', presentEs: 'busco', presentHe: 'אני מחפש', pastEs: 'busqué', pastHe: 'חיפשתי' },
+    { emoji: '⬇️', presentEs: 'descargo', presentHe: 'אני מוריד', pastEs: 'descargué', pastHe: 'הורדתי' },
+    { emoji: '💬', presentEs: 'mando un mensaje', presentHe: 'אני שולח הודעה', pastEs: 'mandé un mensaje', pastHe: 'שלחתי הודעה' },
+    { emoji: '📤', presentEs: 'publico', presentHe: 'אני מפרסם', pastEs: 'publiqué', pastHe: 'פרסמתי' },
+    { emoji: '📅', presentEs: 'reservo', presentHe: 'אני מזמין', pastEs: 'reservé', pastHe: 'הזמנתי' },
+    { emoji: '❌', presentEs: 'cancelo', presentHe: 'אני מבטל', pastEs: 'cancelé', pastHe: 'ביטלתי' },
+    { emoji: '🔋', presentEs: 'cargo', presentHe: 'אני טוען', pastEs: 'cargué', pastHe: 'טענתי' },
+    { emoji: '🔗', presentEs: 'me conecto', presentHe: 'אני מתחבר', pastEs: 'me conecté', pastHe: 'התחברתי' },
+  ]},
+  { emoji: '✈️', title: 'פעלים: נסיעות', pairs: [
+    { emoji: '✈️', presentEs: 'viajo', presentHe: 'אני נוסע', pastEs: 'viajé', pastHe: 'נסעתי' },
+    { emoji: '🏁', presentEs: 'llego', presentHe: 'אני מגיע', pastEs: 'llegué', pastHe: 'הגעתי' },
+    { emoji: '🚪', presentEs: 'salgo', presentHe: 'אני יוצא', pastEs: 'salí', pastHe: 'יצאתי' },
+    { emoji: '🧳', presentEs: 'hago la maleta', presentHe: 'אני אורז', pastEs: 'hice la maleta', pastHe: 'ארזתי' },
+    { emoji: '🗺️', presentEs: 'exploro', presentHe: 'אני חוקר', pastEs: 'exploré', pastHe: 'חקרתי' },
+    { emoji: '🏨', presentEs: 'hago check-in', presentHe: "אני מצ'ק-אין", pastEs: 'hice check-in', pastHe: "צ'ק-אין" },
+    { emoji: '🔄', presentEs: 'vuelvo', presentHe: 'אני חוזר', pastEs: 'volví', pastHe: 'חזרתי' },
+    { emoji: '📋', presentEs: 'planifico', presentHe: 'אני מתכנן', pastEs: 'planifiqué', pastHe: 'תכננתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: דעות', pairs: [
+    { emoji: '🤔', presentEs: 'pienso', presentHe: 'אני חושב', pastEs: 'pensé', pastHe: 'חשבתי' },
+    { emoji: '🙏', presentEs: 'creo', presentHe: 'אני מאמין', pastEs: 'creí', pastHe: 'האמנתי' },
+    { emoji: '⭐', presentEs: 'prefiero', presentHe: 'אני מעדיף', pastEs: 'preferí', pastHe: 'העדפתי' },
+    { emoji: '✅', presentEs: 'estoy de acuerdo', presentHe: 'אני מסכים', pastEs: 'estuve de acuerdo', pastHe: 'הסכמתי' },
+    { emoji: '❌', presentEs: 'no estoy de acuerdo', presentHe: 'אני לא מסכים', pastEs: 'no estuve de acuerdo', pastHe: 'לא הסכמתי' },
+    { emoji: '💡', presentEs: 'sugiero', presentHe: 'אני מציע', pastEs: 'sugerí', pastHe: 'הצעתי' },
+    { emoji: '👍', presentEs: 'recomiendo', presentHe: 'אני ממליץ', pastEs: 'recomendé', pastHe: 'המלצתי' },
+    { emoji: '📖', presentEs: 'explico', presentHe: 'אני מסביר', pastEs: 'expliqué', pastHe: 'הסברתי' },
+  ]},
+];
+
+const ITALIAN_VOCAB_TOPICS_2: ItalianTopic[] = [
+  { emoji: '🛒', title: 'Shopping', words: [
+    { it: 'negozio', en: 'shop' }, { it: 'prezzo', en: 'price' }, { it: 'economico', en: 'cheap' },
+    { it: 'caro', en: 'expensive' }, { it: 'comprare', en: 'to buy' }, { it: 'vendere', en: 'to sell' },
+    { it: 'contanti', en: 'cash' }, { it: 'carta', en: 'card' }, { it: 'scontrino', en: 'receipt' }, { it: 'taglia', en: 'size' },
+  ]},
+  { emoji: '🗺️', title: 'Directions', words: [
+    { it: 'sinistra', en: 'left' }, { it: 'destra', en: 'right' }, { it: 'dritto', en: 'straight' },
+    { it: 'vicino', en: 'near' }, { it: 'lontano', en: 'far' }, { it: 'strada', en: 'street' },
+    { it: 'angolo', en: 'corner' }, { it: 'mappa', en: 'map' }, { it: 'perso', en: 'lost' }, { it: 'arrivare', en: 'to arrive' },
+  ]},
+  { emoji: '🌤️', title: 'Weather', words: [
+    { it: 'caldo', en: 'hot' }, { it: 'freddo', en: 'cold' }, { it: 'pioggia', en: 'rain' },
+    { it: 'sole', en: 'sun' }, { it: 'vento', en: 'wind' }, { it: 'nuvola', en: 'cloud' },
+    { it: 'neve', en: 'snow' }, { it: 'temperatura', en: 'temperature' }, { it: 'previsioni', en: 'forecast' }, { it: 'stagione', en: 'season' },
+  ]},
+  { emoji: '🏥', title: 'Health', words: [
+    { it: 'medico', en: 'doctor' }, { it: 'medicina', en: 'medicine' }, { it: 'dolore', en: 'pain' },
+    { it: 'febbre', en: 'fever' }, { it: 'malato', en: 'sick' }, { it: 'farmacia', en: 'pharmacy' },
+    { it: 'appuntamento', en: 'appointment' }, { it: 'riposo', en: 'rest' }, { it: 'fa male', en: 'it hurts' }, { it: 'meglio', en: 'better' },
+  ]},
+  { emoji: '🚌', title: 'Transport', words: [
+    { it: 'autobus', en: 'bus' }, { it: 'treno', en: 'train' }, { it: 'taxi', en: 'taxi' },
+    { it: 'biglietto', en: 'ticket' }, { it: 'stazione', en: 'station' }, { it: 'aeroporto', en: 'airport' },
+    { it: 'in ritardo', en: 'late' }, { it: 'binario', en: 'platform' }, { it: 'posto', en: 'seat' }, { it: 'autista', en: 'driver' },
+  ]},
+  { emoji: '🍽️', title: 'Eating out', words: [
+    { it: 'menù', en: 'menu' }, { it: 'ordinare', en: 'to order' }, { it: 'cameriere', en: 'waiter' },
+    { it: 'conto', en: 'bill' }, { it: 'prenotazione', en: 'reservation' }, { it: 'tavolo', en: 'table' },
+    { it: 'antipasto', en: 'starter' }, { it: 'dolce', en: 'dessert' }, { it: 'mancia', en: 'tip' }, { it: 'delizioso', en: 'delicious' },
+  ]},
+  { emoji: '📅', title: 'Daily routine', words: [
+    { it: 'svegliarsi', en: 'to wake up' }, { it: 'doccia', en: 'shower' }, { it: 'colazione', en: 'breakfast' },
+    { it: 'andare al lavoro', en: 'go to work' }, { it: 'pranzo', en: 'lunch' }, { it: 'lavorare', en: 'to work' },
+    { it: 'cena', en: 'dinner' }, { it: 'rilassarsi', en: 'to relax' }, { it: 'dormire', en: 'to sleep' }, { it: 'pianificare', en: 'to plan' },
+  ]},
+  { emoji: '💬', title: 'Opinions', words: [
+    { it: 'pensare', en: 'to think' }, { it: 'credere', en: 'to believe' }, { it: 'essere d\'accordo', en: 'to agree' },
+    { it: 'non concordare', en: 'to disagree' }, { it: 'forse', en: 'maybe' }, { it: 'importante', en: 'important' },
+    { it: 'interessante', en: 'interesting' }, { it: 'noioso', en: 'boring' }, { it: 'preferire', en: 'to prefer' }, { it: 'opinione', en: 'opinion' },
+  ]},
+  { emoji: '🏠', title: 'Home & living', words: [
+    { it: 'affitto', en: 'rent' }, { it: 'vicino', en: 'neighbour' }, { it: 'piano', en: 'floor' },
+    { it: 'chiave', en: 'key' }, { it: 'mobili', en: 'furniture' }, { it: 'pulire', en: 'to clean' },
+    { it: 'rotto', en: 'broken' }, { it: 'riparare', en: 'to fix' }, { it: 'comodo', en: 'comfortable' }, { it: 'traslocare', en: 'to move' },
+  ]},
+  { emoji: '💼', title: 'Work & study', words: [
+    { it: 'lavoro', en: 'job' }, { it: 'ufficio', en: 'office' }, { it: 'riunione', en: 'meeting' },
+    { it: 'scadenza', en: 'deadline' }, { it: 'collega', en: 'colleague' }, { it: 'esame', en: 'exam' },
+    { it: 'voto', en: 'grade' }, { it: 'compiti', en: 'homework' }, { it: 'progetto', en: 'project' }, { it: 'imparare', en: 'to learn' },
+  ]},
+];
+
+const ITALIAN_VERB_TOPICS_2: ItalianVerbConjTopic[] = [
+  { emoji: '🛍️', title: 'Verbs: Shopping', pairs: [
+    { emoji: '🛒', presentIt: 'compro', presentEn: 'I buy', pastIt: 'ho comprato', pastEn: 'I bought' },
+    { emoji: '💰', presentIt: 'vendo', presentEn: 'I sell', pastIt: 'ho venduto', pastEn: 'I sold' },
+    { emoji: '💳', presentIt: 'pago', presentEn: 'I pay', pastIt: 'ho pagato', pastEn: 'I paid' },
+    { emoji: '💵', presentIt: 'costa', presentEn: 'it costs', pastIt: 'è costato', pastEn: 'it cost' },
+    { emoji: '🏦', presentIt: 'risparmio', presentEn: 'I save', pastIt: 'ho risparmiato', pastEn: 'I saved' },
+    { emoji: '💸', presentIt: 'spendo', presentEn: 'I spend', pastIt: 'ho speso', pastEn: 'I spent' },
+    { emoji: '🤝', presentIt: 'prendo in prestito', presentEn: 'I borrow', pastIt: 'ho preso in prestito', pastEn: 'I borrowed' },
+    { emoji: '↩️', presentIt: 'restituisco', presentEn: 'I return', pastIt: 'ho restituito', pastEn: 'I returned' },
+  ]},
+  { emoji: '🤝', title: 'Verbs: Social', pairs: [
+    { emoji: '🤗', presentIt: 'incontro', presentEn: 'I meet', pastIt: 'ho incontrato', pastEn: 'I met' },
+    { emoji: '💌', presentIt: 'invito', presentEn: 'I invite', pastIt: 'ho invitato', pastEn: 'I invited' },
+    { emoji: '🏠', presentIt: 'visito', presentEn: 'I visit', pastIt: 'ho visitato', pastEn: 'I visited' },
+    { emoji: '👋', presentIt: 'presento', presentEn: 'I introduce', pastIt: 'ho presentato', pastEn: 'I introduced' },
+    { emoji: '🎉', presentIt: 'festeggio', presentEn: 'I celebrate', pastIt: 'ho festeggiato', pastEn: 'I celebrated' },
+    { emoji: '🙏', presentIt: 'ringrazio', presentEn: 'I thank', pastIt: 'ho ringraziato', pastEn: 'I thanked' },
+    { emoji: '😔', presentIt: 'mi scuso', presentEn: 'I apologize', pastIt: 'mi sono scusato', pastEn: 'I apologized' },
+    { emoji: '🎊', presentIt: 'faccio i complimenti', presentEn: 'I congratulate', pastIt: 'ho fatto i complimenti', pastEn: 'I congratulated' },
+  ]},
+  { emoji: '📱', title: 'Verbs: Digital', pairs: [
+    { emoji: '🔍', presentIt: 'cerco', presentEn: 'I search', pastIt: 'ho cercato', pastEn: 'I searched' },
+    { emoji: '⬇️', presentIt: 'scarico', presentEn: 'I download', pastIt: 'ho scaricato', pastEn: 'I downloaded' },
+    { emoji: '💬', presentIt: 'mando un messaggio', presentEn: 'I message', pastIt: 'ho mandato un messaggio', pastEn: 'I messaged' },
+    { emoji: '📤', presentIt: 'pubblico', presentEn: 'I post', pastIt: 'ho pubblicato', pastEn: 'I posted' },
+    { emoji: '📅', presentIt: 'prenoto', presentEn: 'I book', pastIt: 'ho prenotato', pastEn: 'I booked' },
+    { emoji: '❌', presentIt: 'cancello', presentEn: 'I cancel', pastIt: 'ho cancellato', pastEn: 'I cancelled' },
+    { emoji: '🔋', presentIt: 'carico', presentEn: 'I charge', pastIt: 'ho caricato', pastEn: 'I charged' },
+    { emoji: '🔗', presentIt: 'mi connetto', presentEn: 'I connect', pastIt: 'mi sono connesso', pastEn: 'I connected' },
+  ]},
+  { emoji: '✈️', title: 'Verbs: Travel', pairs: [
+    { emoji: '✈️', presentIt: 'viaggio', presentEn: 'I travel', pastIt: 'ho viaggiato', pastEn: 'I travelled' },
+    { emoji: '🏁', presentIt: 'arrivo', presentEn: 'I arrive', pastIt: 'sono arrivato', pastEn: 'I arrived' },
+    { emoji: '🚪', presentIt: 'parto', presentEn: 'I depart', pastIt: 'sono partito', pastEn: 'I departed' },
+    { emoji: '🧳', presentIt: 'faccio la valigia', presentEn: 'I pack', pastIt: 'ho fatto la valigia', pastEn: 'I packed' },
+    { emoji: '🗺️', presentIt: 'esploro', presentEn: 'I explore', pastIt: 'ho esplorato', pastEn: 'I explored' },
+    { emoji: '🏨', presentIt: 'faccio il check-in', presentEn: 'I check in', pastIt: 'ho fatto il check-in', pastEn: 'I checked in' },
+    { emoji: '🔄', presentIt: 'torno', presentEn: 'I return', pastIt: 'sono tornato', pastEn: 'I returned' },
+    { emoji: '📋', presentIt: 'planifico', presentEn: 'I plan', pastIt: 'ho pianificato', pastEn: 'I planned' },
+  ]},
+  { emoji: '💭', title: 'Verbs: Opinions', pairs: [
+    { emoji: '🤔', presentIt: 'penso', presentEn: 'I think', pastIt: 'ho pensato', pastEn: 'I thought' },
+    { emoji: '🙏', presentIt: 'credo', presentEn: 'I believe', pastIt: 'ho creduto', pastEn: 'I believed' },
+    { emoji: '⭐', presentIt: 'preferisco', presentEn: 'I prefer', pastIt: 'ho preferito', pastEn: 'I preferred' },
+    { emoji: '✅', presentIt: 'sono d\'accordo', presentEn: 'I agree', pastIt: 'ero d\'accordo', pastEn: 'I agreed' },
+    { emoji: '❌', presentIt: 'non sono d\'accordo', presentEn: 'I disagree', pastIt: 'non ero d\'accordo', pastEn: 'I disagreed' },
+    { emoji: '💡', presentIt: 'suggerisco', presentEn: 'I suggest', pastIt: 'ho suggerito', pastEn: 'I suggested' },
+    { emoji: '👍', presentIt: 'raccomando', presentEn: 'I recommend', pastIt: 'ho raccomandato', pastEn: 'I recommended' },
+    { emoji: '📖', presentIt: 'spiego', presentEn: 'I explain', pastIt: 'ho spiegato', pastEn: 'I explained' },
+  ]},
+];
+
+const TURKISH_VOCAB_TOPICS_2: TurkishTopic[] = [
+  { emoji: '🛒', title: 'קניות', words: [
+    { tr: 'dükkan', he: 'חנות' }, { tr: 'fiyat', he: 'מחיר' }, { tr: 'ucuz', he: 'זול' },
+    { tr: 'pahalı', he: 'יקר' }, { tr: 'satın almak', he: 'לקנות' }, { tr: 'satmak', he: 'למכור' },
+    { tr: 'nakit', he: 'מזומן' }, { tr: 'kart', he: 'כרטיס' }, { tr: 'fiş', he: 'קבלה' }, { tr: 'beden', he: 'מידה' },
+  ]},
+  { emoji: '🗺️', title: 'כיוונים', words: [
+    { tr: 'sol', he: 'שמאל' }, { tr: 'sağ', he: 'ימין' }, { tr: 'düz', he: 'ישר' },
+    { tr: 'yakın', he: 'קרוב' }, { tr: 'uzak', he: 'רחוק' }, { tr: 'sokak', he: 'רחוב' },
+    { tr: 'köşe', he: 'פינה' }, { tr: 'harita', he: 'מפה' }, { tr: 'kayboldum', he: 'אבדתי' }, { tr: 'varmak', he: 'להגיע' },
+  ]},
+  { emoji: '🌤️', title: 'מזג אוויר', words: [
+    { tr: 'sıcak', he: 'חם' }, { tr: 'soğuk', he: 'קר' }, { tr: 'yağmur', he: 'גשם' },
+    { tr: 'güneş', he: 'שמש' }, { tr: 'rüzgar', he: 'רוח' }, { tr: 'bulut', he: 'ענן' },
+    { tr: 'kar', he: 'שלג' }, { tr: 'sıcaklık', he: 'טמפרטורה' }, { tr: 'hava tahmini', he: 'תחזית' }, { tr: 'mevsim', he: 'עונה' },
+  ]},
+  { emoji: '🏥', title: 'בריאות', words: [
+    { tr: 'doktor', he: 'רופא' }, { tr: 'ilaç', he: 'תרופה' }, { tr: 'ağrı', he: 'כאב' },
+    { tr: 'ateş', he: 'חום' }, { tr: 'hasta', he: 'חולה' }, { tr: 'eczane', he: 'בית מרקחת' },
+    { tr: 'randevu', he: 'תור' }, { tr: 'dinlenme', he: 'מנוחה' }, { tr: 'acıyor', he: 'כואב' }, { tr: 'daha iyi', he: 'טוב יותר' },
+  ]},
+  { emoji: '🚌', title: 'תחבורה', words: [
+    { tr: 'otobüs', he: 'אוטובוס' }, { tr: 'tren', he: 'רכבת' }, { tr: 'taksi', he: 'מונית' },
+    { tr: 'bilet', he: 'כרטיס' }, { tr: 'istasyon', he: 'תחנה' }, { tr: 'havalimanı', he: 'שדה תעופה' },
+    { tr: 'geç', he: 'מאחר' }, { tr: 'peron', he: 'פלטפורמה' }, { tr: 'koltuk', he: 'מושב' }, { tr: 'şoför', he: 'נהג' },
+  ]},
+  { emoji: '🍽️', title: 'אכילה בחוץ', words: [
+    { tr: 'menü', he: 'תפריט' }, { tr: 'sipariş vermek', he: 'להזמין' }, { tr: 'garson', he: 'מלצר' },
+    { tr: 'hesap', he: 'חשבון' }, { tr: 'rezervasyon', he: 'הזמנה' }, { tr: 'masa', he: 'שולחן' },
+    { tr: 'başlangıç', he: 'מנה ראשונה' }, { tr: 'tatlı', he: 'קינוח' }, { tr: 'bahşiş', he: 'טיפ' }, { tr: 'lezzetli', he: 'טעים' },
+  ]},
+  { emoji: '📅', title: 'שגרה יומית', words: [
+    { tr: 'uyanmak', he: 'להתעורר' }, { tr: 'duş', he: 'מקלחת' }, { tr: 'kahvaltı', he: 'ארוחת בוקר' },
+    { tr: 'işe gitmek', he: 'לצאת לעבודה' }, { tr: 'öğle yemeği', he: 'ארוחת צהריים' }, { tr: 'çalışmak', he: 'לעבוד' },
+    { tr: 'akşam yemeği', he: 'ארוחת ערב' }, { tr: 'dinlenmek', he: 'להירגע' }, { tr: 'uyumak', he: 'לישון' }, { tr: 'planlamak', he: 'לתכנן' },
+  ]},
+  { emoji: '💬', title: 'דעות', words: [
+    { tr: 'düşünmek', he: 'לחשוב' }, { tr: 'inanmak', he: 'להאמין' }, { tr: 'katılmak', he: 'להסכים' },
+    { tr: 'katılmamak', he: 'לא להסכים' }, { tr: 'belki', he: 'אולי' }, { tr: 'önemli', he: 'חשוב' },
+    { tr: 'ilginç', he: 'מעניין' }, { tr: 'sıkıcı', he: 'משעמם' }, { tr: 'tercih etmek', he: 'להעדיף' }, { tr: 'görüş', he: 'דעה' },
+  ]},
+  { emoji: '🏠', title: 'בית ומחייה', words: [
+    { tr: 'kira', he: 'שכירות' }, { tr: 'komşu', he: 'שכן' }, { tr: 'kat', he: 'קומה' },
+    { tr: 'anahtar', he: 'מפתח' }, { tr: 'mobilya', he: 'רהיטים' }, { tr: 'temizlemek', he: 'לנקות' },
+    { tr: 'kırık', he: 'שבור' }, { tr: 'tamir etmek', he: 'לתקן' }, { tr: 'rahat', he: 'נוח' }, { tr: 'taşınmak', he: 'לעבור דירה' },
+  ]},
+  { emoji: '💼', title: 'עבודה ולימודים', words: [
+    { tr: 'iş', he: 'עבודה' }, { tr: 'ofis', he: 'משרד' }, { tr: 'toplantı', he: 'ישיבה' },
+    { tr: 'son tarih', he: 'דד-ליין' }, { tr: 'meslektaş', he: 'עמית' }, { tr: 'sınav', he: 'מבחן' },
+    { tr: 'not', he: 'ציון' }, { tr: 'ödev', he: 'שיעורי בית' }, { tr: 'proje', he: 'פרויקט' }, { tr: 'öğrenmek', he: 'ללמוד' },
+  ]},
+];
+
+const TURKISH_VERB_TOPICS_2: TurkishVerbConjTopic[] = [
+  { emoji: '🛍️', title: 'פעלים: קניות', pairs: [
+    { emoji: '🛒', presentTr: 'ben satın alıyorum', presentHe: 'אני קונה', pastTr: 'ben satın aldım', pastHe: 'קניתי' },
+    { emoji: '💰', presentTr: 'ben satıyorum', presentHe: 'אני מוכר', pastTr: 'ben sattım', pastHe: 'מכרתי' },
+    { emoji: '💳', presentTr: 'ben ödüyorum', presentHe: 'אני משלם', pastTr: 'ben ödedim', pastHe: 'שילמתי' },
+    { emoji: '💵', presentTr: 'bu kaça', presentHe: 'זה עולה כמה', pastTr: 'bu ... tuttu', pastHe: 'עלה ...' },
+    { emoji: '🏦', presentTr: 'ben biriktiriyorum', presentHe: 'אני חוסך', pastTr: 'ben biriktirdim', pastHe: 'חסכתי' },
+    { emoji: '💸', presentTr: 'ben harcıyorum', presentHe: 'אני מוציא', pastTr: 'ben harcadım', pastHe: 'הוצאתי' },
+    { emoji: '🤝', presentTr: 'ben ödünç alıyorum', presentHe: 'אני שואל', pastTr: 'ben ödünç aldım', pastHe: 'שאלתי' },
+    { emoji: '↩️', presentTr: 'ben iade ediyorum', presentHe: 'אני מחזיר', pastTr: 'ben iade ettim', pastHe: 'החזרתי' },
+  ]},
+  { emoji: '🤝', title: 'פעלים: חברתי', pairs: [
+    { emoji: '🤗', presentTr: 'ben buluşuyorum', presentHe: 'אני נפגש', pastTr: 'ben buluştum', pastHe: 'נפגשתי' },
+    { emoji: '💌', presentTr: 'ben davet ediyorum', presentHe: 'אני מזמין', pastTr: 'ben davet ettim', pastHe: 'הזמנתי' },
+    { emoji: '🏠', presentTr: 'ben ziyaret ediyorum', presentHe: 'אני מבקר', pastTr: 'ben ziyaret ettim', pastHe: 'ביקרתי' },
+    { emoji: '👋', presentTr: 'ben tanıştırıyorum', presentHe: 'אני מציג', pastTr: 'ben tanıştırdım', pastHe: 'הצגתי' },
+    { emoji: '🎉', presentTr: 'ben kutluyorum', presentHe: 'אני חוגג', pastTr: 'ben kutladım', pastHe: 'חגגתי' },
+    { emoji: '🙏', presentTr: 'ben teşekkür ediyorum', presentHe: 'אני מודה', pastTr: 'ben teşekkür ettim', pastHe: 'הודיתי' },
+    { emoji: '😔', presentTr: 'ben özür diliyorum', presentHe: 'אני מתנצל', pastTr: 'ben özür diledim', pastHe: 'התנצלתי' },
+    { emoji: '🎊', presentTr: 'ben tebrik ediyorum', presentHe: 'אני מברך', pastTr: 'ben tebrik ettim', pastHe: 'ברכתי' },
+  ]},
+  { emoji: '📱', title: 'פעלים: דיגיטל', pairs: [
+    { emoji: '🔍', presentTr: 'ben arıyorum', presentHe: 'אני מחפש', pastTr: 'ben aradım', pastHe: 'חיפשתי' },
+    { emoji: '⬇️', presentTr: 'ben indiriyorum', presentHe: 'אני מוריד', pastTr: 'ben indirdim', pastHe: 'הורדתי' },
+    { emoji: '💬', presentTr: 'ben mesaj gönderiyorum', presentHe: 'אני שולח הודעה', pastTr: 'ben mesaj gönderdim', pastHe: 'שלחתי הודעה' },
+    { emoji: '📤', presentTr: 'ben paylaşıyorum', presentHe: 'אני מפרסם', pastTr: 'ben paylaştım', pastHe: 'פרסמתי' },
+    { emoji: '📅', presentTr: 'ben rezervasyon yapıyorum', presentHe: 'אני מזמין', pastTr: 'ben rezervasyon yaptım', pastHe: 'הזמנתי' },
+    { emoji: '❌', presentTr: 'ben iptal ediyorum', presentHe: 'אני מבטל', pastTr: 'ben iptal ettim', pastHe: 'ביטלתי' },
+    { emoji: '🔋', presentTr: 'ben şarj ediyorum', presentHe: 'אני טוען', pastTr: 'ben şarj ettim', pastHe: 'טענתי' },
+    { emoji: '🔗', presentTr: 'ben bağlanıyorum', presentHe: 'אני מתחבר', pastTr: 'ben bağlandım', pastHe: 'התחברתי' },
+  ]},
+  { emoji: '✈️', title: 'פעלים: נסיעות', pairs: [
+    { emoji: '✈️', presentTr: 'ben seyahat ediyorum', presentHe: 'אני נוסע', pastTr: 'ben seyahat ettim', pastHe: 'נסעתי' },
+    { emoji: '🏁', presentTr: 'ben varıyorum', presentHe: 'אני מגיע', pastTr: 'ben vardım', pastHe: 'הגעתי' },
+    { emoji: '🚪', presentTr: 'ben ayrılıyorum', presentHe: 'אני יוצא', pastTr: 'ben ayrıldım', pastHe: 'יצאתי' },
+    { emoji: '🧳', presentTr: 'ben bavul topluyorum', presentHe: 'אני ארוז', pastTr: 'ben bavul topladım', pastHe: 'ארזתי' },
+    { emoji: '🗺️', presentTr: 'ben keşfediyorum', presentHe: 'אני חוקר', pastTr: 'ben keşfettim', pastHe: 'חקרתי' },
+    { emoji: '🏨', presentTr: 'ben check-in yapıyorum', presentHe: "אני מצ'ק-אין", pastTr: 'ben check-in yaptım', pastHe: "צ'ק-אין" },
+    { emoji: '🔄', presentTr: 'ben dönüyorum', presentHe: 'אני חוזר', pastTr: 'ben döndüm', pastHe: 'חזרתי' },
+    { emoji: '📋', presentTr: 'ben planlıyorum', presentHe: 'אני מתכנן', pastTr: 'ben planladım', pastHe: 'תכננתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: דעות', pairs: [
+    { emoji: '🤔', presentTr: 'ben düşünüyorum', presentHe: 'אני חושב', pastTr: 'ben düşündüm', pastHe: 'חשבתי' },
+    { emoji: '🙏', presentTr: 'ben inanıyorum', presentHe: 'אני מאמין', pastTr: 'ben inandım', pastHe: 'האמנתי' },
+    { emoji: '⭐', presentTr: 'ben tercih ediyorum', presentHe: 'אני מעדיף', pastTr: 'ben tercih ettim', pastHe: 'העדפתי' },
+    { emoji: '✅', presentTr: 'ben katılıyorum', presentHe: 'אני מסכים', pastTr: 'ben katıldım', pastHe: 'הסכמתי' },
+    { emoji: '❌', presentTr: 'ben katılmıyorum', presentHe: 'אני לא מסכים', pastTr: 'ben katılmadım', pastHe: 'לא הסכמתי' },
+    { emoji: '💡', presentTr: 'ben öneriyorum', presentHe: 'אני מציע', pastTr: 'ben önerdim', pastHe: 'הצעתי' },
+    { emoji: '👍', presentTr: 'ben tavsiye ediyorum', presentHe: 'אני ממליץ', pastTr: 'ben tavsiye ettim', pastHe: 'המלצתי' },
+    { emoji: '📖', presentTr: 'ben açıklıyorum', presentHe: 'אני מסביר', pastTr: 'ben açıkladım', pastHe: 'הסברתי' },
+  ]},
+];
+
+const FRENCH_VOCAB_TOPICS_2: FrenchTopic[] = [
+  { emoji: '🛒', title: 'קניות', words: [
+    { fr: 'magasin', he: 'חנות' }, { fr: 'prix', he: 'מחיר' }, { fr: 'bon marché', he: 'זול' },
+    { fr: 'cher', he: 'יקר' }, { fr: 'acheter', he: 'לקנות' }, { fr: 'vendre', he: 'למכור' },
+    { fr: 'espèces', he: 'מזומן' }, { fr: 'carte', he: 'כרטיס' }, { fr: 'reçu', he: 'קבלה' }, { fr: 'taille', he: 'מידה' },
+  ]},
+  { emoji: '🗺️', title: 'כיוונים', words: [
+    { fr: 'gauche', he: 'שמאל' }, { fr: 'droite', he: 'ימין' }, { fr: 'tout droit', he: 'ישר' },
+    { fr: 'près', he: 'קרוב' }, { fr: 'loin', he: 'רחוק' }, { fr: 'rue', he: 'רחוב' },
+    { fr: 'coin', he: 'פינה' }, { fr: 'carte', he: 'מפה' }, { fr: 'perdu', he: 'אבוד' }, { fr: 'arriver', he: 'להגיע' },
+  ]},
+  { emoji: '🌤️', title: 'מזג אוויר', words: [
+    { fr: 'chaud', he: 'חם' }, { fr: 'froid', he: 'קר' }, { fr: 'pluie', he: 'גשם' },
+    { fr: 'soleil', he: 'שמש' }, { fr: 'vent', he: 'רוח' }, { fr: 'nuage', he: 'ענן' },
+    { fr: 'neige', he: 'שלג' }, { fr: 'température', he: 'טמפרטורה' }, { fr: 'prévisions', he: 'תחזית' }, { fr: 'saison', he: 'עונה' },
+  ]},
+  { emoji: '🏥', title: 'בריאות', words: [
+    { fr: 'médecin', he: 'רופא' }, { fr: 'médicament', he: 'תרופה' }, { fr: 'douleur', he: 'כאב' },
+    { fr: 'fièvre', he: 'חום' }, { fr: 'malade', he: 'חולה' }, { fr: 'pharmacie', he: 'בית מרקחת' },
+    { fr: 'rendez-vous', he: 'תור' }, { fr: 'repos', he: 'מנוחה' }, { fr: 'ça fait mal', he: 'כואב' }, { fr: 'mieux', he: 'טוב יותר' },
+  ]},
+  { emoji: '🚌', title: 'תחבורה', words: [
+    { fr: 'bus', he: 'אוטובוס' }, { fr: 'train', he: 'רכבת' }, { fr: 'taxi', he: 'מונית' },
+    { fr: 'billet', he: 'כרטיס' }, { fr: 'gare', he: 'תחנה' }, { fr: 'aéroport', he: 'שדה תעופה' },
+    { fr: 'en retard', he: 'מאחר' }, { fr: 'quai', he: 'פלטפורמה' }, { fr: 'siège', he: 'מושב' }, { fr: 'chauffeur', he: 'נהג' },
+  ]},
+  { emoji: '🍽️', title: 'אכילה בחוץ', words: [
+    { fr: 'menu', he: 'תפריט' }, { fr: 'commander', he: 'להזמין' }, { fr: 'serveur', he: 'מלצר' },
+    { fr: 'addition', he: 'חשבון' }, { fr: 'réservation', he: 'הזמנה' }, { fr: 'table', he: 'שולחן' },
+    { fr: 'entrée', he: 'מנה ראשונה' }, { fr: 'dessert', he: 'קינוח' }, { fr: 'pourboire', he: 'טיפ' }, { fr: 'délicieux', he: 'טעים' },
+  ]},
+  { emoji: '📅', title: 'שגרה יומית', words: [
+    { fr: 'se réveiller', he: 'להתעורר' }, { fr: 'douche', he: 'מקלחת' }, { fr: 'petit-déjeuner', he: 'ארוחת בוקר' },
+    { fr: 'aller au travail', he: 'לצאת לעבודה' }, { fr: 'déjeuner', he: 'ארוחת צהריים' }, { fr: 'travailler', he: 'לעבוד' },
+    { fr: 'dîner', he: 'ארוחת ערב' }, { fr: 'se détendre', he: 'להירגע' }, { fr: 'dormir', he: 'לישון' }, { fr: 'planifier', he: 'לתכנן' },
+  ]},
+  { emoji: '💬', title: 'דעות', words: [
+    { fr: 'penser', he: 'לחשוב' }, { fr: 'croire', he: 'להאמין' }, { fr: 'être d\'accord', he: 'להסכים' },
+    { fr: 'ne pas être d\'accord', he: 'לא להסכים' }, { fr: 'peut-être', he: 'אולי' }, { fr: 'important', he: 'חשוב' },
+    { fr: 'intéressant', he: 'מעניין' }, { fr: 'ennuyeux', he: 'משעמם' }, { fr: 'préférer', he: 'להעדיף' }, { fr: 'opinion', he: 'דעה' },
+  ]},
+  { emoji: '🏠', title: 'בית ומחייה', words: [
+    { fr: 'loyer', he: 'שכירות' }, { fr: 'voisin', he: 'שכן' }, { fr: 'étage', he: 'קומה' },
+    { fr: 'clé', he: 'מפתח' }, { fr: 'meubles', he: 'רהיטים' }, { fr: 'nettoyer', he: 'לנקות' },
+    { fr: 'cassé', he: 'שבור' }, { fr: 'réparer', he: 'לתקן' }, { fr: 'confortable', he: 'נוח' }, { fr: 'déménager', he: 'לעבור דירה' },
+  ]},
+  { emoji: '💼', title: 'עבודה ולימודים', words: [
+    { fr: 'travail', he: 'עבודה' }, { fr: 'bureau', he: 'משרד' }, { fr: 'réunion', he: 'ישיבה' },
+    { fr: 'délai', he: 'דד-ליין' }, { fr: 'collègue', he: 'עמית' }, { fr: 'examen', he: 'מבחן' },
+    { fr: 'note', he: 'ציון' }, { fr: 'devoirs', he: 'שיעורי בית' }, { fr: 'projet', he: 'פרויקט' }, { fr: 'apprendre', he: 'ללמוד' },
+  ]},
+];
+
+const FRENCH_VERB_TOPICS_2: FrenchVerbConjTopic[] = [
+  { emoji: '🛍️', title: 'פעלים: קניות', pairs: [
+    { emoji: '🛒', presentFr: "j'achète", presentHe: 'אני קונה', pastFr: "j'ai acheté", pastHe: 'קניתי' },
+    { emoji: '💰', presentFr: 'je vends', presentHe: 'אני מוכר', pastFr: "j'ai vendu", pastHe: 'מכרתי' },
+    { emoji: '💳', presentFr: 'je paie', presentHe: 'אני משלם', pastFr: "j'ai payé", pastHe: 'שילמתי' },
+    { emoji: '💵', presentFr: 'ça coûte', presentHe: 'זה עולה', pastFr: 'ça a coûté', pastHe: 'עלה' },
+    { emoji: '🏦', presentFr: "j'économise", presentHe: 'אני חוסך', pastFr: "j'ai économisé", pastHe: 'חסכתי' },
+    { emoji: '💸', presentFr: 'je dépense', presentHe: 'אני מוציא', pastFr: "j'ai dépensé", pastHe: 'הוצאתי' },
+    { emoji: '🤝', presentFr: "j'emprunte", presentHe: 'אני שואל', pastFr: "j'ai emprunté", pastHe: 'שאלתי' },
+    { emoji: '↩️', presentFr: 'je rends', presentHe: 'אני מחזיר', pastFr: "j'ai rendu", pastHe: 'החזרתי' },
+  ]},
+  { emoji: '🤝', title: 'פעלים: חברתי', pairs: [
+    { emoji: '🤗', presentFr: 'je rencontre', presentHe: 'אני נפגש', pastFr: "j'ai rencontré", pastHe: 'נפגשתי' },
+    { emoji: '💌', presentFr: "j'invite", presentHe: 'אני מזמין', pastFr: "j'ai invité", pastHe: 'הזמנתי' },
+    { emoji: '🏠', presentFr: 'je rends visite', presentHe: 'אני מבקר', pastFr: "j'ai rendu visite", pastHe: 'ביקרתי' },
+    { emoji: '👋', presentFr: 'je présente', presentHe: 'אני מציג', pastFr: "j'ai présenté", pastHe: 'הצגתי' },
+    { emoji: '🎉', presentFr: 'je fête', presentHe: 'אני חוגג', pastFr: "j'ai fêté", pastHe: 'חגגתי' },
+    { emoji: '🙏', presentFr: 'je remercie', presentHe: 'אני מודה', pastFr: "j'ai remercié", pastHe: 'הודיתי' },
+    { emoji: '😔', presentFr: 'je m\'excuse', presentHe: 'אני מתנצל', pastFr: 'je me suis excusé', pastHe: 'התנצלתי' },
+    { emoji: '🎊', presentFr: 'je félicite', presentHe: 'אני מברך', pastFr: "j'ai félicité", pastHe: 'ברכתי' },
+  ]},
+  { emoji: '📱', title: 'פעלים: דיגיטל', pairs: [
+    { emoji: '🔍', presentFr: 'je cherche', presentHe: 'אני מחפש', pastFr: "j'ai cherché", pastHe: 'חיפשתי' },
+    { emoji: '⬇️', presentFr: 'je télécharge', presentHe: 'אני מוריד', pastFr: "j'ai téléchargé", pastHe: 'הורדתי' },
+    { emoji: '💬', presentFr: 'j\'envoie un message', presentHe: 'אני שולח הודעה', pastFr: "j'ai envoyé un message", pastHe: 'שלחתי הודעה' },
+    { emoji: '📤', presentFr: 'je publie', presentHe: 'אני מפרסם', pastFr: "j'ai publié", pastHe: 'פרסמתי' },
+    { emoji: '📅', presentFr: 'je réserve', presentHe: 'אני מזמין', pastFr: "j'ai réservé", pastHe: 'הזמנתי' },
+    { emoji: '❌', presentFr: "j'annule", presentHe: 'אני מבטל', pastFr: "j'ai annulé", pastHe: 'ביטלתי' },
+    { emoji: '🔋', presentFr: 'je charge', presentHe: 'אני טוען', pastFr: "j'ai chargé", pastHe: 'טענתי' },
+    { emoji: '🔗', presentFr: 'je me connecte', presentHe: 'אני מתחבר', pastFr: 'je me suis connecté', pastHe: 'התחברתי' },
+  ]},
+  { emoji: '✈️', title: 'פעלים: נסיעות', pairs: [
+    { emoji: '✈️', presentFr: 'je voyage', presentHe: 'אני נוסע', pastFr: "j'ai voyagé", pastHe: 'נסעתי' },
+    { emoji: '🏁', presentFr: "j'arrive", presentHe: 'אני מגיע', pastFr: 'je suis arrivé(e)', pastHe: 'הגעתי' },
+    { emoji: '🚪', presentFr: 'je pars', presentHe: 'אני יוצא', pastFr: 'je suis parti(e)', pastHe: 'יצאתי' },
+    { emoji: '🧳', presentFr: 'je fais ma valise', presentHe: 'אני ארוז', pastFr: "j'ai fait ma valise", pastHe: 'ארזתי' },
+    { emoji: '🗺️', presentFr: "j'explore", presentHe: 'אני חוקר', pastFr: "j'ai exploré", pastHe: 'חקרתי' },
+    { emoji: '🏨', presentFr: 'je fais le check-in', presentHe: "אני מצ'ק-אין", pastFr: "j'ai fait le check-in", pastHe: "צ'ק-אין" },
+    { emoji: '🔄', presentFr: 'je rentre', presentHe: 'אני חוזר', pastFr: 'je suis rentré(e)', pastHe: 'חזרתי' },
+    { emoji: '📋', presentFr: 'je planifie', presentHe: 'אני מתכנן', pastFr: "j'ai planifié", pastHe: 'תכננתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: דעות', pairs: [
+    { emoji: '🤔', presentFr: 'je pense', presentHe: 'אני חושב', pastFr: "j'ai pensé", pastHe: 'חשבתי' },
+    { emoji: '🙏', presentFr: 'je crois', presentHe: 'אני מאמין', pastFr: "j'ai cru", pastHe: 'האמנתי' },
+    { emoji: '⭐', presentFr: 'je préfère', presentHe: 'אני מעדיף', pastFr: "j'ai préféré", pastHe: 'העדפתי' },
+    { emoji: '✅', presentFr: 'je suis d\'accord', presentHe: 'אני מסכים', pastFr: "j'étais d'accord", pastHe: 'הסכמתי' },
+    { emoji: '❌', presentFr: 'je ne suis pas d\'accord', presentHe: 'אני לא מסכים', pastFr: "je n'étais pas d'accord", pastHe: 'לא הסכמתי' },
+    { emoji: '💡', presentFr: 'je suggère', presentHe: 'אני מציע', pastFr: "j'ai suggéré", pastHe: 'הצעתי' },
+    { emoji: '👍', presentFr: 'je recommande', presentHe: 'אני ממליץ', pastFr: "j'ai recommandé", pastHe: 'המלצתי' },
+    { emoji: '📖', presentFr: "j'explique", presentHe: 'אני מסביר', pastFr: "j'ai expliqué", pastHe: 'הסברתי' },
+  ]},
+];
+
 interface SavedPodcast {
   id: number;
   title: string;
@@ -1059,7 +1661,7 @@ interface SavedPodcast {
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
-  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian' | 'turkish' | 'french'>('arabic');
+  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian' | 'turkish' | 'french' | 'arabic2' | 'spanish2' | 'italian2' | 'turkish2' | 'french2'>('arabic');
   const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | null>(null);
   const [activeVerbTopic, setActiveVerbTopic] = useState<ArabicVerbConjTopic | null>(null);
   const [activeSpanishVerbTopic, setActiveSpanishVerbTopic] = useState<SpanishVerbConjTopic | null>(null);
@@ -1657,18 +2259,28 @@ export default function App() {
   };
 
   const generateQuizOptions = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic, idx: number) => {
-    const isItalianTopic = vocabBuilderLanguage === 'italian';
-    const isTurkishTopic = vocabBuilderLanguage === 'turkish';
-    const isFrenchTopic = vocabBuilderLanguage === 'french';
+    const isItalianTopic = vocabBuilderLanguage === 'italian' || vocabBuilderLanguage === 'italian2';
+    const isTurkishTopic = vocabBuilderLanguage === 'turkish' || vocabBuilderLanguage === 'turkish2';
+    const isFrenchTopic = vocabBuilderLanguage === 'french' || vocabBuilderLanguage === 'french2';
     const correct = isItalianTopic ? (topic.words[idx] as ItalianWord).en : (topic.words[idx] as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he;
-    const allWords = vocabBuilderLanguage === 'spanish'
+    const allWords = vocabBuilderLanguage === 'spanish2'
+      ? SPANISH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
+      : vocabBuilderLanguage === 'spanish'
       ? SPANISH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : vocabBuilderLanguage === 'italian2'
+      ? ITALIAN_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.en))
       : isItalianTopic
       ? ITALIAN_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.en))
+      : vocabBuilderLanguage === 'turkish2'
+      ? TURKISH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : isTurkishTopic
       ? TURKISH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : vocabBuilderLanguage === 'french2'
+      ? FRENCH_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : isFrenchTopic
       ? FRENCH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : vocabBuilderLanguage === 'arabic2'
+      ? ARABIC_VOCAB_TOPICS_2.flatMap(t => t.words.map(w => w.he))
       : ARABIC_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he));
     const others = allWords.filter(h => h !== correct);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
@@ -2053,12 +2665,22 @@ export default function App() {
 
   // VOCAB BUILDER VIEW
   if (view === 'vocab-builder') {
-    const isSpanish = vocabBuilderLanguage === 'spanish';
-    const isItalian = vocabBuilderLanguage === 'italian';
-    const isTurkish = vocabBuilderLanguage === 'turkish';
-    const isFrench = vocabBuilderLanguage === 'french';
+    const isSpanish = vocabBuilderLanguage === 'spanish' || vocabBuilderLanguage === 'spanish2';
+    const isItalian = vocabBuilderLanguage === 'italian' || vocabBuilderLanguage === 'italian2';
+    const isTurkish = vocabBuilderLanguage === 'turkish' || vocabBuilderLanguage === 'turkish2';
+    const isFrench = vocabBuilderLanguage === 'french' || vocabBuilderLanguage === 'french2';
+    const isLevel2 = vocabBuilderLanguage === 'arabic2' || vocabBuilderLanguage === 'spanish2' || vocabBuilderLanguage === 'italian2' || vocabBuilderLanguage === 'turkish2' || vocabBuilderLanguage === 'french2';
     const isLatin = isSpanish || isItalian || isTurkish || isFrench;
-    const allTopics = isSpanish ? SPANISH_VOCAB_TOPICS : isItalian ? ITALIAN_VOCAB_TOPICS : isTurkish ? TURKISH_VOCAB_TOPICS : isFrench ? FRENCH_VOCAB_TOPICS : ARABIC_VOCAB_TOPICS;
+    const allTopics = vocabBuilderLanguage === 'spanish2' ? SPANISH_VOCAB_TOPICS_2
+      : vocabBuilderLanguage === 'spanish' ? SPANISH_VOCAB_TOPICS
+      : vocabBuilderLanguage === 'italian2' ? ITALIAN_VOCAB_TOPICS_2
+      : vocabBuilderLanguage === 'italian' ? ITALIAN_VOCAB_TOPICS
+      : vocabBuilderLanguage === 'turkish2' ? TURKISH_VOCAB_TOPICS_2
+      : vocabBuilderLanguage === 'turkish' ? TURKISH_VOCAB_TOPICS
+      : vocabBuilderLanguage === 'french2' ? FRENCH_VOCAB_TOPICS_2
+      : vocabBuilderLanguage === 'french' ? FRENCH_VOCAB_TOPICS
+      : vocabBuilderLanguage === 'arabic2' ? ARABIC_VOCAB_TOPICS_2
+      : ARABIC_VOCAB_TOPICS;
 
     // Stable shuffled list for alphabet quiz (kept in closure)
     const alphaShuffled = [...ARABIC_ALPHABET].sort(() => 0.5 - Math.random());
@@ -2506,7 +3128,7 @@ export default function App() {
                 <ArrowLeft size={16} /> {isItalian ? 'Back' : 'חזרה'}
               </button>
               <div>
-                <h1 className="text-base font-bold">{isSpanish ? '🇪🇸 Spanish Starter' : isItalian ? '🇮🇹 Italian Starter' : isTurkish ? '🇹🇷 Turkish Starter' : isFrench ? '🇫🇷 French Starter' : '🌙 Arabic Starter'}</h1>
+                <h1 className="text-base font-bold">{vocabBuilderLanguage === 'spanish2' ? '🇪🇸 Spanish A2' : vocabBuilderLanguage === 'spanish' ? '🇪🇸 Spanish Starter' : vocabBuilderLanguage === 'italian2' ? '🇮🇹 Italian A2' : vocabBuilderLanguage === 'italian' ? '🇮🇹 Italian Starter' : vocabBuilderLanguage === 'turkish2' ? '🇹🇷 Turkish A2' : vocabBuilderLanguage === 'turkish' ? '🇹🇷 Turkish Starter' : vocabBuilderLanguage === 'french2' ? '🇫🇷 French A2' : vocabBuilderLanguage === 'french' ? '🇫🇷 French Starter' : vocabBuilderLanguage === 'arabic2' ? '🌟 Arabic A2' : '🌙 Arabic Starter'}</h1>
                 <p className="text-xs text-gray-500">{isItalian ? 'Choose a topic to learn' : 'בחר נושא ללמוד'}</p>
               </div>
             </div>
@@ -2534,7 +3156,7 @@ export default function App() {
                 </button>
               ))}
               {/* Verb conjugation topics — Arabic only */}
-              {!isLatin && ARABIC_VERB_TOPICS.map((topic, i) => (
+              {!isLatin && (isLevel2 ? ARABIC_VERB_TOPICS_2 : ARABIC_VERB_TOPICS).map((topic, i) => (
                 <button key={'verb_' + i} onClick={() => setActiveVerbTopic(topic)}
                   className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
@@ -2542,7 +3164,7 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">הווה ↔ עבר</span>
                 </button>
               ))}
-              {isSpanish && SPANISH_VERB_TOPICS.map((topic, i) => (
+              {isSpanish && (vocabBuilderLanguage === 'spanish2' ? SPANISH_VERB_TOPICS_2 : SPANISH_VERB_TOPICS).map((topic, i) => (
                 <button key={'sverbz_' + i} onClick={() => setActiveSpanishVerbTopic(topic)}
                   className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
@@ -2550,7 +3172,7 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">presente ↔ pretérito</span>
                 </button>
               ))}
-              {isItalian && ITALIAN_VERB_TOPICS.map((topic, i) => (
+              {isItalian && (vocabBuilderLanguage === 'italian2' ? ITALIAN_VERB_TOPICS_2 : ITALIAN_VERB_TOPICS).map((topic, i) => (
                 <button key={'iverbz_' + i} onClick={() => setActiveItalianVerbTopic(topic)}
                   className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
@@ -2558,7 +3180,7 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">presente ↔ passato</span>
                 </button>
               ))}
-              {isTurkish && TURKISH_VERB_TOPICS.map((topic, i) => (
+              {isTurkish && (vocabBuilderLanguage === 'turkish2' ? TURKISH_VERB_TOPICS_2 : TURKISH_VERB_TOPICS).map((topic, i) => (
                 <button key={'tverbz_' + i} onClick={() => setActiveTurkishVerbTopic(topic)}
                   className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
@@ -2566,7 +3188,7 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">שימוש ↔ עבר</span>
                 </button>
               ))}
-              {isFrench && FRENCH_VERB_TOPICS.map((topic, i) => (
+              {isFrench && (vocabBuilderLanguage === 'french2' ? FRENCH_VERB_TOPICS_2 : FRENCH_VERB_TOPICS).map((topic, i) => (
                 <button key={'fverbz_' + i} onClick={() => setActiveFrenchVerbTopic(topic)}
                   className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
@@ -3151,11 +3773,23 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🌙</span>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-amber-800">Arabic Starter — לומדים ערבית מאפס</p>
+                          <p className="text-sm font-bold text-amber-800">Arabic Starter A1 — לומדים ערבית מאפס</p>
                           <p className="text-xs text-amber-600">אלפבית • מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-amber-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'arabic' && (
+                    <button onClick={() => { setVocabBuilderLanguage('arabic2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-300 rounded-2xl hover:from-orange-200 hover:to-amber-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-orange-800">Arabic Level A2 — ערבית שלב ב׳</p>
+                          <p className="text-xs text-orange-600">קניות • כיוונים • מזג אוויר • בריאות • ועוד</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-orange-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
                   {language === 'spanish' && (
@@ -3163,11 +3797,23 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🇪🇸</span>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-red-800">Spanish Starter — לומדים ספרדית מאפס</p>
+                          <p className="text-sm font-bold text-red-800">Spanish Starter A1 — לומדים ספרדית מאפס</p>
                           <p className="text-xs text-red-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-red-500 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'spanish' && (
+                    <button onClick={() => { setVocabBuilderLanguage('spanish2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-yellow-100 to-red-100 border border-yellow-300 rounded-2xl hover:from-yellow-200 hover:to-red-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-yellow-800">Spanish Level A2 — ספרדית שלב ב׳</p>
+                          <p className="text-xs text-yellow-700">קניות • כיוונים • מזג אוויר • בריאות • ועוד</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-yellow-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
                   {language === 'spanish' && (
@@ -3181,11 +3827,23 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🇮🇹</span>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-green-800">Italian Starter — Learn Italian from scratch</p>
+                          <p className="text-sm font-bold text-green-800">Italian Starter A1 — Learn Italian from scratch</p>
                           <p className="text-xs text-green-600">First words with pronunciation • Topic lists • Quiz</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-green-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'italian' && (
+                    <button onClick={() => { setVocabBuilderLanguage('italian2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-emerald-100 to-green-100 border border-emerald-300 rounded-2xl hover:from-emerald-200 hover:to-green-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-emerald-800">Italian Level A2 — Intermediate Italian</p>
+                          <p className="text-xs text-emerald-600">Shopping • Directions • Weather • Health • and more</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-emerald-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
                   {language === 'turkish' && (
@@ -3193,11 +3851,23 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🇹🇷</span>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-red-800">Turkish Starter — ללמוד טורקית</p>
+                          <p className="text-sm font-bold text-red-800">Turkish Starter A1 — ללמוד טורקית</p>
                           <p className="text-xs text-red-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-red-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'turkish' && (
+                    <button onClick={() => { setVocabBuilderLanguage('turkish2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-rose-100 to-red-100 border border-rose-300 rounded-2xl hover:from-rose-200 hover:to-red-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-rose-800">Turkish Level A2 — טורקית שלב ב׳</p>
+                          <p className="text-xs text-rose-600">קניות • כיוונים • מזג אוויר • בריאות • ועוד</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-rose-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
                   {language === 'french' && (
@@ -3205,11 +3875,23 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🇫🇷</span>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-blue-800">French Starter — ללמוד צרפתית</p>
+                          <p className="text-sm font-bold text-blue-800">French Starter A1 — ללמוד צרפתית</p>
                           <p className="text-xs text-blue-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-blue-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'french' && (
+                    <button onClick={() => { setVocabBuilderLanguage('french2'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-sky-100 to-blue-100 border border-sky-300 rounded-2xl hover:from-sky-200 hover:to-blue-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌟</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-sky-800">French Level A2 — צרפתית שלב ב׳</p>
+                          <p className="text-xs text-sky-600">קניות • כיוונים • מזג אוויר • בריאות • ועוד</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-sky-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
 
