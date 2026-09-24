@@ -126,9 +126,17 @@ interface ArabicVerbConjTopic { emoji: string; title: string; pairs: ArabicVerbP
 interface SpanishWord { es: string; he: string; }
 interface SpanishTopic { emoji: string; title: string; words: SpanishWord[]; }
 
+// Spanish Verb Conjugation — present (yo) vs. preterite (yo)
+interface SpanishVerbPair { emoji: string; presentEs: string; presentHe: string; pastEs: string; pastHe: string; }
+interface SpanishVerbConjTopic { emoji: string; title: string; pairs: SpanishVerbPair[]; }
+
 // Italian Vocabulary Builder — targets English speakers, so glosses and UI text are in English, not Hebrew
 interface ItalianWord { it: string; en: string; }
 interface ItalianTopic { emoji: string; title: string; words: ItalianWord[]; }
+
+// Italian Verb Conjugation — present (io) vs. passato prossimo (io ho/sono ...)
+interface ItalianVerbPair { emoji: string; presentIt: string; presentEn: string; pastIt: string; pastEn: string; }
+interface ItalianVerbConjTopic { emoji: string; title: string; pairs: ItalianVerbPair[]; }
 
 // Arabic Alphabet Trainer
 interface AlphabetLetter {
@@ -317,6 +325,66 @@ const ARABIC_VERB_TOPICS: ArabicVerbConjTopic[] = [
     { emoji: '📖', presentAr: 'أنا بقرا', presentTranslit: 'אנא בְּקְרָא', presentHe: 'אני קורא/ת', pastAr: 'أنا قريت', pastTranslit: 'אנא קְרֵית', pastHe: 'אני קראתי' },
     { emoji: '✍️', presentAr: "أنا بوقّع", presentTranslit: 'אנא בְּוַקֵּע', presentHe: 'אני חותם/ת', pastAr: "أنا وقّعت", pastTranslit: 'אנא וַקֵּעְת', pastHe: 'אני חתמתי' },
   ]},
+  { emoji: '🏃', title: 'פעלים: תנועה', pairs: [
+    { emoji: '🚶', presentAr: 'أنا بروح', presentTranslit: 'אנא בְּרוּח', presentHe: 'אני הולך/ת', pastAr: 'أنا رحت', pastTranslit: 'אנא רֻחְת', pastHe: 'אני הלכתי' },
+    { emoji: '🏠', presentAr: 'أنا بيجي', presentTranslit: 'אנא בְּיִג׳ִי', presentHe: 'אני בא/ה', pastAr: 'أنا جيت', pastTranslit: 'אנא ג׳ִית', pastHe: 'אני באתי' },
+    { emoji: '🏃', presentAr: 'أنا بركض', presentTranslit: 'אנא בְּרֻקּוּץ', presentHe: 'אני רץ/ה', pastAr: 'أنا ركضت', pastTranslit: 'אנא רֻקַּצְת', pastHe: 'אני רצתי' },
+    { emoji: '👣', presentAr: 'أنا بمشي', presentTranslit: 'אנא בְּמַשִׁי', presentHe: 'אני מטייל/ת', pastAr: 'أنا مشيت', pastTranslit: 'אנא מַשִׁית', pastHe: 'אני טיילתי' },
+    { emoji: '🚗', presentAr: 'أنا بسوق', presentTranslit: 'אנא בְּסוּק', presentHe: 'אני נוהג/ת', pastAr: 'أنا سقت', pastTranslit: 'אנא סֻקְת', pastHe: 'אני נהגתי' },
+    { emoji: '✈️', presentAr: 'أنا بطير', presentTranslit: 'אנא בְּטִיר', presentHe: 'אני טס/ה', pastAr: 'أنا طرت', pastTranslit: 'אנא טֻרְת', pastHe: 'אני טסתי' },
+    { emoji: '🧳', presentAr: 'أنا بسافر', presentTranslit: 'אנא בְּסָאפֵר', presentHe: 'אני נוסע/ת', pastAr: 'أنا سافرت', pastTranslit: 'אנא סָאפַּרְת', pastHe: 'אני נסעתי' },
+    { emoji: '🏁', presentAr: 'أنا بوصل', presentTranslit: 'אנא בְּוַצַּל', presentHe: 'אני מגיע/ה', pastAr: 'أنا وصلت', pastTranslit: 'אנא וַצַּלְת', pastHe: 'אני הגעתי' },
+    { emoji: '👋', presentAr: 'أنا بمشي من', presentTranslit: 'אנא בְּמַשִׁי מִן', presentHe: 'אני עוזב/ת', pastAr: 'أنا مشيت من', pastTranslit: 'אנא מַשִׁית מִן', pastHe: 'אני עזבתי' },
+    { emoji: '🔄', presentAr: 'أنا برجع', presentTranslit: 'אנא בְּרְג׳ַע', presentHe: 'אני חוזר/ת', pastAr: 'أنا رجعت', pastTranslit: 'אנא רְג׳ַעְת', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '🍳', title: 'פעלים: בית', pairs: [
+    { emoji: '🍽️', presentAr: 'أنا بآكل', presentTranslit: 'אנא בָּאכֻל', presentHe: 'אני אוכל/ת', pastAr: 'أنا أكلت', pastTranslit: 'אנא אֲכַלְת', pastHe: 'אני אכלתי' },
+    { emoji: '🥤', presentAr: 'أنا بشرب', presentTranslit: 'אנא בְּשְׁרַב', presentHe: 'אני שותה', pastAr: 'أنا شربت', pastTranslit: 'אנא שְׁרַבְת', pastHe: 'אני שתיתי' },
+    { emoji: '👨‍🍳', presentAr: 'أنا بطبخ', presentTranslit: 'אנא בְּטְבֻח', presentHe: 'אני מבשל/ת', pastAr: 'أنا طبخت', pastTranslit: 'אנא טַבַּחְת', pastHe: 'אני בישלתי' },
+    { emoji: '😴', presentAr: 'أنا بنام', presentTranslit: 'אנא בְּנָאם', presentHe: 'אני ישן/ה', pastAr: 'أنا نمت', pastTranslit: 'אנא נֻמְת', pastHe: 'אני ישנתי' },
+    { emoji: '⏰', presentAr: 'أنا بصحّى', presentTranslit: 'אנא בְּצַחֵּי', presentHe: 'אני מתעורר/ת', pastAr: 'أنا صحّيت', pastTranslit: 'אנא צַחֵּית', pastHe: 'אני התעוררתי' },
+    { emoji: '🧹', presentAr: 'أنا بنظّف', presentTranslit: 'אנא בְּנַדַּ׳ף', presentHe: 'אני מנקה', pastAr: 'أنا نظّفت', pastTranslit: 'אנא נַדַּ׳פְת', pastHe: 'אני ניקיתי' },
+    { emoji: '🚿', presentAr: 'أنا بغسل', presentTranslit: 'אנא בְּגַ׳סֶל', presentHe: 'אני שוטף/ת', pastAr: 'أنا غسلت', pastTranslit: 'אנא גַ׳סַּלְת', pastHe: 'אני שטפתי' },
+    { emoji: '🚪', presentAr: 'أنا بفتح', presentTranslit: 'אנא בְּפַּתַח', presentHe: 'אני פותח/ת', pastAr: 'أنا فتحت', pastTranslit: 'אנא פַּתַחְת', pastHe: 'אני פתחתי' },
+    { emoji: '🔒', presentAr: 'أنا بسكّر', presentTranslit: 'אנא בְּסַכֵּר', presentHe: 'אני סוגר/ת', pastAr: 'أنا سكّرت', pastTranslit: 'אנא סַכֵּרְת', pastHe: 'אני סגרתי' },
+    { emoji: '🛒', presentAr: 'أنا بشتري', presentTranslit: 'אנא בִּשְׁתְּרִי', presentHe: 'אני קונה', pastAr: 'أنا اشتريت', pastTranslit: 'אנא אִשְׁתְּרֵית', pastHe: 'אני קניתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: מחשבה', pairs: [
+    { emoji: '🤔', presentAr: 'أنا بفكّر', presentTranslit: 'אנא בְּפַּכֵּר', presentHe: 'אני חושב/ת', pastAr: 'أنا فكّرت', pastTranslit: 'אנא פַּכֵּרְת', pastHe: 'אני חשבתי' },
+    { emoji: '🧠', presentAr: 'أنا بعرف', presentTranslit: 'אנא בְּעְרַף', presentHe: 'אני יודע/ת', pastAr: 'أنا عرفت', pastTranslit: 'אנא עְרַפְת', pastHe: 'אני ידעתי' },
+    { emoji: '💝', presentAr: 'أنا بحبّ', presentTranslit: 'אנא בְּחֻב', presentHe: 'אני רוצה/אוהב/ת', pastAr: 'أنا حبّيت', pastTranslit: 'אנא חַבֵּית', pastHe: 'אני אהבתי' },
+    { emoji: '🌟', presentAr: 'أنا بتذكّر', presentTranslit: 'אנא בִּתְדַּכֵּר', presentHe: 'אני זוכר/ת', pastAr: 'أنا تذكّرت', pastTranslit: 'אנא תְּדַּכֵּרְת', pastHe: 'אני זכרתי' },
+    { emoji: '🌫️', presentAr: 'أنا بنسى', presentTranslit: 'אנא בְּנְסָא', presentHe: 'אני שוכח/ת', pastAr: 'أنا نسيت', pastTranslit: 'אנא נְסִית', pastHe: 'אני שכחתי' },
+    { emoji: '💡', presentAr: 'أنا بفهم', presentTranslit: 'אנא בְּפְהַם', presentHe: 'אני מבין/ה', pastAr: 'أنا فهمت', pastTranslit: 'אנא פְּהַמְת', pastHe: 'אני הבנתי' },
+    { emoji: '❤️', presentAr: 'أنا بحسّ', presentTranslit: 'אנא בְּחֻס', presentHe: 'אני מרגיש/ה', pastAr: 'أنا حسّيت', pastTranslit: 'אנא חַסֵּית', pastHe: 'אני הרגשתי' },
+    { emoji: '🌈', presentAr: 'أنا بتمنّى', presentTranslit: 'אנא בִּתְמַנֵּא', presentHe: 'אני מקווה', pastAr: 'أنا تمنّيت', pastTranslit: 'אנא תְּמַנֵּית', pastHe: 'אני קיוויתי' },
+    { emoji: '✔️', presentAr: 'أنا بقرّر', presentTranslit: 'אנא בְּקַרֵּר', presentHe: 'אני מחליט/ה', pastAr: 'أنا قرّرت', pastTranslit: 'אנא קַרֵּרְת', pastHe: 'אני החלטתי' },
+    { emoji: '🎯', presentAr: 'أنا بريد', presentTranslit: 'אנא בְּרִיד', presentHe: 'אני רוצה', pastAr: 'أنا أردت', pastTranslit: 'אנא אֲרַדְת', pastHe: 'אני רציתי' },
+  ]},
+  { emoji: '🏥', title: 'פעלים: גוף ובריאות', pairs: [
+    { emoji: '👁️', presentAr: 'أنا بشوف', presentTranslit: 'אנא בְּשׁוּף', presentHe: 'אני רואה', pastAr: 'أنا شفت', pastTranslit: 'אנא שֻׁפְת', pastHe: 'אני ראיתי' },
+    { emoji: '👂', presentAr: 'أنا بسمع', presentTranslit: 'אנא בְּסְמַע', presentHe: 'אני שומע/ת', pastAr: 'أنا سمعت', pastTranslit: 'אנא סְמַעְת', pastHe: 'אני שמעתי' },
+    { emoji: '🤕', presentAr: 'أنا بوجعني', presentTranslit: 'אנא בְּווּג׳ַ׳עְנִי', presentHe: 'כואב לי', pastAr: 'أنا وجعني', pastTranslit: 'אנא ווּג׳ַ׳עְנִי', pastHe: 'כאב לי' },
+    { emoji: '😨', presentAr: 'أنا بوقع', presentTranslit: 'אנא בְּוַקַּע', presentHe: 'אני נופל/ת', pastAr: 'أنا وقعت', pastTranslit: 'אנא וַקַּעְת', pastHe: 'אני נפלתי' },
+    { emoji: '🪑', presentAr: 'أنا بقعد', presentTranslit: 'אנא בְּקְעֻד', presentHe: 'אני יושב/ת', pastAr: 'أنا قعدت', pastTranslit: 'אנא קְעַדְת', pastHe: 'אני ישבתי' },
+    { emoji: '🧍', presentAr: 'أنا بوقف', presentTranslit: 'אנא בְּוַקֵּף', presentHe: 'אני עומד/ת', pastAr: 'أنا وقفت', pastTranslit: 'אנא וַקַּפְת', pastHe: 'אני עמדתי' },
+    { emoji: '😌', presentAr: 'أنا برتاح', presentTranslit: 'אנא בְּרְתָּאח', presentHe: 'אני נח/ה', pastAr: 'أنا ارتحت', pastTranslit: 'אנא אִרְתַּחְת', pastHe: 'אני נחתי' },
+    { emoji: '🏋️', presentAr: 'أنا بتمرّن', presentTranslit: 'אנא בִּתְמַרֵּן', presentHe: 'אני מתאמן/ת', pastAr: 'أنا تمرّنت', pastTranslit: 'אנא תְּמַרֵּנְת', pastHe: 'אני התאמנתי' },
+    { emoji: '🤒', presentAr: 'أنا بمرض', presentTranslit: 'אנא בְּמְרַץ', presentHe: 'אני חולה', pastAr: 'أنا مرضت', pastTranslit: 'אנא מְרַצְת', pastHe: 'אני חליתי' },
+    { emoji: '💪', presentAr: 'أنا بتعافى', presentTranslit: 'אנא בִּתְעָאפָּא', presentHe: 'אני מחלים/ה', pastAr: 'أنا تعافيت', pastTranslit: 'אנא תְּעָאפִּית', pastHe: 'אני החלמתי' },
+  ]},
+  { emoji: '🌳', title: 'פעלים: טבע ופנאי', pairs: [
+    { emoji: '🎮', presentAr: 'أنا بلعب', presentTranslit: 'אנא בְּלְעַב', presentHe: 'אני משחק/ת', pastAr: 'أنا لعبت', pastTranslit: 'אנא לְעַבְת', pastHe: 'אני שיחקתי' },
+    { emoji: '🏊', presentAr: 'أنا بسبح', presentTranslit: 'אנא בִּסְבַּח', presentHe: 'אני שוחה', pastAr: 'أنا سبحت', pastTranslit: 'אנא סְבַּחְת', pastHe: 'אני שחיתי' },
+    { emoji: '📺', presentAr: 'أنا بتفرّج', presentTranslit: 'אנא בִּתְפַּרַּג׳', presentHe: 'אני צופה', pastAr: 'أنا تفرّجت', pastTranslit: 'אנא תְּפַּרַּג׳ְת', pastHe: 'אני צפיתי' },
+    { emoji: '🎵', presentAr: 'أنا بسمع موسيقى', presentTranslit: 'אנא בְּסְמַע מוּסִיקָּא', presentHe: 'אני מקשיב/ה למוזיקה', pastAr: 'أنا سمعت موسيقى', pastTranslit: 'אנא סְמַעְת מוּסִיקָּא', pastHe: 'אני הקשבתי למוזיקה' },
+    { emoji: '📖', presentAr: 'أنا بقرا', presentTranslit: 'אנא בְּקְרָא', presentHe: 'אני קורא/ת', pastAr: 'أنا قريت', pastTranslit: 'אנא קְרֵית', pastHe: 'אני קראתי' },
+    { emoji: '✏️', presentAr: 'أنا بكتب', presentTranslit: 'אנא בְּכְתֻב', presentHe: 'אני כותב/ת', pastAr: 'أنا كتبت', pastTranslit: 'אנא כְּתַבְת', pastHe: 'אני כתבתי' },
+    { emoji: '🎤', presentAr: 'أنا بغنّي', presentTranslit: 'אנא בְּגַ׳נֵּי', presentHe: 'אני שר/ה', pastAr: 'أنا غنّيت', pastTranslit: 'אנא גַ׳נֵּית', pastHe: 'אני שרתי' },
+    { emoji: '😂', presentAr: 'أنا بضحك', presentTranslit: 'אנא בִּדְחַכ', presentHe: 'אני צוחק/ת', pastAr: 'أنا ضحكت', pastTranslit: 'אנא דְּחַכְת', pastHe: 'אני צחקתי' },
+    { emoji: '😢', presentAr: 'أنا ببكي', presentTranslit: 'אנא בְּבְּכִי', presentHe: 'אני בוכה', pastAr: 'أنا بكيت', pastTranslit: 'אנא בְּכֵית', pastHe: 'אני בכיתי' },
+    { emoji: '🤗', presentAr: 'أنا بلتقي', presentTranslit: 'אנא בִּלְתְּקִי', presentHe: 'אני נפגש/ת', pastAr: 'أنا التقيت', pastTranslit: 'אנא אִלְתְּקֵית', pastHe: 'אני נפגשתי' },
+  ]},
 ];
 
 const SPANISH_VOCAB_TOPICS: SpanishTopic[] = [
@@ -439,6 +507,59 @@ const SPANISH_VOCAB_TOPICS: SpanishTopic[] = [
     { es: 'pelo', he: 'שיער' },
     { es: 'hombro', he: 'כתף' },
     { es: 'barriga', he: 'בטן' },
+  ]},
+];
+
+const SPANISH_VERB_TOPICS: SpanishVerbConjTopic[] = [
+  { emoji: '🏃', title: 'Verbos: Movimiento', pairs: [
+    { emoji: '🚶', presentEs: 'yo voy', presentHe: 'אני הולך/ת', pastEs: 'yo fui', pastHe: 'אני הלכתי' },
+    { emoji: '🏠', presentEs: 'yo vengo', presentHe: 'אני בא/ה', pastEs: 'yo vine', pastHe: 'אני באתי' },
+    { emoji: '🏃', presentEs: 'yo corro', presentHe: 'אני רץ/ה', pastEs: 'yo corrí', pastHe: 'אני רצתי' },
+    { emoji: '👣', presentEs: 'yo camino', presentHe: 'אני מטייל/ת', pastEs: 'yo caminé', pastHe: 'אני טיילתי' },
+    { emoji: '✈️', presentEs: 'yo vuelo', presentHe: 'אני טס/ה', pastEs: 'yo volé', pastHe: 'אני טסתי' },
+    { emoji: '🏁', presentEs: 'yo llego', presentHe: 'אני מגיע/ה', pastEs: 'yo llegué', pastHe: 'אני הגעתי' },
+    { emoji: '🚪', presentEs: 'yo salgo', presentHe: 'אני יוצא/ת', pastEs: 'yo salí', pastHe: 'אני יצאתי' },
+    { emoji: '🔄', presentEs: 'yo vuelvo', presentHe: 'אני חוזר/ת', pastEs: 'yo volví', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '🍳', title: 'Verbos: Hogar', pairs: [
+    { emoji: '🍽️', presentEs: 'yo como', presentHe: 'אני אוכל/ת', pastEs: 'yo comí', pastHe: 'אני אכלתי' },
+    { emoji: '🥤', presentEs: 'yo bebo', presentHe: 'אני שותה', pastEs: 'yo bebí', pastHe: 'אני שתיתי' },
+    { emoji: '👨‍🍳', presentEs: 'yo cocino', presentHe: 'אני מבשל/ת', pastEs: 'yo cociné', pastHe: 'אני בישלתי' },
+    { emoji: '😴', presentEs: 'yo duermo', presentHe: 'אני ישן/ה', pastEs: 'yo dormí', pastHe: 'אני ישנתי' },
+    { emoji: '🧹', presentEs: 'yo limpio', presentHe: 'אני מנקה', pastEs: 'yo limpié', pastHe: 'אני ניקיתי' },
+    { emoji: '🚪', presentEs: 'yo abro', presentHe: 'אני פותח/ת', pastEs: 'yo abrí', pastHe: 'אני פתחתי' },
+    { emoji: '🔒', presentEs: 'yo cierro', presentHe: 'אני סוגר/ת', pastEs: 'yo cerré', pastHe: 'אני סגרתי' },
+    { emoji: '🛒', presentEs: 'yo compro', presentHe: 'אני קונה', pastEs: 'yo compré', pastHe: 'אני קניתי' },
+  ]},
+  { emoji: '💬', title: 'Verbos: Comunicación', pairs: [
+    { emoji: '🗣️', presentEs: 'yo hablo', presentHe: 'אני מדבר/ת', pastEs: 'yo hablé', pastHe: 'אני דיברתי' },
+    { emoji: '👂', presentEs: 'yo escucho', presentHe: 'אני מקשיב/ה', pastEs: 'yo escuché', pastHe: 'אני הקשבתי' },
+    { emoji: '📖', presentEs: 'yo leo', presentHe: 'אני קורא/ת', pastEs: 'yo leí', pastHe: 'אני קראתי' },
+    { emoji: '✍️', presentEs: 'yo escribo', presentHe: 'אני כותב/ת', pastEs: 'yo escribí', pastHe: 'אני כתבתי' },
+    { emoji: '📱', presentEs: 'yo llamo', presentHe: 'אני מתקשר/ת', pastEs: 'yo llamé', pastHe: 'אני התקשרתי' },
+    { emoji: '📲', presentEs: 'yo contesto', presentHe: 'אני עונה', pastEs: 'yo contesté', pastHe: 'אני עניתי' },
+    { emoji: '📤', presentEs: 'yo mando', presentHe: 'אני שולח/ת', pastEs: 'yo mandé', pastHe: 'אני שלחתי' },
+    { emoji: '📥', presentEs: 'yo recibo', presentHe: 'אני מקבל/ת', pastEs: 'yo recibí', pastHe: 'אני קיבלתי' },
+  ]},
+  { emoji: '💭', title: 'Verbos: Mente', pairs: [
+    { emoji: '🤔', presentEs: 'yo pienso', presentHe: 'אני חושב/ת', pastEs: 'yo pensé', pastHe: 'אני חשבתי' },
+    { emoji: '🧠', presentEs: 'yo sé', presentHe: 'אני יודע/ת', pastEs: 'yo supe', pastHe: 'אני ידעתי' },
+    { emoji: '💝', presentEs: 'yo quiero', presentHe: 'אני רוצה/אוהב/ת', pastEs: 'yo quise', pastHe: 'אני רציתי' },
+    { emoji: '🌟', presentEs: 'yo recuerdo', presentHe: 'אני זוכר/ת', pastEs: 'yo recordé', pastHe: 'אני זכרתי' },
+    { emoji: '🌫️', presentEs: 'yo olvido', presentHe: 'אני שוכח/ת', pastEs: 'yo olvidé', pastHe: 'אני שכחתי' },
+    { emoji: '💡', presentEs: 'yo entiendo', presentHe: 'אני מבין/ה', pastEs: 'yo entendí', pastHe: 'אני הבנתי' },
+    { emoji: '❤️', presentEs: 'yo siento', presentHe: 'אני מרגיש/ה', pastEs: 'yo sentí', pastHe: 'אני הרגשתי' },
+    { emoji: '✔️', presentEs: 'yo decido', presentHe: 'אני מחליט/ה', pastEs: 'yo decidí', pastHe: 'אני החלטתי' },
+  ]},
+  { emoji: '💼', title: 'Verbos: Trabajo', pairs: [
+    { emoji: '💼', presentEs: 'yo trabajo', presentHe: 'אני עובד/ת', pastEs: 'yo trabajé', pastHe: 'אני עבדתי' },
+    { emoji: '📚', presentEs: 'yo estudio', presentHe: 'אני לומד/ת', pastEs: 'yo estudié', pastHe: 'אני למדתי' },
+    { emoji: '👨‍🏫', presentEs: 'yo enseño', presentHe: 'אני מלמד/ת', pastEs: 'yo enseñé', pastHe: 'אני לימדתי' },
+    { emoji: '🎓', presentEs: 'yo aprendo', presentHe: 'אני לומד/ת', pastEs: 'yo aprendí', pastHe: 'אני למדתי' },
+    { emoji: '✅', presentEs: 'yo termino', presentHe: 'אני מסיים/ת', pastEs: 'yo terminé', pastHe: 'אני סיימתי' },
+    { emoji: '🚀', presentEs: 'yo empiezo', presentHe: 'אני מתחיל/ה', pastEs: 'yo empecé', pastHe: 'אני התחלתי' },
+    { emoji: '🤝', presentEs: 'yo ayudo', presentHe: 'אני עוזר/ת', pastEs: 'yo ayudé', pastHe: 'אני עזרתי' },
+    { emoji: '💰', presentEs: 'yo gano', presentHe: 'אני מרוויח/ה', pastEs: 'yo gané', pastHe: 'אני הרווחתי' },
   ]},
 ];
 
@@ -565,6 +686,59 @@ const ITALIAN_VOCAB_TOPICS: ItalianTopic[] = [
   ]},
 ];
 
+const ITALIAN_VERB_TOPICS: ItalianVerbConjTopic[] = [
+  { emoji: '🏃', title: 'Verbs: Movement', pairs: [
+    { emoji: '🚶', presentIt: 'io vado', presentEn: 'I go', pastIt: 'io sono andato/a', pastEn: 'I went' },
+    { emoji: '🏠', presentIt: 'io vengo', presentEn: 'I come', pastIt: 'io sono venuto/a', pastEn: 'I came' },
+    { emoji: '🏃', presentIt: 'io corro', presentEn: 'I run', pastIt: 'io ho corso', pastEn: 'I ran' },
+    { emoji: '👣', presentIt: 'io cammino', presentEn: 'I walk', pastIt: 'io ho camminato', pastEn: 'I walked' },
+    { emoji: '✈️', presentIt: 'io volo', presentEn: 'I fly', pastIt: 'io ho volato', pastEn: 'I flew' },
+    { emoji: '🏁', presentIt: 'io arrivo', presentEn: 'I arrive', pastIt: 'io sono arrivato/a', pastEn: 'I arrived' },
+    { emoji: '🚪', presentIt: 'io parto', presentEn: 'I leave', pastIt: 'io sono partito/a', pastEn: 'I left' },
+    { emoji: '🔄', presentIt: 'io torno', presentEn: 'I return', pastIt: 'io sono tornato/a', pastEn: 'I returned' },
+  ]},
+  { emoji: '🍳', title: 'Verbs: Home', pairs: [
+    { emoji: '🍽️', presentIt: 'io mangio', presentEn: 'I eat', pastIt: 'io ho mangiato', pastEn: 'I ate' },
+    { emoji: '🥤', presentIt: 'io bevo', presentEn: 'I drink', pastIt: 'io ho bevuto', pastEn: 'I drank' },
+    { emoji: '👨‍🍳', presentIt: 'io cucino', presentEn: 'I cook', pastIt: 'io ho cucinato', pastEn: 'I cooked' },
+    { emoji: '😴', presentIt: 'io dormo', presentEn: 'I sleep', pastIt: 'io ho dormito', pastEn: 'I slept' },
+    { emoji: '🧹', presentIt: 'io pulisco', presentEn: 'I clean', pastIt: 'io ho pulito', pastEn: 'I cleaned' },
+    { emoji: '🚪', presentIt: 'io apro', presentEn: 'I open', pastIt: 'io ho aperto', pastEn: 'I opened' },
+    { emoji: '🔒', presentIt: 'io chiudo', presentEn: 'I close', pastIt: 'io ho chiuso', pastEn: 'I closed' },
+    { emoji: '🛒', presentIt: 'io compro', presentEn: 'I buy', pastIt: 'io ho comprato', pastEn: 'I bought' },
+  ]},
+  { emoji: '💬', title: 'Verbs: Communication', pairs: [
+    { emoji: '🗣️', presentIt: 'io parlo', presentEn: 'I speak', pastIt: 'io ho parlato', pastEn: 'I spoke' },
+    { emoji: '👂', presentIt: 'io ascolto', presentEn: 'I listen', pastIt: 'io ho ascoltato', pastEn: 'I listened' },
+    { emoji: '📖', presentIt: 'io leggo', presentEn: 'I read', pastIt: 'io ho letto', pastEn: 'I read' },
+    { emoji: '✍️', presentIt: 'io scrivo', presentEn: 'I write', pastIt: 'io ho scritto', pastEn: 'I wrote' },
+    { emoji: '📱', presentIt: 'io chiamo', presentEn: 'I call', pastIt: 'io ho chiamato', pastEn: 'I called' },
+    { emoji: '📲', presentIt: 'io rispondo', presentEn: 'I answer', pastIt: 'io ho risposto', pastEn: 'I answered' },
+    { emoji: '📤', presentIt: 'io mando', presentEn: 'I send', pastIt: 'io ho mandato', pastEn: 'I sent' },
+    { emoji: '📥', presentIt: 'io ricevo', presentEn: 'I receive', pastIt: 'io ho ricevuto', pastEn: 'I received' },
+  ]},
+  { emoji: '💭', title: 'Verbs: Mind', pairs: [
+    { emoji: '🤔', presentIt: 'io penso', presentEn: 'I think', pastIt: 'io ho pensato', pastEn: 'I thought' },
+    { emoji: '🧠', presentIt: 'io so', presentEn: 'I know', pastIt: 'io ho saputo', pastEn: 'I knew' },
+    { emoji: '💝', presentIt: 'io voglio', presentEn: 'I want', pastIt: 'io ho voluto', pastEn: 'I wanted' },
+    { emoji: '🌟', presentIt: 'io ricordo', presentEn: 'I remember', pastIt: 'io ho ricordato', pastEn: 'I remembered' },
+    { emoji: '🌫️', presentIt: 'io dimentico', presentEn: 'I forget', pastIt: 'io ho dimenticato', pastEn: 'I forgot' },
+    { emoji: '💡', presentIt: 'io capisco', presentEn: 'I understand', pastIt: 'io ho capito', pastEn: 'I understood' },
+    { emoji: '❤️', presentIt: 'io sento', presentEn: 'I feel', pastIt: 'io ho sentito', pastEn: 'I felt' },
+    { emoji: '✔️', presentIt: 'io decido', presentEn: 'I decide', pastIt: 'io ho deciso', pastEn: 'I decided' },
+  ]},
+  { emoji: '💼', title: 'Verbs: Work', pairs: [
+    { emoji: '💼', presentIt: 'io lavoro', presentEn: 'I work', pastIt: 'io ho lavorato', pastEn: 'I worked' },
+    { emoji: '📚', presentIt: 'io studio', presentEn: 'I study', pastIt: 'io ho studiato', pastEn: 'I studied' },
+    { emoji: '👨‍🏫', presentIt: 'io insegno', presentEn: 'I teach', pastIt: 'io ho insegnato', pastEn: 'I taught' },
+    { emoji: '🎓', presentIt: 'io imparo', presentEn: 'I learn', pastIt: 'io ho imparato', pastEn: 'I learned' },
+    { emoji: '✅', presentIt: 'io finisco', presentEn: 'I finish', pastIt: 'io ho finito', pastEn: 'I finished' },
+    { emoji: '🚀', presentIt: 'io inizio', presentEn: 'I start', pastIt: 'io ho iniziato', pastEn: 'I started' },
+    { emoji: '🤝', presentIt: 'io aiuto', presentEn: 'I help', pastIt: 'io ho aiutato', pastEn: 'I helped' },
+    { emoji: '💰', presentIt: 'io guadagno', presentEn: 'I earn', pastIt: 'io ho guadagnato', pastEn: 'I earned' },
+  ]},
+];
+
 interface SavedPodcast {
   id: number;
   title: string;
@@ -589,6 +763,8 @@ export default function App() {
   const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian'>('arabic');
   const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | null>(null);
   const [activeVerbTopic, setActiveVerbTopic] = useState<ArabicVerbConjTopic | null>(null);
+  const [activeSpanishVerbTopic, setActiveSpanishVerbTopic] = useState<SpanishVerbConjTopic | null>(null);
+  const [activeItalianVerbTopic, setActiveItalianVerbTopic] = useState<ItalianVerbConjTopic | null>(null);
   const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
   const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
   const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
@@ -1669,6 +1845,116 @@ export default function App() {
       );
     }
 
+    if (activeSpanishVerbTopic) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveSpanishVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> Verbos
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeSpanishVerbTopic.emoji} {activeSpanishVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">Presente vs. Pretérito</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-teal-50 border border-teal-200 rounded-2xl">
+                <span className="text-sm font-bold text-teal-700">Presente</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">↔</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-rose-50 border border-rose-200 rounded-2xl">
+                <span className="text-sm font-bold text-rose-700">Pretérito</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {activeSpanishVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  <div className="bg-teal-50 border border-teal-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-teal-900 leading-tight">{pair.presentEs}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentHe}</p>
+                    <button onClick={() => getSpanishVocabAudio({ es: pair.presentEs, he: '' })} disabled={vocabAudioLoading['es_' + pair.presentEs]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-teal-200 rounded-full hover:bg-teal-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['es_' + pair.presentEs] ? <Loader2 size={12} className="animate-spin text-teal-600" /> : <Volume2 size={12} className="text-teal-600" />}
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+                  <div className="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-rose-900 leading-tight">{pair.pastEs}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
+                    <button onClick={() => getSpanishVocabAudio({ es: pair.pastEs, he: '' })} disabled={vocabAudioLoading['es_' + pair.pastEs]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['es_' + pair.pastEs] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    if (activeItalianVerbTopic) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveItalianVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> Back
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeItalianVerbTopic.emoji} {activeItalianVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">Present vs. Past</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-teal-50 border border-teal-200 rounded-2xl">
+                <span className="text-sm font-bold text-teal-700">Present</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">↔</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-rose-50 border border-rose-200 rounded-2xl">
+                <span className="text-sm font-bold text-rose-700">Past</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {activeItalianVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  <div className="bg-teal-50 border border-teal-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-teal-900 leading-tight">{pair.presentIt}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentEn}</p>
+                    <button onClick={() => getItalianVocabAudio({ it: pair.presentIt, en: '' })} disabled={vocabAudioLoading['it_' + pair.presentIt]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-teal-200 rounded-full hover:bg-teal-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['it_' + pair.presentIt] ? <Loader2 size={12} className="animate-spin text-teal-600" /> : <Volume2 size={12} className="text-teal-600" />}
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+                  <div className="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-rose-900 leading-tight">{pair.pastIt}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastEn}</p>
+                    <button onClick={() => getItalianVocabAudio({ it: pair.pastIt, en: '' })} disabled={vocabAudioLoading['it_' + pair.pastIt]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['it_' + pair.pastIt] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
     if (activeVerbTopic) {
       // Verb conjugation table view
       return (
@@ -1780,6 +2066,22 @@ export default function App() {
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
                   <span className="text-sm font-bold text-gray-700">{topic.title}</span>
                   <span className="text-xs text-teal-500 font-semibold">הווה ↔ עבר</span>
+                </button>
+              ))}
+              {isSpanish && SPANISH_VERB_TOPICS.map((topic, i) => (
+                <button key={'sverbz_' + i} onClick={() => setActiveSpanishVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-teal-500 font-semibold">presente ↔ pretérito</span>
+                </button>
+              ))}
+              {isItalian && ITALIAN_VERB_TOPICS.map((topic, i) => (
+                <button key={'iverbz_' + i} onClick={() => setActiveItalianVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-teal-500 font-semibold">presente ↔ passato</span>
                 </button>
               ))}
             </div>
