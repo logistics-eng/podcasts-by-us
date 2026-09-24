@@ -494,7 +494,8 @@ ${transcript}`;
         if (m && !scriptSpeakers.includes(m[1].trim())) scriptSpeakers.push(m[1].trim());
         if (scriptSpeakers.length >= 2) break;
       }
-      const host1Name = speakerNames?.host1 || scriptSpeakers[0] || 'Alex';
+      const host1Name = (speakerNames?.host1 || '') || scriptSpeakers[0] || 'Alex';
+      const host2Name = (speakerNames?.host2 || '') || scriptSpeakers[1] || 'Sam';
 
       // Voice constants
       const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';   // two-host female (B1+)
@@ -517,36 +518,39 @@ ${transcript}`;
       const VOICE_FEMALE_NL = 'nl-NL-ColetteNeural';
       const VOICE_MALE_NL   = 'nl-NL-MaartenNeural';
 
+      // Returns true if speaker is the SECOND (male) narrator
+      const isMale = (speaker: string) => speaker === host2Name && speaker !== host1Name;
+
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
           const femaleVoice = spanishDialect === 'argentina' ? VOICE_FEMALE_AR : VOICE_FEMALE_ES;
           const maleVoice   = spanishDialect === 'argentina' ? VOICE_MALE_AR   : VOICE_MALE_ES;
           if (hostCount === 'one') return femaleVoice;
-          return speaker === host1Name ? femaleVoice : maleVoice;
+          return isMale(speaker) ? maleVoice : femaleVoice;
         }
         if (language === 'french') {
           if (hostCount === 'one') return VOICE_FEMALE_FR;
-          return speaker === host1Name ? VOICE_FEMALE_FR : VOICE_MALE_FR;
+          return isMale(speaker) ? VOICE_MALE_FR : VOICE_FEMALE_FR;
         }
         if (language === 'arabic') {
           if (hostCount === 'one') return VOICE_FEMALE_AR_LEV;
-          return speaker === host1Name ? VOICE_FEMALE_AR_LEV : VOICE_MALE_AR_LEV;
+          return isMale(speaker) ? VOICE_MALE_AR_LEV : VOICE_FEMALE_AR_LEV;
         }
         if (language === 'turkish') {
           if (hostCount === 'one') return VOICE_FEMALE_TR;
-          return speaker === host1Name ? VOICE_FEMALE_TR : VOICE_MALE_TR;
+          return isMale(speaker) ? VOICE_MALE_TR : VOICE_FEMALE_TR;
         }
         if (language === 'italian') {
           if (hostCount === 'one') return VOICE_FEMALE_IT;
-          return speaker === host1Name ? VOICE_FEMALE_IT : VOICE_MALE_IT;
+          return isMale(speaker) ? VOICE_MALE_IT : VOICE_FEMALE_IT;
         }
         if (language === 'dutch') {
           if (hostCount === 'one') return VOICE_FEMALE_NL;
-          return speaker === host1Name ? VOICE_FEMALE_NL : VOICE_MALE_NL;
+          return isMale(speaker) ? VOICE_MALE_NL : VOICE_FEMALE_NL;
         }
         if (hostCount === 'one') return VOICE_FEMALE_GB;
-        if (level === 'A1' || level === 'A2') return speaker === host1Name ? VOICE_FEMALE_US_SLOW : VOICE_MALE_US_SLOW;
-        return speaker === host1Name ? VOICE_FEMALE_US : VOICE_MALE_US;
+        if (level === 'A1' || level === 'A2') return isMale(speaker) ? VOICE_MALE_US_SLOW : VOICE_FEMALE_US_SLOW;
+        return isMale(speaker) ? VOICE_MALE_US : VOICE_FEMALE_US;
       };
 
       // Speaking rate: 90% speed → 0.9, A1/A2 capped at 0.8
