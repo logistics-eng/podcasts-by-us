@@ -138,6 +138,22 @@ interface ItalianTopic { emoji: string; title: string; words: ItalianWord[]; }
 interface ItalianVerbPair { emoji: string; presentIt: string; presentEn: string; pastIt: string; pastEn: string; }
 interface ItalianVerbConjTopic { emoji: string; title: string; pairs: ItalianVerbPair[]; }
 
+// Turkish Vocabulary Builder — targets Hebrew speakers, glosses in Hebrew
+interface TurkishWord { tr: string; he: string; }
+interface TurkishTopic { emoji: string; title: string; words: TurkishWord[]; }
+
+// Turkish Verb Conjugation — present (ben) vs. past (ben)
+interface TurkishVerbPair { emoji: string; presentTr: string; presentHe: string; pastTr: string; pastHe: string; }
+interface TurkishVerbConjTopic { emoji: string; title: string; pairs: TurkishVerbPair[]; }
+
+// French Vocabulary Builder — targets Hebrew speakers, glosses in Hebrew
+interface FrenchWord { fr: string; he: string; }
+interface FrenchTopic { emoji: string; title: string; words: FrenchWord[]; }
+
+// French Verb Conjugation — présent (je) vs. passé composé (j'ai/je suis)
+interface FrenchVerbPair { emoji: string; presentFr: string; presentHe: string; pastFr: string; pastHe: string; }
+interface FrenchVerbConjTopic { emoji: string; title: string; pairs: FrenchVerbPair[]; }
+
 // Arabic Alphabet Trainer
 interface AlphabetLetter {
   ar: string;       // isolated form
@@ -739,6 +755,289 @@ const ITALIAN_VERB_TOPICS: ItalianVerbConjTopic[] = [
   ]},
 ];
 
+const TURKISH_VOCAB_TOPICS: TurkishTopic[] = [
+  { emoji: '🔢', title: 'מספרים', words: [
+    { tr: 'bir', he: 'אחד' },
+    { tr: 'iki', he: 'שניים' },
+    { tr: 'üç', he: 'שלושה' },
+    { tr: 'dört', he: 'ארבעה' },
+    { tr: 'beş', he: 'חמישה' },
+    { tr: 'altı', he: 'שישה' },
+    { tr: 'yedi', he: 'שבעה' },
+    { tr: 'sekiz', he: 'שמונה' },
+    { tr: 'dokuz', he: 'תשעה' },
+    { tr: 'on', he: 'עשרה' },
+  ]},
+  { emoji: '👋', title: 'ברכות', words: [
+    { tr: 'merhaba', he: 'שלום' },
+    { tr: 'günaydın', he: 'בוקר טוב' },
+    { tr: 'iyi günler', he: 'יום טוב' },
+    { tr: 'iyi akşamlar', he: 'ערב טוב' },
+    { tr: 'nasılsın?', he: 'מה שלומך?' },
+    { tr: 'iyiyim', he: 'אני בסדר' },
+    { tr: 'teşekkürler', he: 'תודה' },
+    { tr: 'rica ederim', he: 'בבקשה' },
+    { tr: 'hoşça kal', he: 'להתראות' },
+    { tr: 'görüşürüz', he: 'נתראה' },
+  ]},
+  { emoji: '👨‍👩‍👧‍👦', title: 'משפחה', words: [
+    { tr: 'baba', he: 'אבא' },
+    { tr: 'anne', he: 'אמא' },
+    { tr: 'erkek kardeş', he: 'אח' },
+    { tr: 'kız kardeş', he: 'אחות' },
+    { tr: 'dede', he: 'סבא' },
+    { tr: 'büyükanne', he: 'סבתא' },
+    { tr: 'oğul', he: 'בן' },
+    { tr: 'kız', he: 'בת' },
+    { tr: 'amca', he: 'דוד' },
+    { tr: 'koca', he: 'בעל' },
+  ]},
+  { emoji: '🎨', title: 'צבעים', words: [
+    { tr: 'kırmızı', he: 'אדום' },
+    { tr: 'mavi', he: 'כחול' },
+    { tr: 'yeşil', he: 'ירוק' },
+    { tr: 'sarı', he: 'צהוב' },
+    { tr: 'beyaz', he: 'לבן' },
+    { tr: 'siyah', he: 'שחור' },
+    { tr: 'mor', he: 'סגול' },
+    { tr: 'turuncu', he: 'כתום' },
+    { tr: 'pembe', he: 'ורוד' },
+    { tr: 'kahverengi', he: 'חום' },
+  ]},
+  { emoji: '😊', title: 'רגשות', words: [
+    { tr: 'mutlu', he: 'שמח' },
+    { tr: 'üzgün', he: 'עצוב' },
+    { tr: 'kızgın', he: 'כועס' },
+    { tr: 'korkmuş', he: 'מפחד' },
+    { tr: 'yorgun', he: 'עייף' },
+    { tr: 'aç', he: 'רעב' },
+    { tr: 'heyecanlı', he: 'נרגש' },
+    { tr: 'gergin', he: 'עצבני' },
+    { tr: 'sıkılmış', he: 'משועמם' },
+    { tr: 'gururlu', he: 'גאה' },
+  ]},
+  { emoji: '🍕', title: 'אוכל', words: [
+    { tr: 'ekmek', he: 'לחם' },
+    { tr: 'su', he: 'מים' },
+    { tr: 'kahve', he: 'קפה' },
+    { tr: 'süt', he: 'חלב' },
+    { tr: 'elma', he: 'תפוח' },
+    { tr: 'tavuk', he: 'עוף' },
+    { tr: 'pilav', he: 'אורז' },
+    { tr: 'peynir', he: 'גבינה' },
+    { tr: 'yumurta', he: 'ביצה' },
+    { tr: 'çikolata', he: 'שוקולד' },
+  ]},
+  { emoji: '🏠', title: 'מקומות', words: [
+    { tr: 'ev', he: 'בית' },
+    { tr: 'okul', he: 'בית ספר' },
+    { tr: 'çarşı', he: 'שוק' },
+    { tr: 'hastane', he: 'בית חולים' },
+    { tr: 'restoran', he: 'מסעדה' },
+    { tr: 'cadde', he: 'רחוב' },
+    { tr: 'plaj', he: 'חוף ים' },
+    { tr: 'dükkan', he: 'חנות' },
+    { tr: 'park', he: 'פארק' },
+    { tr: 'şehir', he: 'עיר' },
+  ]},
+  { emoji: '⏰', title: 'זמן', words: [
+    { tr: 'bugün', he: 'היום' },
+    { tr: 'yarın', he: 'מחר' },
+    { tr: 'dün', he: 'אתמול' },
+    { tr: 'şimdi', he: 'עכשיו' },
+    { tr: 'öğleden sonra', he: 'אחר הצהריים' },
+    { tr: 'gece', he: 'לילה' },
+    { tr: 'hafta', he: 'שבוע' },
+    { tr: 'ay', he: 'חודש' },
+    { tr: 'yıl', he: 'שנה' },
+    { tr: 'dakika', he: 'דקה' },
+  ]},
+  { emoji: '🏃', title: 'פעלים בסיסיים', words: [
+    { tr: 'istiyorum', he: 'אני רוצה' },
+    { tr: 'konuşuyorum', he: 'אני מדבר' },
+    { tr: 'içiyorum', he: 'אני שותה' },
+    { tr: 'yiyorum', he: 'אני אוכל' },
+    { tr: 'gidiyorum', he: 'אני הולך' },
+    { tr: 'geliyor', he: 'הוא/היא בא/ה' },
+    { tr: 'çalışıyorum', he: 'אני עובד' },
+    { tr: 'uyuyorum', he: 'אני ישן' },
+    { tr: 'seviyorum', he: 'אני אוהב' },
+    { tr: 'anlamıyorum', he: 'לא הבנתי' },
+  ]},
+  { emoji: '🧍', title: 'גוף', words: [
+    { tr: 'baş', he: 'ראש' },
+    { tr: 'göz', he: 'עין' },
+    { tr: 'el', he: 'יד' },
+    { tr: 'ayak', he: 'רגל' },
+    { tr: 'kalp', he: 'לב' },
+    { tr: 'kulak', he: 'אוזן' },
+    { tr: 'burun', he: 'אף' },
+    { tr: 'saç', he: 'שיער' },
+    { tr: 'omuz', he: 'כתף' },
+    { tr: 'karın', he: 'בטן' },
+  ]},
+];
+
+const TURKISH_VERB_TOPICS: TurkishVerbConjTopic[] = [
+  { emoji: '🏃', title: 'פעלים: תנועה', pairs: [
+    { emoji: '🚶', presentTr: 'ben gidiyorum', presentHe: 'אני הולך/ת', pastTr: 'ben gittim', pastHe: 'אני הלכתי' },
+    { emoji: '🏠', presentTr: 'ben geliyorum', presentHe: 'אני בא/ה', pastTr: 'ben geldim', pastHe: 'אני באתי' },
+    { emoji: '🏃', presentTr: 'ben koşuyorum', presentHe: 'אני רץ/ה', pastTr: 'ben koştum', pastHe: 'אני רצתי' },
+    { emoji: '👣', presentTr: 'ben yürüyorum', presentHe: 'אני מהלך/ת', pastTr: 'ben yürüdüm', pastHe: 'אני הלכתי לאט' },
+    { emoji: '✈️', presentTr: 'ben uçuyorum', presentHe: 'אני טס/ה', pastTr: 'ben uçtum', pastHe: 'אני טסתי' },
+    { emoji: '🏁', presentTr: 'ben varıyorum', presentHe: 'אני מגיע/ה', pastTr: 'ben vardım', pastHe: 'אני הגעתי' },
+    { emoji: '🚪', presentTr: 'ben çıkıyorum', presentHe: 'אני יוצא/ת', pastTr: 'ben çıktım', pastHe: 'אני יצאתי' },
+    { emoji: '🔄', presentTr: 'ben dönüyorum', presentHe: 'אני חוזר/ת', pastTr: 'ben döndüm', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '🍳', title: 'פעלים: בית', pairs: [
+    { emoji: '🍽️', presentTr: 'ben yiyorum', presentHe: 'אני אוכל/ת', pastTr: 'ben yedim', pastHe: 'אני אכלתי' },
+    { emoji: '🥤', presentTr: 'ben içiyorum', presentHe: 'אני שותה', pastTr: 'ben içtim', pastHe: 'אני שתיתי' },
+    { emoji: '👨‍🍳', presentTr: 'ben pişiriyorum', presentHe: 'אני מבשל/ת', pastTr: 'ben pişirdim', pastHe: 'אני בישלתי' },
+    { emoji: '😴', presentTr: 'ben uyuyorum', presentHe: 'אני ישן/ה', pastTr: 'ben uyudum', pastHe: 'אני ישנתי' },
+    { emoji: '🧹', presentTr: 'ben temizliyorum', presentHe: 'אני מנקה', pastTr: 'ben temizledim', pastHe: 'אני ניקיתי' },
+    { emoji: '🚪', presentTr: 'ben açıyorum', presentHe: 'אני פותח/ת', pastTr: 'ben açtım', pastHe: 'אני פתחתי' },
+    { emoji: '🔒', presentTr: 'ben kapatıyorum', presentHe: 'אני סוגר/ת', pastTr: 'ben kapattım', pastHe: 'אני סגרתי' },
+    { emoji: '🛒', presentTr: 'ben alıyorum', presentHe: 'אני קונה', pastTr: 'ben aldım', pastHe: 'אני קניתי' },
+  ]},
+  { emoji: '💬', title: 'פעלים: תקשורת', pairs: [
+    { emoji: '🗣️', presentTr: 'ben konuşuyorum', presentHe: 'אני מדבר/ת', pastTr: 'ben konuştum', pastHe: 'אני דיברתי' },
+    { emoji: '👂', presentTr: 'ben dinliyorum', presentHe: 'אני מקשיב/ה', pastTr: 'ben dinledim', pastHe: 'אני הקשבתי' },
+    { emoji: '📖', presentTr: 'ben okuyorum', presentHe: 'אני קורא/ת', pastTr: 'ben okudum', pastHe: 'אני קראתי' },
+    { emoji: '✍️', presentTr: 'ben yazıyorum', presentHe: 'אני כותב/ת', pastTr: 'ben yazdım', pastHe: 'אני כתבתי' },
+    { emoji: '📱', presentTr: 'ben arıyorum', presentHe: 'אני מתקשר/ת', pastTr: 'ben aradım', pastHe: 'אני התקשרתי' },
+    { emoji: '📲', presentTr: 'ben cevaplıyorum', presentHe: 'אני עונה', pastTr: 'ben cevapladım', pastHe: 'אני עניתי' },
+    { emoji: '📤', presentTr: 'ben gönderiyorum', presentHe: 'אני שולח/ת', pastTr: 'ben gönderdim', pastHe: 'אני שלחתי' },
+    { emoji: '📥', presentTr: 'ben alıyorum', presentHe: 'אני מקבל/ת', pastTr: 'ben aldım', pastHe: 'אני קיבלתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: מחשבה', pairs: [
+    { emoji: '🤔', presentTr: 'ben düşünüyorum', presentHe: 'אני חושב/ת', pastTr: 'ben düşündüm', pastHe: 'אני חשבתי' },
+    { emoji: '🧠', presentTr: 'ben biliyorum', presentHe: 'אני יודע/ת', pastTr: 'ben bildim', pastHe: 'אני ידעתי' },
+    { emoji: '💝', presentTr: 'ben istiyorum', presentHe: 'אני רוצה', pastTr: 'ben istedim', pastHe: 'אני רציתי' },
+    { emoji: '🌟', presentTr: 'ben hatırlıyorum', presentHe: 'אני זוכר/ת', pastTr: 'ben hatırladım', pastHe: 'אני זכרתי' },
+    { emoji: '🌫️', presentTr: 'ben unutuyorum', presentHe: 'אני שוכח/ת', pastTr: 'ben unuttum', pastHe: 'אני שכחתי' },
+    { emoji: '💡', presentTr: 'ben anlıyorum', presentHe: 'אני מבין/ה', pastTr: 'ben anladım', pastHe: 'אני הבנתי' },
+    { emoji: '❤️', presentTr: 'ben hissediyorum', presentHe: 'אני מרגיש/ה', pastTr: 'ben hissettim', pastHe: 'אני הרגשתי' },
+    { emoji: '✔️', presentTr: 'ben karar veriyorum', presentHe: 'אני מחליט/ה', pastTr: 'ben karar verdim', pastHe: 'אני החלטתי' },
+  ]},
+  { emoji: '💼', title: 'פעלים: עבודה', pairs: [
+    { emoji: '💼', presentTr: 'ben çalışıyorum', presentHe: 'אני עובד/ת', pastTr: 'ben çalıştım', pastHe: 'אני עבדתי' },
+    { emoji: '📚', presentTr: 'ben öğreniyorum', presentHe: 'אני לומד/ת', pastTr: 'ben öğrendim', pastHe: 'אני למדתי' },
+    { emoji: '👨‍🏫', presentTr: 'ben öğretiyorum', presentHe: 'אני מלמד/ת', pastTr: 'ben öğrettim', pastHe: 'אני לימדתי' },
+    { emoji: '✅', presentTr: 'ben bitiriyorum', presentHe: 'אני מסיים/ת', pastTr: 'ben bitirdim', pastHe: 'אני סיימתי' },
+    { emoji: '🚀', presentTr: 'ben başlıyorum', presentHe: 'אני מתחיל/ה', pastTr: 'ben başladım', pastHe: 'אני התחלתי' },
+    { emoji: '🤝', presentTr: 'ben yardım ediyorum', presentHe: 'אני עוזר/ת', pastTr: 'ben yardım ettim', pastHe: 'אני עזרתי' },
+    { emoji: '📋', presentTr: 'ben planlıyorum', presentHe: 'אני מתכנן/ת', pastTr: 'ben planladım', pastHe: 'אני תכננתי' },
+    { emoji: '💰', presentTr: 'ben kazanıyorum', presentHe: 'אני מרוויח/ה', pastTr: 'ben kazandım', pastHe: 'אני הרווחתי' },
+  ]},
+];
+
+const FRENCH_VOCAB_TOPICS: FrenchTopic[] = [
+  { emoji: '🔢', title: 'מספרים', words: [
+    { fr: 'un', he: 'אחד' }, { fr: 'deux', he: 'שניים' }, { fr: 'trois', he: 'שלושה' },
+    { fr: 'quatre', he: 'ארבעה' }, { fr: 'cinq', he: 'חמישה' }, { fr: 'six', he: 'שישה' },
+    { fr: 'sept', he: 'שבעה' }, { fr: 'huit', he: 'שמונה' }, { fr: 'neuf', he: 'תשעה' }, { fr: 'dix', he: 'עשרה' },
+  ]},
+  { emoji: '👋', title: 'ברכות', words: [
+    { fr: 'bonjour', he: 'שלום' }, { fr: 'bonsoir', he: 'ערב טוב' }, { fr: 'merci', he: 'תודה' },
+    { fr: "s'il vous plaît", he: 'בבקשה' }, { fr: 'de rien', he: 'על לא דבר' },
+    { fr: 'comment allez-vous?', he: 'מה שלומך?' }, { fr: 'très bien', he: 'מצוין' },
+    { fr: 'au revoir', he: 'להתראות' }, { fr: 'excusez-moi', he: 'סליחה' }, { fr: 'bonne nuit', he: 'לילה טוב' },
+  ]},
+  { emoji: '👨‍👩‍👧‍👦', title: 'משפחה', words: [
+    { fr: 'père', he: 'אבא' }, { fr: 'mère', he: 'אמא' }, { fr: 'frère', he: 'אח' },
+    { fr: 'sœur', he: 'אחות' }, { fr: 'grand-père', he: 'סבא' }, { fr: 'grand-mère', he: 'סבתא' },
+    { fr: 'fils', he: 'בן' }, { fr: 'fille', he: 'בת' }, { fr: 'oncle', he: 'דוד' }, { fr: 'mari', he: 'בעל' },
+  ]},
+  { emoji: '🎨', title: 'צבעים', words: [
+    { fr: 'rouge', he: 'אדום' }, { fr: 'bleu', he: 'כחול' }, { fr: 'vert', he: 'ירוק' },
+    { fr: 'jaune', he: 'צהוב' }, { fr: 'blanc', he: 'לבן' }, { fr: 'noir', he: 'שחור' },
+    { fr: 'violet', he: 'סגול' }, { fr: 'orange', he: 'כתום' }, { fr: 'rose', he: 'ורוד' }, { fr: 'marron', he: 'חום' },
+  ]},
+  { emoji: '😊', title: 'רגשות', words: [
+    { fr: 'heureux', he: 'שמח' }, { fr: 'triste', he: 'עצוב' }, { fr: 'en colère', he: 'כועס' },
+    { fr: 'fatigué', he: 'עייף' }, { fr: 'affamé', he: 'רעב' }, { fr: 'excité', he: 'נרגש' },
+    { fr: 'inquiet', he: 'מודאג' }, { fr: 'ennuyé', he: 'משועמם' }, { fr: 'fier', he: 'גאה' }, { fr: 'amoureux', he: 'מאוהב' },
+  ]},
+  { emoji: '🍕', title: 'אוכל', words: [
+    { fr: 'pain', he: 'לחם' }, { fr: 'eau', he: 'מים' }, { fr: 'café', he: 'קפה' },
+    { fr: 'lait', he: 'חלב' }, { fr: 'fromage', he: 'גבינה' }, { fr: 'poulet', he: 'עוף' },
+    { fr: 'riz', he: 'אורז' }, { fr: 'œuf', he: 'ביצה' }, { fr: 'chocolat', he: 'שוקולד' }, { fr: 'pomme', he: 'תפוח' },
+  ]},
+  { emoji: '🏠', title: 'מקומות', words: [
+    { fr: 'maison', he: 'בית' }, { fr: 'école', he: 'בית ספר' }, { fr: 'marché', he: 'שוק' },
+    { fr: 'hôpital', he: 'בית חולים' }, { fr: 'restaurant', he: 'מסעדה' }, { fr: 'rue', he: 'רחוב' },
+    { fr: 'plage', he: 'חוף ים' }, { fr: 'magasin', he: 'חנות' }, { fr: 'parc', he: 'פארק' }, { fr: 'ville', he: 'עיר' },
+  ]},
+  { emoji: '⏰', title: 'זמן', words: [
+    { fr: "aujourd'hui", he: 'היום' }, { fr: 'demain', he: 'מחר' }, { fr: 'hier', he: 'אתמול' },
+    { fr: 'maintenant', he: 'עכשיו' }, { fr: 'après-midi', he: 'אחר הצהריים' }, { fr: 'nuit', he: 'לילה' },
+    { fr: 'semaine', he: 'שבוע' }, { fr: 'mois', he: 'חודש' }, { fr: 'année', he: 'שנה' }, { fr: 'minute', he: 'דקה' },
+  ]},
+  { emoji: '🏃', title: 'פעלים בסיסיים', words: [
+    { fr: 'je veux', he: 'אני רוצה' }, { fr: 'je parle', he: 'אני מדבר' }, { fr: 'je bois', he: 'אני שותה' },
+    { fr: 'je mange', he: 'אני אוכל' }, { fr: 'je vais', he: 'אני הולך' }, { fr: 'il vient', he: 'הוא בא' },
+    { fr: 'je travaille', he: 'אני עובד' }, { fr: 'je dors', he: 'אני ישן' }, { fr: "j'aime", he: 'אני אוהב' }, { fr: 'je comprends', he: 'אני מבין' },
+  ]},
+  { emoji: '🧍', title: 'גוף', words: [
+    { fr: 'tête', he: 'ראש' }, { fr: 'œil', he: 'עין' }, { fr: 'main', he: 'יד' },
+    { fr: 'pied', he: 'רגל' }, { fr: 'cœur', he: 'לב' }, { fr: 'oreille', he: 'אוזן' },
+    { fr: 'nez', he: 'אף' }, { fr: 'cheveux', he: 'שיער' }, { fr: 'épaule', he: 'כתף' }, { fr: 'ventre', he: 'בטן' },
+  ]},
+];
+
+const FRENCH_VERB_TOPICS: FrenchVerbConjTopic[] = [
+  { emoji: '🏃', title: 'פעלים: תנועה', pairs: [
+    { emoji: '🚶', presentFr: 'je vais', presentHe: 'אני הולך/ת', pastFr: 'je suis allé(e)', pastHe: 'אני הלכתי' },
+    { emoji: '🏠', presentFr: 'je viens', presentHe: 'אני בא/ה', pastFr: 'je suis venu(e)', pastHe: 'אני באתי' },
+    { emoji: '🏃', presentFr: 'je cours', presentHe: 'אני רץ/ה', pastFr: "j'ai couru", pastHe: 'אני רצתי' },
+    { emoji: '👣', presentFr: 'je marche', presentHe: 'אני מהלך/ת', pastFr: "j'ai marché", pastHe: 'אני הלכתי' },
+    { emoji: '✈️', presentFr: 'je vole', presentHe: 'אני טס/ה', pastFr: "j'ai volé", pastHe: 'אני טסתי' },
+    { emoji: '🏁', presentFr: "j'arrive", presentHe: 'אני מגיע/ה', pastFr: 'je suis arrivé(e)', pastHe: 'אני הגעתי' },
+    { emoji: '🚪', presentFr: 'je pars', presentHe: 'אני עוזב/ת', pastFr: 'je suis parti(e)', pastHe: 'אני עזבתי' },
+    { emoji: '🔄', presentFr: 'je rentre', presentHe: 'אני חוזר/ת', pastFr: 'je suis rentré(e)', pastHe: 'אני חזרתי' },
+  ]},
+  { emoji: '🍳', title: 'פעלים: בית', pairs: [
+    { emoji: '🍽️', presentFr: 'je mange', presentHe: 'אני אוכל/ת', pastFr: "j'ai mangé", pastHe: 'אני אכלתי' },
+    { emoji: '🥤', presentFr: 'je bois', presentHe: 'אני שותה', pastFr: "j'ai bu", pastHe: 'אני שתיתי' },
+    { emoji: '👨‍🍳', presentFr: 'je cuisine', presentHe: 'אני מבשל/ת', pastFr: "j'ai cuisiné", pastHe: 'אני בישלתי' },
+    { emoji: '😴', presentFr: 'je dors', presentHe: 'אני ישן/ה', pastFr: "j'ai dormi", pastHe: 'אני ישנתי' },
+    { emoji: '🧹', presentFr: 'je nettoie', presentHe: 'אני מנקה', pastFr: "j'ai nettoyé", pastHe: 'אני ניקיתי' },
+    { emoji: '🚪', presentFr: "j'ouvre", presentHe: 'אני פותח/ת', pastFr: "j'ai ouvert", pastHe: 'אני פתחתי' },
+    { emoji: '🔒', presentFr: 'je ferme', presentHe: 'אני סוגר/ת', pastFr: "j'ai fermé", pastHe: 'אני סגרתי' },
+    { emoji: '🛒', presentFr: "j'achète", presentHe: 'אני קונה', pastFr: "j'ai acheté", pastHe: 'אני קניתי' },
+  ]},
+  { emoji: '💬', title: 'פעלים: תקשורת', pairs: [
+    { emoji: '🗣️', presentFr: 'je parle', presentHe: 'אני מדבר/ת', pastFr: "j'ai parlé", pastHe: 'אני דיברתי' },
+    { emoji: '👂', presentFr: "j'écoute", presentHe: 'אני מקשיב/ה', pastFr: "j'ai écouté", pastHe: 'אני הקשבתי' },
+    { emoji: '📖', presentFr: 'je lis', presentHe: 'אני קורא/ת', pastFr: "j'ai lu", pastHe: 'אני קראתי' },
+    { emoji: '✍️', presentFr: "j'écris", presentHe: 'אני כותב/ת', pastFr: "j'ai écrit", pastHe: 'אני כתבתי' },
+    { emoji: '📱', presentFr: "j'appelle", presentHe: 'אני מתקשר/ת', pastFr: "j'ai appelé", pastHe: 'אני התקשרתי' },
+    { emoji: '📲', presentFr: 'je réponds', presentHe: 'אני עונה', pastFr: "j'ai répondu", pastHe: 'אני עניתי' },
+    { emoji: '📤', presentFr: "j'envoie", presentHe: 'אני שולח/ת', pastFr: "j'ai envoyé", pastHe: 'אני שלחתי' },
+    { emoji: '📥', presentFr: 'je reçois', presentHe: 'אני מקבל/ת', pastFr: "j'ai reçu", pastHe: 'אני קיבלתי' },
+  ]},
+  { emoji: '💭', title: 'פעלים: מחשבה', pairs: [
+    { emoji: '🤔', presentFr: 'je pense', presentHe: 'אני חושב/ת', pastFr: "j'ai pensé", pastHe: 'אני חשבתי' },
+    { emoji: '🧠', presentFr: 'je sais', presentHe: 'אני יודע/ת', pastFr: "j'ai su", pastHe: 'אני ידעתי' },
+    { emoji: '💝', presentFr: 'je veux', presentHe: 'אני רוצה', pastFr: "j'ai voulu", pastHe: 'אני רציתי' },
+    { emoji: '🌟', presentFr: 'je me souviens', presentHe: 'אני זוכר/ת', pastFr: 'je me suis souvenu(e)', pastHe: 'אני זכרתי' },
+    { emoji: '🌫️', presentFr: "j'oublie", presentHe: 'אני שוכח/ת', pastFr: "j'ai oublié", pastHe: 'אני שכחתי' },
+    { emoji: '💡', presentFr: 'je comprends', presentHe: 'אני מבין/ה', pastFr: "j'ai compris", pastHe: 'אני הבנתי' },
+    { emoji: '❤️', presentFr: 'je sens', presentHe: 'אני מרגיש/ה', pastFr: "j'ai senti", pastHe: 'אני הרגשתי' },
+    { emoji: '✔️', presentFr: 'je décide', presentHe: 'אני מחליט/ה', pastFr: "j'ai décidé", pastHe: 'אני החלטתי' },
+  ]},
+  { emoji: '💼', title: 'פעלים: עבודה', pairs: [
+    { emoji: '💼', presentFr: 'je travaille', presentHe: 'אני עובד/ת', pastFr: "j'ai travaillé", pastHe: 'אני עבדתי' },
+    { emoji: '📚', presentFr: "j'étudie", presentHe: 'אני לומד/ת', pastFr: "j'ai étudié", pastHe: 'אני למדתי' },
+    { emoji: '👨‍🏫', presentFr: "j'enseigne", presentHe: 'אני מלמד/ת', pastFr: "j'ai enseigné", pastHe: 'אני לימדתי' },
+    { emoji: '✅', presentFr: 'je finis', presentHe: 'אני מסיים/ת', pastFr: "j'ai fini", pastHe: 'אני סיימתי' },
+    { emoji: '🚀', presentFr: 'je commence', presentHe: 'אני מתחיל/ה', pastFr: "j'ai commencé", pastHe: 'אני התחלתי' },
+    { emoji: '🤝', presentFr: "j'aide", presentHe: 'אני עוזר/ת', pastFr: "j'ai aidé", pastHe: 'אני עזרתי' },
+    { emoji: '📋', presentFr: 'je planifie', presentHe: 'אני מתכנן/ת', pastFr: "j'ai planifié", pastHe: 'אני תכננתי' },
+    { emoji: '💰', presentFr: 'je gagne', presentHe: 'אני מרוויח/ה', pastFr: "j'ai gagné", pastHe: 'אני הרווחתי' },
+  ]},
+];
+
 interface SavedPodcast {
   id: number;
   title: string;
@@ -760,11 +1059,13 @@ interface SavedPodcast {
 
 export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
-  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian'>('arabic');
-  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | null>(null);
+  const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian' | 'turkish' | 'french'>('arabic');
+  const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic | null>(null);
   const [activeVerbTopic, setActiveVerbTopic] = useState<ArabicVerbConjTopic | null>(null);
   const [activeSpanishVerbTopic, setActiveSpanishVerbTopic] = useState<SpanishVerbConjTopic | null>(null);
   const [activeItalianVerbTopic, setActiveItalianVerbTopic] = useState<ItalianVerbConjTopic | null>(null);
+  const [activeTurkishVerbTopic, setActiveTurkishVerbTopic] = useState<TurkishVerbConjTopic | null>(null);
+  const [activeFrenchVerbTopic, setActiveFrenchVerbTopic] = useState<FrenchVerbConjTopic | null>(null);
   const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
   const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
   const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
@@ -1297,7 +1598,57 @@ export default function App() {
     }
   };
 
-  const startQuiz = (topic: ArabicTopic | SpanishTopic | ItalianTopic) => {
+  const getTurkishVocabAudio = async (word: TurkishWord) => {
+    const key = 'tr_' + word.tr;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.tr, voice: 'tr-TR-EmelNeural' }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const getFrenchVocabAudio = async (word: FrenchWord) => {
+    const key = 'fr_' + word.fr;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.fr, voice: 'fr-FR-DeniseNeural' }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const startQuiz = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic) => {
     setQuizIndex(0);
     setQuizAnswered(null);
     setQuizScore(0);
@@ -1305,13 +1656,19 @@ export default function App() {
     generateQuizOptions(topic, 0);
   };
 
-  const generateQuizOptions = (topic: ArabicTopic | SpanishTopic | ItalianTopic, idx: number) => {
+  const generateQuizOptions = (topic: ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic, idx: number) => {
     const isItalianTopic = vocabBuilderLanguage === 'italian';
-    const correct = isItalianTopic ? (topic.words[idx] as ItalianWord).en : (topic.words[idx] as ArabicWord | SpanishWord).he;
+    const isTurkishTopic = vocabBuilderLanguage === 'turkish';
+    const isFrenchTopic = vocabBuilderLanguage === 'french';
+    const correct = isItalianTopic ? (topic.words[idx] as ItalianWord).en : (topic.words[idx] as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he;
     const allWords = vocabBuilderLanguage === 'spanish'
       ? SPANISH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
       : isItalianTopic
       ? ITALIAN_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.en))
+      : isTurkishTopic
+      ? TURKISH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
+      : isFrenchTopic
+      ? FRENCH_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he))
       : ARABIC_VOCAB_TOPICS.flatMap(t => t.words.map(w => w.he));
     const others = allWords.filter(h => h !== correct);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
@@ -1697,8 +2054,10 @@ export default function App() {
   if (view === 'vocab-builder') {
     const isSpanish = vocabBuilderLanguage === 'spanish';
     const isItalian = vocabBuilderLanguage === 'italian';
-    const isLatin = isSpanish || isItalian;
-    const allTopics = isSpanish ? SPANISH_VOCAB_TOPICS : isItalian ? ITALIAN_VOCAB_TOPICS : ARABIC_VOCAB_TOPICS;
+    const isTurkish = vocabBuilderLanguage === 'turkish';
+    const isFrench = vocabBuilderLanguage === 'french';
+    const isLatin = isSpanish || isItalian || isTurkish || isFrench;
+    const allTopics = isSpanish ? SPANISH_VOCAB_TOPICS : isItalian ? ITALIAN_VOCAB_TOPICS : isTurkish ? TURKISH_VOCAB_TOPICS : isFrench ? FRENCH_VOCAB_TOPICS : ARABIC_VOCAB_TOPICS;
 
     // Stable shuffled list for alphabet quiz (kept in closure)
     const alphaShuffled = [...ARABIC_ALPHABET].sort(() => 0.5 - Math.random());
@@ -1904,6 +2263,116 @@ export default function App() {
       );
     }
 
+    if (activeFrenchVerbTopic) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveFrenchVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> נושאים
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeFrenchVerbTopic.emoji} {activeFrenchVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">הווה מול עבר בצרפתית</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-blue-50 border border-blue-200 rounded-2xl">
+                <span className="text-sm font-bold text-blue-700">הווה</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">↔</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-rose-50 border border-rose-200 rounded-2xl">
+                <span className="text-sm font-bold text-rose-700">עבר</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {activeFrenchVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-blue-900 leading-tight">{pair.presentFr}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentHe}</p>
+                    <button onClick={() => getFrenchVocabAudio({ fr: pair.presentFr, he: '' })} disabled={vocabAudioLoading['fr_' + pair.presentFr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-blue-200 rounded-full hover:bg-blue-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['fr_' + pair.presentFr] ? <Loader2 size={12} className="animate-spin text-blue-600" /> : <Volume2 size={12} className="text-blue-600" />}
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+                  <div className="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-rose-900 leading-tight">{pair.pastFr}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
+                    <button onClick={() => getFrenchVocabAudio({ fr: pair.pastFr, he: '' })} disabled={vocabAudioLoading['fr_' + pair.pastFr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['fr_' + pair.pastFr] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    if (activeTurkishVerbTopic) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveTurkishVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> נושאים
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeTurkishVerbTopic.emoji} {activeTurkishVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">הווה מול עבר בטורקית</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-teal-50 border border-teal-200 rounded-2xl">
+                <span className="text-sm font-bold text-teal-700">הווה</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">↔</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-rose-50 border border-rose-200 rounded-2xl">
+                <span className="text-sm font-bold text-rose-700">עבר</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {activeTurkishVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  <div className="bg-teal-50 border border-teal-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-teal-900 leading-tight">{pair.presentTr}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentHe}</p>
+                    <button onClick={() => getTurkishVocabAudio({ tr: pair.presentTr, he: '' })} disabled={vocabAudioLoading['tr_' + pair.presentTr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-teal-200 rounded-full hover:bg-teal-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['tr_' + pair.presentTr] ? <Loader2 size={12} className="animate-spin text-teal-600" /> : <Volume2 size={12} className="text-teal-600" />}
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+                  <div className="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-rose-900 leading-tight">{pair.pastTr}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
+                    <button onClick={() => getTurkishVocabAudio({ tr: pair.pastTr, he: '' })} disabled={vocabAudioLoading['tr_' + pair.pastTr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['tr_' + pair.pastTr] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
     if (activeItalianVerbTopic) {
       return (
         <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
@@ -2036,7 +2505,7 @@ export default function App() {
                 <ArrowLeft size={16} /> {isItalian ? 'Back' : 'חזרה'}
               </button>
               <div>
-                <h1 className="text-base font-bold">{isSpanish ? '🇪🇸 Spanish Starter' : isItalian ? '🇮🇹 Italian Starter' : '🌙 Arabic Starter'}</h1>
+                <h1 className="text-base font-bold">{isSpanish ? '🇪🇸 Spanish Starter' : isItalian ? '🇮🇹 Italian Starter' : isTurkish ? '🇹🇷 Turkish Starter' : isFrench ? '🇫🇷 French Starter' : '🌙 Arabic Starter'}</h1>
                 <p className="text-xs text-gray-500">{isItalian ? 'Choose a topic to learn' : 'בחר נושא ללמוד'}</p>
               </div>
             </div>
@@ -2088,6 +2557,22 @@ export default function App() {
                   <span className="text-xs text-teal-500 font-semibold">presente ↔ passato</span>
                 </button>
               ))}
+              {isTurkish && TURKISH_VERB_TOPICS.map((topic, i) => (
+                <button key={'tverbz_' + i} onClick={() => setActiveTurkishVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-teal-500 font-semibold">שימוש ↔ עבר</span>
+                </button>
+              ))}
+              {isFrench && FRENCH_VERB_TOPICS.map((topic, i) => (
+                <button key={'fverbz_' + i} onClick={() => setActiveFrenchVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-teal-500 font-semibold">הווה ↔ עבר</span>
+                </button>
+              ))}
             </div>
           </main>
         </div>
@@ -2097,11 +2582,15 @@ export default function App() {
     // Word list / quiz view
     const topic = vocabTopic;
     const word = topic.words[quizIndex];
-    const wordKey = isSpanish ? 'es_' + (word as SpanishWord).es : isItalian ? 'it_' + (word as ItalianWord).it : (word as ArabicWord).ar;
+    const wordKey = isSpanish ? 'es_' + (word as SpanishWord).es : isItalian ? 'it_' + (word as ItalianWord).it : isTurkish ? 'tr_' + (word as TurkishWord).tr : isFrench ? 'fr_' + (word as FrenchWord).fr : (word as ArabicWord).ar;
     const accentCls = isSpanish
       ? { btn: 'bg-red-500 text-white hover:bg-red-600', btnOutline: 'bg-red-50 border-red-200 hover:bg-red-100', text: 'text-red-600', hover: 'hover:border-red-300 hover:bg-red-50' }
       : isItalian
       ? { btn: 'bg-green-600 text-white hover:bg-green-700', btnOutline: 'bg-green-50 border-green-200 hover:bg-green-100', text: 'text-green-600', hover: 'hover:border-green-300 hover:bg-green-50' }
+      : isTurkish
+      ? { btn: 'bg-red-600 text-white hover:bg-red-700', btnOutline: 'bg-red-50 border-red-200 hover:bg-red-100', text: 'text-red-600', hover: 'hover:border-red-300 hover:bg-red-50' }
+      : isFrench
+      ? { btn: 'bg-blue-600 text-white hover:bg-blue-700', btnOutline: 'bg-blue-50 border-blue-200 hover:bg-blue-100', text: 'text-blue-600', hover: 'hover:border-blue-300 hover:bg-blue-50' }
       : { btn: 'bg-amber-500 text-white hover:bg-amber-600', btnOutline: 'bg-amber-50 border-amber-200 hover:bg-amber-100', text: 'text-amber-600', hover: 'hover:border-amber-300 hover:bg-amber-50' };
 
     const playAll = async () => {
@@ -2109,6 +2598,8 @@ export default function App() {
       for (const w of topic.words) {
         if (isSpanish) await getSpanishVocabAudio(w as SpanishWord);
         else if (isItalian) await getItalianVocabAudio(w as ItalianWord);
+        else if (isTurkish) await getTurkishVocabAudio(w as TurkishWord);
+        else if (isFrench) await getFrenchVocabAudio(w as FrenchWord);
         else await getVocabAudio(w as ArabicWord);
         await new Promise(r => setTimeout(r, 1800));
       }
@@ -2127,7 +2618,7 @@ export default function App() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setVocabMode('browse'); }} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'browse' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Words' : 'מילים'}</button>
-              <button onClick={() => startQuiz(topic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Quiz' : 'חידון'}</button>
+              <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic)} className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${vocabMode === 'quiz' ? accentCls.btn : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{isItalian ? 'Quiz' : 'חידון'}</button>
             </div>
           </div>
         </header>
@@ -2142,10 +2633,10 @@ export default function App() {
               </div>
               <div className="space-y-3">
                 {topic.words.map((w, i) => {
-                  const wKey = isSpanish ? 'es_' + (w as SpanishWord).es : isItalian ? 'it_' + (w as ItalianWord).it : (w as ArabicWord).ar;
+                  const wKey = isSpanish ? 'es_' + (w as SpanishWord).es : isItalian ? 'it_' + (w as ItalianWord).it : isTurkish ? 'tr_' + (w as TurkishWord).tr : isFrench ? 'fr_' + (w as FrenchWord).fr : (w as ArabicWord).ar;
                   return (
                     <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm">
-                      <button onClick={() => isSpanish ? getSpanishVocabAudio(w as SpanishWord) : isItalian ? getItalianVocabAudio(w as ItalianWord) : getVocabAudio(w as ArabicWord)} disabled={vocabAudioLoading[wKey]} className={`flex-shrink-0 w-10 h-10 flex items-center justify-center border rounded-full transition-all disabled:opacity-50 ${accentCls.btnOutline}`}>
+                      <button onClick={() => isSpanish ? getSpanishVocabAudio(w as SpanishWord) : isItalian ? getItalianVocabAudio(w as ItalianWord) : isTurkish ? getTurkishVocabAudio(w as TurkishWord) : isFrench ? getFrenchVocabAudio(w as FrenchWord) : getVocabAudio(w as ArabicWord)} disabled={vocabAudioLoading[wKey]} className={`flex-shrink-0 w-10 h-10 flex items-center justify-center border rounded-full transition-all disabled:opacity-50 ${accentCls.btnOutline}`}>
                         {vocabAudioLoading[wKey] ? <Loader2 size={16} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={16} className={accentCls.text} />}
                       </button>
                       <div className="flex-1 min-w-0">
@@ -2153,6 +2644,10 @@ export default function App() {
                           <p className="text-xl font-bold text-gray-800">{(w as SpanishWord).es}</p>
                         ) : isItalian ? (
                           <p className="text-xl font-bold text-gray-800">{(w as ItalianWord).it}</p>
+                        ) : isTurkish ? (
+                          <p className="text-xl font-bold text-gray-800">{(w as TurkishWord).tr}</p>
+                        ) : isFrench ? (
+                          <p className="text-xl font-bold text-gray-800">{(w as FrenchWord).fr}</p>
                         ) : (
                           <>
                             <p className="text-xl font-bold text-gray-800 text-right" dir="rtl">{(w as ArabicWord).ar}</p>
@@ -2161,7 +2656,7 @@ export default function App() {
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-700">{isItalian ? (w as ItalianWord).en : (w as ArabicWord | SpanishWord).he}</p>
+                        <p className="text-sm font-bold text-indigo-700">{isItalian ? (w as ItalianWord).en : (w as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he}</p>
                       </div>
                     </div>
                   );
@@ -2180,7 +2675,7 @@ export default function App() {
                   <p className="text-lg text-gray-600">ענית נכון על <span className={`font-bold ${accentCls.text}`}>{quizScore}</span> מתוך <span className="font-bold">{topic.words.length}</span></p>
                 )}
                 <div className="flex gap-3 justify-center mt-6">
-                  <button onClick={() => startQuiz(topic)} className={`px-5 py-2.5 font-bold rounded-full transition-all ${accentCls.btn}`}>{isItalian ? 'Play again' : 'שחק שוב'}</button>
+                  <button onClick={() => startQuiz(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic)} className={`px-5 py-2.5 font-bold rounded-full transition-all ${accentCls.btn}`}>{isItalian ? 'Play again' : 'שחק שוב'}</button>
                   <button onClick={() => setVocabMode('browse')} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-full hover:bg-gray-200 transition-all">{isItalian ? 'Back to words' : 'חזור למילים'}</button>
                 </div>
               </div>
@@ -2191,13 +2686,17 @@ export default function App() {
                   <span>✅ {quizScore}</span>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8 text-center space-y-3">
-                  <button onClick={() => isSpanish ? getSpanishVocabAudio(word as SpanishWord) : isItalian ? getItalianVocabAudio(word as ItalianWord) : getVocabAudio(word as ArabicWord)} className={`mx-auto w-14 h-14 flex items-center justify-center border rounded-full transition-all ${accentCls.btnOutline}`}>
+                  <button onClick={() => isSpanish ? getSpanishVocabAudio(word as SpanishWord) : isItalian ? getItalianVocabAudio(word as ItalianWord) : isTurkish ? getTurkishVocabAudio(word as TurkishWord) : isFrench ? getFrenchVocabAudio(word as FrenchWord) : getVocabAudio(word as ArabicWord)} className={`mx-auto w-14 h-14 flex items-center justify-center border rounded-full transition-all ${accentCls.btnOutline}`}>
                     {vocabAudioLoading[wordKey] ? <Loader2 size={22} className={`animate-spin ${accentCls.text}`} /> : <Volume2 size={22} className={accentCls.text} />}
                   </button>
                   {isSpanish ? (
                     <p className="text-4xl font-bold text-gray-800">{(word as SpanishWord).es}</p>
                   ) : isItalian ? (
                     <p className="text-4xl font-bold text-gray-800">{(word as ItalianWord).it}</p>
+                  ) : isTurkish ? (
+                    <p className="text-4xl font-bold text-gray-800">{(word as TurkishWord).tr}</p>
+                  ) : isFrench ? (
+                    <p className="text-4xl font-bold text-gray-800">{(word as FrenchWord).fr}</p>
                   ) : (
                     <>
                       <p className="text-4xl font-bold text-gray-800" dir="rtl">{(word as ArabicWord).ar}</p>
@@ -2208,7 +2707,7 @@ export default function App() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {quizOptions.map((opt, i) => {
-                    const isCorrect = opt === (isItalian ? (word as ItalianWord).en : (word as ArabicWord | SpanishWord).he);
+                    const isCorrect = opt === (isItalian ? (word as ItalianWord).en : (word as ArabicWord | SpanishWord | TurkishWord | FrenchWord).he);
                     const isChosen = opt === quizAnswered;
                     let cls = 'p-4 rounded-2xl border-2 text-sm font-bold transition-all text-center ';
                     if (!quizAnswered) cls += `bg-white border-gray-200 ${accentCls.hover} cursor-pointer`;
@@ -2223,7 +2722,7 @@ export default function App() {
                           const next = quizIndex + 1;
                           setQuizIndex(next);
                           setQuizAnswered(null);
-                          if (next < topic.words.length) generateQuizOptions(topic, next);
+                          if (next < topic.words.length) generateQuizOptions(topic as ArabicTopic | SpanishTopic | ItalianTopic | TurkishTopic | FrenchTopic, next);
                         }, 1200);
                       }}>
                         {opt}
@@ -2446,7 +2945,7 @@ export default function App() {
                 {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
                   <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                 )}
-                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ {selectedPodcast.language === 'italian' ? 'Speaking' : 'דיבור'}</button>
+                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ Speaking Practice</button>
               </div>
               {selectedPodcast.vocabulary && selectedPodcast.level && (
                 <button onClick={() => handleGenerateWorksheet({ title: selectedPodcast.title, vocabulary: selectedPodcast.vocabulary!, level: selectedPodcast.level!, grammarTips: selectedPodcast.grammar_tips ?? [], language: selectedPodcast.language ?? 'english', podcastId: selectedPodcast.id, savedWorksheet: selectedPodcast.worksheet })} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
@@ -2685,6 +3184,30 @@ export default function App() {
                         </div>
                       </div>
                       <ArrowLeft size={16} className="text-green-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'turkish' && (
+                    <button onClick={() => { setVocabBuilderLanguage('turkish'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl hover:from-red-100 hover:to-red-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🇹🇷</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-red-800">Turkish Starter — ללמוד טורקית</p>
+                          <p className="text-xs text-red-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-red-600 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {language === 'french' && (
+                    <button onClick={() => { setVocabBuilderLanguage('french'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-2xl hover:from-blue-100 hover:to-blue-200 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🇫🇷</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-blue-800">French Starter — ללמוד צרפתית</p>
+                          <p className="text-xs text-blue-600">מילים ראשונות עם הגייה • רשימות נושא • חידון</p>
+                        </div>
+                      </div>
+                      <ArrowLeft size={16} className="text-blue-600 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
                   )}
 
@@ -2953,7 +3476,7 @@ export default function App() {
                           {mode === 'generate' && (
                             <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Grammar Tips</button>
                           )}
-                          <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ {language === 'italian' ? 'Speaking' : 'דיבור'}</button>
+                          <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'speaking' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>🎙️ Speaking Practice</button>
                         </div>
                         {vocabularyChart && level && (
                           <button onClick={handleGenerateWorksheet} disabled={isGeneratingWorksheet} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-full hover:bg-green-700 shadow-sm disabled:opacity-50 transition-all">
