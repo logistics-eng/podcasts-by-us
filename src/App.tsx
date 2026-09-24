@@ -1756,10 +1756,11 @@ export default function App() {
     if (!textToTranslate) { alert('No transcript to translate.'); return; }
     setIsTranslatingHebrew(true);
     try {
+      const isItalianCtx = (overrideTranscript !== undefined ? selectedPodcast?.language : language) === 'italian';
       const res = await fetch('/api/translate-hebrew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: textToTranslate }),
+        body: JSON.stringify({ transcript: textToTranslate, targetLanguage: isItalianCtx ? 'English' : 'Hebrew' }),
       });
       const data = await res.json();
       console.log('[Hebrew] response status:', res.status, 'has translated:', !!data.translated, 'error:', data.error);
@@ -2980,7 +2981,7 @@ export default function App() {
                   </button>
                   {selectedPodcast.transcript && (
                     <button onClick={() => handleToggleHebrew(selectedPodcast.transcript)} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
-                      {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
+                      {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? (selectedPodcast.language === 'italian' ? '✕ Hide English' : '✕ Hide Hebrew') : (selectedPodcast.language === 'italian' ? '🇬🇧 English' : '🇮🇱 Hebrew')}</>}
                     </button>
                   )}
                   {selectedPodcast.language === 'arabic' && (selectedPodcast.level === 'A1' || selectedPodcast.level === 'A2' || selectedPodcast.level === 'B1') && selectedPodcast.transcript && (
@@ -3010,8 +3011,8 @@ export default function App() {
                       <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>
                       <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={selectedPodcast.language === 'arabic' ? 'rtl' : undefined}>{selectedPodcast.transcript}</p>
                     </div>
-                    <div dir="rtl">
-                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">עברית</p>
+                    <div dir={selectedPodcast.language === 'italian' ? undefined : 'rtl'}>
+                      <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">{selectedPodcast.language === 'italian' ? 'English' : 'עברית'}</p>
                       <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{hebrewTranscript}</p>
                     </div>
                   </div>
@@ -3497,7 +3498,7 @@ export default function App() {
                           )}
                           {transcript && (
                             <button onClick={() => handleToggleHebrew()} disabled={isTranslatingHebrew} className="flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-all disabled:opacity-50">
-                              {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? '✕ Hide Hebrew' : '🇮🇱 Hebrew'}</>}
+                              {isTranslatingHebrew ? <><Loader2 size={14} className="animate-spin" /> Translating...</> : <>{showHebrew ? (language === 'italian' ? '✕ Hide English' : '✕ Hide Hebrew') : (language === 'italian' ? '🇬🇧 English' : '🇮🇱 Hebrew')}</>}
                             </button>
                           )}
                           {language === 'arabic' && (level === 'A1' || level === 'A2' || level === 'B1') && transcript && (
@@ -3568,8 +3569,8 @@ export default function App() {
                                     <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">Original</p>
                                     <p className="whitespace-pre-wrap leading-relaxed text-gray-700" dir={language === 'arabic' ? 'rtl' : undefined}>{body}</p>
                                   </div>
-                                  <div dir="rtl">
-                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">עברית</p>
+                                  <div dir={language === 'italian' ? undefined : 'rtl'}>
+                                    <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide">{language === 'italian' ? 'English' : 'עברית'}</p>
                                     <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{hebrewTranscript}</p>
                                   </div>
                                 </div>
