@@ -4086,14 +4086,25 @@ export default function App() {
 
                 <div className="space-y-4">
                   {/* Language toggle */}
-                  <div className="flex p-1 bg-gray-100 rounded-xl">
-                    <button onClick={() => setLanguage('english')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'english' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇬🇧 English</button>
-                    <button onClick={() => setLanguage('spanish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'spanish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇪🇸 Spanish</button>
-                    <button onClick={() => setLanguage('french')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'french' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇫🇷 French</button>
-                    <button onClick={() => setLanguage('arabic')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'arabic' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇸🇾 Arabic</button>
-                    <button onClick={() => setLanguage('turkish')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'turkish' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇹🇷 Turkish</button>
-                    <button onClick={() => setLanguage('italian')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'italian' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇹 Italian</button>
-                    <button onClick={() => setLanguage('dutch')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${language === 'dutch' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🇳🇱 Dutch</button>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Select a language</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[
+                        { id: 'english', flag: '🇬🇧', label: 'English' },
+                        { id: 'spanish', flag: '🇪🇸', label: 'Spanish' },
+                        { id: 'french',  flag: '🇫🇷', label: 'French'  },
+                        { id: 'arabic',  flag: '🇸🇾', label: 'Arabic'  },
+                        { id: 'turkish', flag: '🇹🇷', label: 'Turkish' },
+                        { id: 'italian', flag: '🇮🇹', label: 'Italian' },
+                        { id: 'dutch',   flag: '🇳🇱', label: 'Dutch'   },
+                      ].map(({ id, flag, label }) => (
+                        <button key={id} onClick={() => setLanguage(id as typeof language)}
+                          className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl text-xs font-bold transition-all border ${language === id ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}`}>
+                          <span className="text-lg leading-none">{flag}</span>
+                          <span>{label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   {language === 'arabic' && (
                     <button onClick={() => { setVocabBuilderLanguage('arabic'); setView('vocab-builder'); setVocabTopic(null); setVocabMode('browse'); setShowAlphabet(false); setSelectedLetter(null); }} className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all group">
