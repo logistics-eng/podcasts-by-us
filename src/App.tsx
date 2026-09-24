@@ -1453,10 +1453,24 @@ export default function App() {
   const copyToClipboard = () => { navigator.clipboard.writeText(transcript); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const copySpeakingPrompt = (text: string) => {
     const done = () => { setSpeakingCopied(true); setTimeout(() => setSpeakingCopied(false), 2000); };
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(done).catch(() => { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); done(); });
+    const fallback = () => {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.top = '0';
+      el.style.left = '0';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      try { document.execCommand('copy'); } catch {}
+      document.body.removeChild(el);
+      done();
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
     } else {
-      const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); done();
+      fallback();
     }
   };
   const copyVocabToClipboard = () => { navigator.clipboard.writeText(vocabularyChart); setVocabCopied(true); setTimeout(() => setVocabCopied(false), 2000); };
