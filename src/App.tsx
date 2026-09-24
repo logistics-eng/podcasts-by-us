@@ -3754,10 +3754,9 @@ export default function App() {
                     <Mic size={18} className="text-indigo-600" />
                     Build Your Podcast
                   </h2>
-                  <button onClick={() => setView('library')} className="relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all">
-                    <Library size={13} />
-                    My Podcasts
-                    {library.length > 0 && <span className="bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">{library.length}</span>}
+                  <button onClick={() => setView('library')} className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl transition-all">
+                    <Library size={15} />
+                    My Podcasts{library.length > 0 ? ` (${library.length})` : ''}
                   </button>
                 </div>
 
