@@ -3721,10 +3721,6 @@ export default function App() {
             </div>
             <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
                       </div>
-          <button onClick={() => setView('library')} title="My Podcasts" className="relative flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all">
-            <Library size={18} />
-            {library.length > 0 && <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">{library.length}</span>}
-          </button>
         </div>
       </header>
 
@@ -3753,10 +3749,17 @@ export default function App() {
 
             {mode === 'generate' ? (
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Mic size={18} className="text-indigo-600" />
-                  Build Your Podcast
-                </h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Mic size={18} className="text-indigo-600" />
+                    Build Your Podcast
+                  </h2>
+                  <button onClick={() => setView('library')} className="relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all">
+                    <Library size={13} />
+                    My Podcasts
+                    {library.length > 0 && <span className="bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">{library.length}</span>}
+                  </button>
+                </div>
 
                 <div className="space-y-4">
                   {/* Language toggle */}
