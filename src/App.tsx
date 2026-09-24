@@ -3754,9 +3754,9 @@ export default function App() {
                     <Mic size={18} className="text-indigo-600" />
                     Build Your Podcast
                   </h2>
-                  <button onClick={() => setView('library')} className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl transition-all">
-                    <Library size={15} />
-                    See My Podcasts{library.length > 0 ? ` (${library.length})` : ''}
+                  <button onClick={() => setView('library')} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl transition-all whitespace-nowrap">
+                    <Library size={15} className="flex-shrink-0" />
+                    <span>See My Podcasts{library.length > 0 ? ` (${library.length})` : ''}</span>
                   </button>
                 </div>
 
