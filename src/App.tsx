@@ -118,6 +118,10 @@ const LEVELS = [
 interface ArabicWord { ar: string; translit: string; he: string; }
 interface ArabicTopic { emoji: string; title: string; words: ArabicWord[]; }
 
+// Arabic Verb Conjugation — present vs. past pairs
+interface ArabicVerbPair { emoji: string; presentAr: string; presentTranslit: string; presentHe: string; pastAr: string; pastTranslit: string; pastHe: string; }
+interface ArabicVerbConjTopic { emoji: string; title: string; pairs: ArabicVerbPair[]; }
+
 // Spanish Vocabulary Builder
 interface SpanishWord { es: string; he: string; }
 interface SpanishTopic { emoji: string; title: string; words: SpanishWord[]; }
@@ -285,6 +289,33 @@ const ARABIC_VOCAB_TOPICS: ArabicTopic[] = [
     { ar: 'شعر', translit: "שַׁעַר", he: 'שיער' },
     { ar: 'كتف', translit: "כְּתֵף", he: 'כתף' },
     { ar: 'بطن', translit: "בַּטְּן", he: 'בטן' },
+  ]},
+];
+
+const ARABIC_VERB_TOPICS: ArabicVerbConjTopic[] = [
+  { emoji: '🖊️', title: 'פעלים: עבודה', pairs: [
+    { emoji: '🎨', presentAr: 'أنا برسم', presentTranslit: 'אנא בְּרַסֻּם', presentHe: 'אני מציייר/ת', pastAr: 'أنا رسمت', pastTranslit: 'אנא רַסַּמְת', pastHe: 'אני ציירתי' },
+    { emoji: '🧮', presentAr: 'أنا بحسب', presentTranslit: 'אנא בְּחַסֻּב', presentHe: 'אני מחשב/ת', pastAr: 'أنا حسبت', pastTranslit: 'אנא חַסַּבְת', pastHe: 'אני חישבתי' },
+    { emoji: '🖨️', presentAr: 'أنا بطبع', presentTranslit: 'אנא בִּטְבַּע', presentHe: 'אני מדפיס/ה', pastAr: 'أنا طبعت', pastTranslit: 'אנא טַבַּעְת', pastHe: 'אני הדפסתי' },
+    { emoji: '📋', presentAr: 'أنا بنسخ', presentTranslit: 'אנא בְּנַסַּח', presentHe: 'אני מעתיק/ה', pastAr: 'أنا نسخت', pastTranslit: 'אנא נַסַּחְת', pastHe: 'אני העתקתי' },
+    { emoji: '⚙️', presentAr: 'أنا بجهّز', presentTranslit: "אנא בְּג'ַהֵּז", presentHe: 'אני מכין/ה', pastAr: "أنا جهّزت", pastTranslit: "אנא ג'ַהֵּזְת", pastHe: 'אני הכנתי' },
+    { emoji: '📊', presentAr: 'أنا بحطّط', presentTranslit: 'אנא בְּחַטֵּט', presentHe: 'אני מתכנן/ת', pastAr: 'أنا حططت', pastTranslit: 'אנא חַטֵּטְת', pastHe: 'אני תיכננתי' },
+    { emoji: '🤝', presentAr: 'أنا بنجتمع', presentTranslit: "אנא בְּנִג'תְמֵע", presentHe: 'אני נפגש/ת', pastAr: 'أنا اجتمعت', pastTranslit: "אנא אִג'תְמַעְת", pastHe: 'אני נפגשתי' },
+    { emoji: '👨‍🏫', presentAr: "أنا بعلّم", presentTranslit: 'אנא בְּעַלֵּם', presentHe: 'אני מלמד/ת', pastAr: "أنا علّمت", pastTranslit: 'אנא עַלֵּמְת', pastHe: 'אני לימדתי' },
+    { emoji: '📚', presentAr: "أنا بتعلّم", presentTranslit: 'אנא בִּתְעַלֵּם', presentHe: 'אני לומד/ת', pastAr: "أنا تعلّمت", pastTranslit: 'אנא תְּעַלֵּמְת', pastHe: 'אני למדתי' },
+    { emoji: '✅', presentAr: "أنا بخلّص", presentTranslit: "אנא בְּח'לֵּץ", presentHe: 'אני מסיים/ת', pastAr: "أنا خلّصت", pastTranslit: "אנא ח'לֵּצְת", pastHe: 'אני סיימתי' },
+  ]},
+  { emoji: '📞', title: 'פעלים: תקשורת', pairs: [
+    { emoji: '📱', presentAr: "أنا بتّصل", presentTranslit: 'אנא בִּתַּצֵּל', presentHe: 'אני מתקשר/ת', pastAr: "أنا اتّصلت", pastTranslit: 'אנא אִתַּצַּלְת', pastHe: 'אני התקשרתי' },
+    { emoji: '📲', presentAr: 'أنا بردّ', presentTranslit: 'אנא בְּרֻד', presentHe: 'אני עונה', pastAr: 'أنا ردّيت', pastTranslit: 'אנא רַדֵּית', pastHe: 'אני עניתי' },
+    { emoji: '❓', presentAr: 'أنا بسأل', presentTranslit: 'אנא בְּסַאל', presentHe: 'אני שואל/ת', pastAr: 'أنا سألت', pastTranslit: 'אנא סַאלְת', pastHe: 'אני שאלתי' },
+    { emoji: '💬', presentAr: 'أنا بجاوب', presentTranslit: "אנא בְּג'אוֹב", presentHe: 'אני משיב/ה', pastAr: 'أنا جاوبت', pastTranslit: "אנא ג'אוֹבְת", pastHe: 'אני השבתי' },
+    { emoji: '💡', presentAr: 'أنا بشرح', presentTranslit: 'אנא בְּשְׁרַח', presentHe: 'אני מסביר/ה', pastAr: 'أنا شرحت', pastTranslit: 'אנא שְׁרַחְת', pastHe: 'אני הסברתי' },
+    { emoji: '🗣️', presentAr: "أنا بخبّر", presentTranslit: "אנא בְּח'בַּר", presentHe: 'אני מספר/ת', pastAr: "أنا خبّرت", pastTranslit: "אנא ח'בַּרְת", pastHe: 'אני סיפרתי' },
+    { emoji: '📤', presentAr: 'أنا ببعت', presentTranslit: 'אנא בִּבְעַת', presentHe: 'אני שולח/ת', pastAr: 'أنا بعتت', pastTranslit: 'אנא בַּעַתְת', pastHe: 'אני שלחתי' },
+    { emoji: '📥', presentAr: 'أنا بستلم', presentTranslit: 'אנא בִּסְתְּלֵם', presentHe: 'אני מקבל/ת', pastAr: 'أنا استلمت', pastTranslit: 'אנא אִסְתְּלַמְת', pastHe: 'אני קיבלתי' },
+    { emoji: '📖', presentAr: 'أنا بقرا', presentTranslit: 'אנא בְּקְרָא', presentHe: 'אני קורא/ת', pastAr: 'أنا قريت', pastTranslit: 'אנא קְרֵית', pastHe: 'אני קראתי' },
+    { emoji: '✍️', presentAr: "أنا بوقّع", presentTranslit: 'אנא בְּוַקֵּע', presentHe: 'אני חותם/ת', pastAr: "أنا وقّعت", pastTranslit: 'אנא וַקֵּעְת', pastHe: 'אני חתמתי' },
   ]},
 ];
 
@@ -557,6 +588,7 @@ export default function App() {
   const [view, setView] = useState<'create' | 'library' | 'detail' | 'vocab-builder'>('create');
   const [vocabBuilderLanguage, setVocabBuilderLanguage] = useState<'arabic' | 'spanish' | 'italian'>('arabic');
   const [vocabTopic, setVocabTopic] = useState<ArabicTopic | SpanishTopic | ItalianTopic | null>(null);
+  const [activeVerbTopic, setActiveVerbTopic] = useState<ArabicVerbConjTopic | null>(null);
   const [vocabMode, setVocabMode] = useState<'browse' | 'quiz'>('browse');
   const [vocabAudioUrls, setVocabAudioUrls] = useState<Record<string, string>>({});
   const [vocabAudioLoading, setVocabAudioLoading] = useState<Record<string, boolean>>({});
@@ -1143,6 +1175,31 @@ export default function App() {
     }
   };
 
+  const getVerbAudio = async (text: string) => {
+    const key = 'verb_' + text;
+    if (vocabAudioUrls[key]) { new Audio(vocabAudioUrls[key]).play(); return; }
+    setVocabAudioLoading(prev => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch('/api/tts-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: text }),
+      });
+      const data = await res.json();
+      if (data.base64) {
+        const binary = atob(data.base64.replace(/-/g, '+').replace(/_/g, '/'));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        setVocabAudioUrls(prev => ({ ...prev, [key]: url }));
+        new Audio(url).play();
+      }
+    } finally {
+      setVocabAudioLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
   const handleToggleHebrew = async (overrideTranscript?: string) => {
     if (showHebrew) { setShowHebrew(false); return; }
     if (hebrewTranscript) { setShowHebrew(true); return; }
@@ -1580,6 +1637,73 @@ export default function App() {
       );
     }
 
+    if (activeVerbTopic) {
+      // Verb conjugation table view
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] font-sans">
+          <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setActiveVerbTopic(null)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
+                <ArrowLeft size={16} /> נושאים
+              </button>
+              <div className="flex-1">
+                <h1 className="text-base font-bold">{activeVerbTopic.emoji} {activeVerbTopic.title}</h1>
+                <p className="text-xs text-gray-500">הווה מול עבר בערבית לבנטית</p>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 py-4">
+            {/* Column headers */}
+            <div className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 mb-3">
+              <div className="flex flex-col items-center py-2 px-3 bg-teal-50 border border-teal-200 rounded-2xl">
+                <span className="text-sm font-bold text-teal-700" dir="rtl">אַלְיוֹם</span>
+                <span className="text-xs text-teal-500">היום</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-400">מקאבל</span>
+              </div>
+              <div className="flex flex-col items-center py-2 px-3 bg-rose-50 border border-rose-200 rounded-2xl">
+                <span className="text-sm font-bold text-rose-700" dir="rtl">אִמְבַּארֵח</span>
+                <span className="text-xs text-rose-500">אתמול</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {activeVerbTopic.pairs.map((pair, i) => (
+                <div key={i} className="grid grid-cols-[1fr_2.5rem_1fr] gap-2 items-stretch">
+                  {/* Present form */}
+                  <div className="bg-teal-50 border border-teal-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-teal-900 text-right leading-tight" dir="rtl">{pair.presentAr}</p>
+                    <p className="text-[11px] text-teal-700 font-mono leading-tight">{pair.presentTranslit}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.presentHe}</p>
+                    <button onClick={() => getVerbAudio(pair.presentAr)} disabled={vocabAudioLoading['verb_' + pair.presentAr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-teal-200 rounded-full hover:bg-teal-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['verb_' + pair.presentAr] ? <Loader2 size={12} className="animate-spin text-teal-600" /> : <Volume2 size={12} className="text-teal-600" />}
+                    </button>
+                  </div>
+
+                  {/* Middle emoji + number */}
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="w-6 h-6 rounded-full bg-gray-700 text-white text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                    <span className="text-lg">{pair.emoji}</span>
+                  </div>
+
+                  {/* Past form */}
+                  <div className="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col gap-1">
+                    <p className="text-base font-bold text-rose-900 text-right leading-tight" dir="rtl">{pair.pastAr}</p>
+                    <p className="text-[11px] text-rose-700 font-mono leading-tight">{pair.pastTranslit}</p>
+                    <p className="text-[11px] text-gray-600 leading-tight">{pair.pastHe}</p>
+                    <button onClick={() => getVerbAudio(pair.pastAr)} disabled={vocabAudioLoading['verb_' + pair.pastAr]} className="mt-1 self-start w-7 h-7 flex items-center justify-center bg-white border border-rose-200 rounded-full hover:bg-rose-100 transition-all disabled:opacity-50">
+                      {vocabAudioLoading['verb_' + pair.pastAr] ? <Loader2 size={12} className="animate-spin text-rose-600" /> : <Volume2 size={12} className="text-rose-600" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
     if (!vocabTopic) {
       // Topic selection grid
       return (
@@ -1615,6 +1739,15 @@ export default function App() {
                   <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
                   <span className="text-sm font-bold text-gray-700">{topic.title}</span>
                   <span className="text-xs text-gray-400">{topic.words.length} {isItalian ? 'words' : 'מילים'}</span>
+                </button>
+              ))}
+              {/* Verb conjugation topics — Arabic only */}
+              {!isLatin && ARABIC_VERB_TOPICS.map((topic, i) => (
+                <button key={'verb_' + i} onClick={() => setActiveVerbTopic(topic)}
+                  className="flex flex-col items-center gap-2 p-5 bg-white border border-teal-100 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{topic.emoji}</span>
+                  <span className="text-sm font-bold text-gray-700">{topic.title}</span>
+                  <span className="text-xs text-teal-500 font-semibold">הווה ↔ עבר</span>
                 </button>
               ))}
             </div>
