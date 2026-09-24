@@ -3756,7 +3756,7 @@ export default function App() {
                   </h2>
                   <button onClick={() => setView('library')} className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl transition-all">
                     <Library size={15} />
-                    My Podcasts{library.length > 0 ? ` (${library.length})` : ''}
+                    See My Podcasts{library.length > 0 ? ` (${library.length})` : ''}
                   </button>
                 </div>
 
