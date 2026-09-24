@@ -898,6 +898,10 @@ export default function App() {
   };
 
   useEffect(() => {
+    fetchLibrary();
+  }, []);
+
+  useEffect(() => {
     if (view === 'library') fetchLibrary();
   }, [view]);
 
@@ -2595,8 +2599,8 @@ export default function App() {
             </div>
             <h1 className="text-xl font-bold tracking-tight">Podcasts By Us</h1>
                       </div>
-          <button onClick={() => setView('library')} className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all">
-            <Library size={16} /> Library
+          <button onClick={() => setView('library')} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition-all">
+            <Library size={16} /> My Podcasts{library.length > 0 && <span className="bg-indigo-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">{library.length}</span>}
           </button>
         </div>
       </header>
