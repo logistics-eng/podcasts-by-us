@@ -1877,6 +1877,7 @@ interface SavedPodcast {
   topic?: string;
   language?: string;
   worksheet?: string;
+  source_urls?: { url1: string; url2?: string };
 }
 
 export default function App() {
@@ -2111,6 +2112,9 @@ export default function App() {
           grammarTips: grammarTips.length > 0 ? grammarTips : undefined,
           language,
           contentMode,
+          sourceUrls: (sourceType === 'article' && articleSourceType === 'url' && articleUrl.trim())
+            ? { url1: articleUrl.trim(), ...(articleUrl2.trim() ? { url2: articleUrl2.trim() } : {}) }
+            : undefined,
         }),
       });
       if (!res.ok) {
@@ -3882,6 +3886,33 @@ export default function App() {
               <audio ref={detailAudioRef} src={detailAudioUrl} onEnded={() => setDetailIsPlaying(false)} onTimeUpdate={() => detailAudioRef.current && setDetailCurrentTime(detailAudioRef.current.currentTime)} onLoadedMetadata={() => detailAudioRef.current && setDetailDuration(detailAudioRef.current.duration)} className="hidden" />
             </div>
           )}
+          {selectedPodcast.source_urls && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">📰 Source Article</span>
+              <a href={selectedPodcast.source_urls.url1} target="_blank" rel="noopener noreferrer"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all truncate max-w-[220px]"
+                title={selectedPodcast.source_urls.url1}>
+                {selectedPodcast.source_urls.url1.replace(/^https?:\/\/(www\.)?/, '').slice(0, 45)}{selectedPodcast.source_urls.url1.replace(/^https?:\/\/(www\.)?/, '').length > 45 ? '…' : ''}
+              </a>
+              {selectedPodcast.source_urls.url2 && (
+                <a href={selectedPodcast.source_urls.url2} target="_blank" rel="noopener noreferrer"
+                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all truncate max-w-[220px]"
+                  title={selectedPodcast.source_urls.url2}>
+                  {selectedPodcast.source_urls.url2.replace(/^https?:\/\/(www\.)?/, '').slice(0, 45)}{selectedPodcast.source_urls.url2.replace(/^https?:\/\/(www\.)?/, '').length > 45 ? '…' : ''}
+                </a>
+              )}
+              <button onClick={() => {
+                setSourceType('article');
+                setArticleSourceType('url');
+                setArticleUrl(selectedPodcast.source_urls!.url1);
+                setArticleUrl2(selectedPodcast.source_urls!.url2 || '');
+                setLanguage((selectedPodcast.language as typeof language) || 'english');
+                setView('create');
+              }} className="ml-auto shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-lg transition-all">
+                Make another podcast →
+              </button>
+            </div>
+          )}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[600px]">
             <div className="p-2 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 gap-1 flex-wrap">
               <div className="flex items-center gap-1 flex-wrap">
@@ -4029,6 +4060,33 @@ export default function App() {
               )}
             </div>
           </div>
+          {selectedPodcast.source_urls && (
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 space-y-4">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">📰 Source Article</p>
+              <div className="flex flex-wrap gap-2">
+                {[selectedPodcast.source_urls.url1, selectedPodcast.source_urls.url2].filter(Boolean).map((url, i) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-full hover:bg-indigo-100 transition-all max-w-xs truncate"
+                    title={url}>
+                    {url!.length > 50 ? url!.slice(0, 50) + '…' : url}
+                  </a>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  if (selectedPodcast.source_urls?.url1) setArticleUrl(selectedPodcast.source_urls.url1);
+                  if (selectedPodcast.source_urls?.url2) setArticleUrl2(selectedPodcast.source_urls.url2);
+                  setSourceType('article');
+                  setArticleSourceType('url');
+                  if (selectedPodcast.language) setLanguage(selectedPodcast.language as typeof language);
+                  setView('create');
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all"
+              >
+                Make another podcast →
+              </button>
+            </div>
+          )}
         </main>
       </div>
     );

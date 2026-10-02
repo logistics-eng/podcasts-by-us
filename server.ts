@@ -66,6 +66,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS content_mode TEXT DEFAULT 'podcast'`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS topic TEXT`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS worksheet TEXT`);
+  await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS source_urls JSONB`);
 }
 
 // Shared Gemini client defined on the server side
@@ -107,10 +108,10 @@ async function startServer() {
   // Save a podcast
   app.post('/api/podcasts', async (req, res) => {
     try {
-      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips, language, contentMode } = req.body;
+      const { title, transcript, vocabulary, audioData, level, hostCount, speechSpeed, duration, grammarTips, language, contentMode, sourceUrls } = req.body;
       const result = await pool.query(
-        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips, language, content_mode) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
-        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english', contentMode ?? 'podcast']
+        'INSERT INTO podcasts (title, transcript, vocabulary, audio_data, level, host_count, speech_speed, duration, grammar_tips, language, content_mode, source_urls) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id, title, level, host_count, speech_speed, duration, created_at',
+        [title, transcript, vocabulary, audioData, level, hostCount, speechSpeed ?? 100, duration ?? null, grammarTips ? JSON.stringify(grammarTips) : null, language ?? 'english', contentMode ?? 'podcast', sourceUrls ? JSON.stringify(sourceUrls) : null]
       );
       let topic = 'Education & Culture';
       if (contentMode === 'roleplay' || contentMode === 'phonecall') {
@@ -138,7 +139,7 @@ async function startServer() {
   app.get('/api/podcasts', async (req, res) => {
     try {
       const lang = (req.query.language as string) || 'english';
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic, worksheet FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic, worksheet, source_urls FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
