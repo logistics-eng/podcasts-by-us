@@ -2014,7 +2014,7 @@ export default function App() {
   const fetchLibrary = async () => {
     setLoadingLibrary(true);
     try {
-      const res = await fetch(`/api/podcasts?language=${language}`);
+      const res = await fetch('/api/podcasts');
       const data = await res.json();
       setLibrary(data);
     } finally {

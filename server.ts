@@ -138,8 +138,7 @@ async function startServer() {
   // List all podcasts
   app.get('/api/podcasts', async (req, res) => {
     try {
-      const lang = (req.query.language as string) || 'english';
-      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic, worksheet, source_urls FROM podcasts WHERE language = $1 ORDER BY created_at DESC', [lang]);
+      const result = await pool.query('SELECT id, title, description, level, host_count, speech_speed, duration, created_at, content_mode, topic, worksheet, source_urls, language FROM podcasts ORDER BY created_at DESC');
       res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
