@@ -519,7 +519,13 @@ ${transcript}`;
       const VOICE_MALE_NL   = 'nl-NL-MaartenNeural';
 
       // Returns true if speaker is the SECOND (male) narrator
-      const isMale = (speaker: string) => speaker === host2Name && speaker !== host1Name;
+      // Also treat any unrecognised speaker as male when it's not the first speaker
+      const knownSpeakers = [host1Name, host2Name].filter(Boolean);
+      const isMale = (speaker: string) => {
+        if (knownSpeakers.length >= 2) return speaker === host2Name && speaker !== host1Name;
+        // Only one speaker name known — treat anything that isn't host1Name as male
+        return speaker !== host1Name && speaker !== '';
+      };
 
       const getVoice = (speaker: string) => {
         if (language === 'spanish') {
