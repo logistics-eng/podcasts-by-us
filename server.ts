@@ -56,15 +56,29 @@ async function withTtsSlot<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-async function ttsWithRetry<T>(fn: () => Promise<T>, maxRetries = 4): Promise<T> {
+async function ttsWithRetry<T>(fn: () => Promise<T>, maxRetries = 4, shouldStop?: () => boolean): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
       return await withTtsSlot(fn);
     } catch (e: any) {
-      if (attempt >= maxRetries) throw e;
+      if (attempt >= maxRetries || shouldStop?.()) throw e;
       await sleep(1000 * 2 ** attempt + Math.random() * 500);
     }
   }
+}
+
+// Run fn over items with at most `limit` in flight, keeping result order; stops starting new items after a failure.
+async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  let failed = false;
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (!failed && next < items.length) {
+      const i = next++;
+      try { out[i] = await fn(items[i]); } catch (e) { failed = true; throw e; }
+    }
+  }));
+  return out;
 }
 
 
@@ -614,9 +628,43 @@ ${transcript}`;
         });
       };
 
+      // Fallback engine for when Microsoft's free Edge endpoint throttles this server's IP.
+      // Used for the WHOLE podcast (never mixed with Edge lines) so voices stay consistent.
+      const MALE_VOICES = new Set([VOICE_MALE_US, VOICE_MALE_US_SLOW, VOICE_MALE_ES, VOICE_MALE_AR, VOICE_MALE_FR, VOICE_MALE_AR_LEV, VOICE_MALE_TR, VOICE_MALE_IT, VOICE_MALE_NL]);
+
+      const splitForOpenAi = (text: string, max = 4000): string[] => {
+        if (text.length <= max) return [text];
+        const out: string[] = [];
+        let cur = '';
+        for (const s of text.split(/(?<=[.!?؟])\s+/)) {
+          if (cur && (cur + ' ' + s).length > max) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s;
+        }
+        if (cur) out.push(cur);
+        return out.flatMap(c => c.length > max ? c.match(new RegExp(`.{1,${max}}`, 'gs')) || [] : [c]);
+      };
+
+      const openaiTtsLine = async (male: boolean, text: string): Promise<Buffer> => {
+        const parts: Buffer[] = [];
+        for (const input of splitForOpenAi(applyPronunciationFixes(text))) {
+          const resp = await openai.audio.speech.create({
+            model: 'tts-1',
+            voice: male ? 'onyx' : 'nova',
+            input,
+            response_format: 'mp3',
+            speed: Math.min(4, Math.max(0.25, rate)),
+          });
+          parts.push(Buffer.from(await resp.arrayBuffer()));
+        }
+        return Buffer.concat(parts);
+      };
+
       // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
       const speakerPattern = /^[؀-ۿa-zA-Z0-9 ]{1,30}:/;
-      const entries: { voice: string; text: string }[] = [];
+      const makeEntry = (speaker: string, text: string) => {
+        const voice = getVoice(speaker);
+        return { voice, male: MALE_VOICES.has(voice), text };
+      };
+      const entries: { voice: string; male: boolean; text: string }[] = [];
       for (const line of script.split('\n')) {
         const t = line.trim();
         if (!t) continue;
@@ -626,24 +674,39 @@ ${transcript}`;
           const colonIdx = t.indexOf(':');
           const speaker = t.substring(0, colonIdx).trim();
           const text = t.substring(colonIdx + 1).trim();
-          if (text) entries.push({ voice: getVoice(speaker), text });
+          if (text) entries.push(makeEntry(speaker, text));
         } else if (entries.length > 0) {
           // Continuation line — append to last speaker's text
           entries[entries.length - 1].text += ' ' + t;
         } else {
           // Plain text with no speaker prefix — treat as single speaker
-          entries.push({ voice: getVoice(''), text: t });
+          entries.push(makeEntry('', t));
         }
       }
-      const tasks = entries;
 
-      const audioBuffers: Buffer[] = await Promise.all(tasks.map(t => ttsWithRetry(() => edgeTtsLine(t.voice, t.text))));
+      let audioBuffers: Buffer[];
+      let engine: 'edge' | 'openai' = 'edge';
+      let edgeFailed = false;
+      try {
+        audioBuffers = await Promise.all(entries.map(t =>
+          ttsWithRetry(
+            () => { if (edgeFailed) throw new Error('Edge TTS aborted after another line failed'); return edgeTtsLine(t.voice, t.text); },
+            2,
+            () => edgeFailed,
+          ).catch(e => { edgeFailed = true; throw e; })
+        ));
+      } catch (edgeErr: any) {
+        console.error('Edge TTS failed, falling back to OpenAI TTS:', edgeErr?.message || edgeErr);
+        engine = 'openai';
+        audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
+      }
       const combined = Buffer.concat(audioBuffers);
-      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
+      res.set('X-TTS-Engine', engine);
+      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg', engine });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
       const msg = error?.message || String(error);
-      if (/Edge TTS|WebSocket/i.test(msg)) {
+      if (error?.status || /Edge TTS|WebSocket|OpenAI/i.test(msg)) {
         res.status(503).json({ error: 'The audio service is busy right now. Please try again in a minute.' });
       } else {
         res.status(500).json({ error: msg });
