@@ -40,6 +40,33 @@ async function geminiWithRetry<T>(fn: () => Promise<T>, maxRetries = 4, retryWai
   throw new Error('Max retries exceeded');
 }
 
+// Microsoft Edge TTS rate-limits (429) when too many WebSockets open at once from one IP.
+// Cap simultaneous connections across ALL requests; a releasing call hands its slot to the next waiter.
+const TTS_MAX_CONCURRENT = 5;
+let ttsActive = 0;
+const ttsWaiters: (() => void)[] = [];
+async function withTtsSlot<T>(fn: () => Promise<T>): Promise<T> {
+  if (ttsActive >= TTS_MAX_CONCURRENT) await new Promise<void>(resolve => ttsWaiters.push(resolve));
+  else ttsActive++;
+  try {
+    return await fn();
+  } finally {
+    const next = ttsWaiters.shift();
+    if (next) next(); else ttsActive--;
+  }
+}
+
+async function ttsWithRetry<T>(fn: () => Promise<T>, maxRetries = 4): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await withTtsSlot(fn);
+    } catch (e: any) {
+      if (attempt >= maxRetries) throw e;
+      await sleep(1000 * 2 ** attempt + Math.random() * 500);
+    }
+  }
+}
+
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -610,12 +637,17 @@ ${transcript}`;
       }
       const tasks = entries;
 
-      const audioBuffers: Buffer[] = await Promise.all(tasks.map(t => edgeTtsLine(t.voice, t.text)));
+      const audioBuffers: Buffer[] = await Promise.all(tasks.map(t => ttsWithRetry(() => edgeTtsLine(t.voice, t.text))));
       const combined = Buffer.concat(audioBuffers);
       res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
       console.error('Audio generation failed:', error);
-      res.status(500).json({ error: error?.message || String(error) });
+      const msg = error?.message || String(error);
+      if (/Edge TTS|WebSocket/i.test(msg)) {
+        res.status(503).json({ error: 'The audio service is busy right now. Please try again in a minute.' });
+      } else {
+        res.status(500).json({ error: msg });
+      }
     }
   });
 
