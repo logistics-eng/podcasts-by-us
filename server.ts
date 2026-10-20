@@ -672,7 +672,8 @@ ${transcript}`;
         if (/^\d+\.\s/.test(t)) continue;
         if (speakerPattern.test(t)) {
           const colonIdx = t.indexOf(':');
-          const speaker = t.substring(0, colonIdx).trim();
+          // Strip parentheticals like "Emma (laughs)" → "Emma"
+          const speaker = t.substring(0, colonIdx).trim().replace(/\s*\([^)]*\)\s*$/, '');
           const text = t.substring(colonIdx + 1).trim();
           if (text) entries.push(makeEntry(speaker, text));
         } else if (entries.length > 0) {
