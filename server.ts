@@ -531,7 +531,7 @@ ${transcript}`;
       // Determine host1 name: prefer explicit speakerNames, fall back to first speaker found in script
       const scriptSpeakers: string[] = [];
       for (const line of (script as string).split('\n')) {
-        const m = line.trim().match(/^([؀-ۿa-zA-Z0-9 ]{1,30}):/);
+        const m = line.trim().match(/^([؀-ۿa-zA-ZÀ-ÖØ-öø-ÿ0-9 ]{1,30}):/);
         if (m && !scriptSpeakers.includes(m[1].trim())) scriptSpeakers.push(m[1].trim());
         if (scriptSpeakers.length >= 2) break;
       }
@@ -659,7 +659,7 @@ ${transcript}`;
       };
 
       // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
-      const speakerPattern = /^[؀-ۿa-zA-Z0-9 ]{1,30}:/;
+      const speakerPattern = /^[؀-ۿa-zA-ZÀ-ÖØ-öø-ÿ0-9 ]{1,30}:/;
       const makeEntry = (speaker: string, text: string) => {
         const voice = getVoice(speaker);
         return { voice, male: MALE_VOICES.has(voice), text };
