@@ -1920,7 +1920,8 @@ export default function App() {
   const [contentMode, setContentMode] = useState<'podcast' | 'roleplay' | 'phonecall'>('podcast');
   const [subject, setSubject] = useState('');
   const [sourceType, setSourceType] = useState<'subject' | 'article'>('subject');
-  const [articleSourceType, setArticleSourceType] = useState<'text' | 'url'>('text');
+  const [articleSourceType, setArticleSourceType] = useState<'text' | 'url' | 'image'>('text');
+  const [isExtractingImage, setIsExtractingImage] = useState(false);
   const [articleText, setArticleText] = useState('');
   const [articleText2, setArticleText2] = useState('');
   const [articleUrl, setArticleUrl] = useState('');
@@ -4378,8 +4379,48 @@ export default function App() {
                       <div className="flex gap-2">
                         <button onClick={() => setArticleSourceType('text')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'text' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Paste Text</button>
                         <button onClick={() => setArticleSourceType('url')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'url' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>Article URL</button>
+                        <button onClick={() => setArticleSourceType('image')} className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg border transition-all ${articleSourceType === 'image' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'}`}>📷 Photo</button>
                       </div>
-                      {articleSourceType === 'text' ? (
+                      {articleSourceType === 'image' ? (
+                        <div className="space-y-3">
+                          <label className="text-sm font-bold text-gray-800">Upload a photo of text</label>
+                          <label className={`flex flex-col items-center justify-center gap-2 w-full py-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isExtractingImage ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/50'}`}>
+                            <span className="text-2xl">{isExtractingImage ? '⏳' : '📷'}</span>
+                            <span className="text-xs font-bold text-gray-500">{isExtractingImage ? 'Extracting text…' : 'Tap to upload image'}</span>
+                            <span className="text-[10px] text-gray-400">JPG, PNG, WEBP</span>
+                            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={isExtractingImage} onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setIsExtractingImage(true);
+                              try {
+                                const reader = new FileReader();
+                                const base64 = await new Promise<string>((resolve, reject) => {
+                                  reader.onload = () => resolve((reader.result as string).split(',')[1]);
+                                  reader.onerror = reject;
+                                  reader.readAsDataURL(file);
+                                });
+                                const res = await fetch('/api/extract-image-text', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ imageBase64: base64, mediaType: file.type }),
+                                });
+                                const data = await res.json();
+                                if (data.text) {
+                                  setArticleText(data.text);
+                                  setArticleSourceType('text');
+                                } else {
+                                  alert('Could not extract text from image. Please try a clearer photo.');
+                                }
+                              } catch {
+                                alert('Failed to process image. Please try again.');
+                              } finally {
+                                setIsExtractingImage(false);
+                              }
+                            }} />
+                          </label>
+                          <p className="text-[10px] text-gray-400 italic px-1">The text will be extracted automatically and you can edit it before generating.</p>
+                        </div>
+                      ) : articleSourceType === 'text' ? (
                         <div className="space-y-4">
                           <div className="space-y-2">
                             <label className="text-sm font-bold text-gray-800">Article 1 Text</label>

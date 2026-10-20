@@ -843,6 +843,27 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
+  app.post('/api/extract-image-text', async (req, res) => {
+    try {
+      const { imageBase64, mediaType } = req.body as { imageBase64: string; mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' };
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 4096,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+            { type: 'text', text: 'Extract all the text from this image exactly as written. Return only the extracted text with no commentary, headings, or formatting changes. Preserve paragraph breaks.' },
+          ],
+        }],
+      });
+      const text = (msg.content[0] as any).text.trim();
+      res.json({ text });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Vite development vs production middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
