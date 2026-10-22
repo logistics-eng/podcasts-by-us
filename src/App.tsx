@@ -4615,10 +4615,10 @@ export default function App() {
                           <span className="text-[10px] text-gray-400 w-7 tabular-nums">{formatTime(currentTime)}</span>
                           <input type="range" min="0" max={duration || 0} value={currentTime} onChange={handleSeek} className="flex-1 h-1 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
                           <span className="text-[10px] text-gray-400 w-7 tabular-nums">{formatTime(duration)}</span>
+                          <button onClick={() => { const rates = [1, 1.25, 1.5, 1.75, 2]; const next = rates[(rates.indexOf(playbackRate) + 1) % rates.length]; setPlaybackRate(next); if (audioRef.current) audioRef.current.playbackRate = next; }} className="px-2 py-1 rounded-lg text-[10px] font-bold text-indigo-500 bg-indigo-50 hover:bg-indigo-100 transition-all tabular-nums min-w-[36px] text-center shrink-0" title="Playback speed">{playbackRate}x</button>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
-                        <button onClick={() => { const rates = [1, 1.25, 1.5, 1.75, 2]; const next = rates[(rates.indexOf(playbackRate) + 1) % rates.length]; setPlaybackRate(next); if (audioRef.current) audioRef.current.playbackRate = next; }} className="px-2 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-100 transition-all tabular-nums min-w-[42px] text-center" title="Playback speed">{playbackRate}x</button>
                         <button onClick={handleSave} disabled={isSaving || !!savedId} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${savedId ? 'text-green-600 bg-green-50' : 'text-indigo-600 hover:bg-indigo-50'}`} title="Save to Library">
                           {isSaving ? <Loader2 className="animate-spin" size={16} /> : savedId ? <><Check size={16} />Saved</> : <><Save size={16} />Save</>}
                         </button>

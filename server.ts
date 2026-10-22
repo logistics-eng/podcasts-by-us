@@ -539,8 +539,8 @@ ${transcript}`;
       const host2Name = (speakerNames?.host2 || '') || scriptSpeakers[1] || 'Sam';
 
       // Voice constants
-      const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';
-      const VOICE_MALE_US   = 'en-US-AndrewMultilingualNeural';
+      const VOICE_FEMALE_US = 'en-US-AriaNeural';
+      const VOICE_MALE_US   = 'en-US-DavisNeural';
       const VOICE_FEMALE_US_SLOW = VOICE_FEMALE_US;
       const VOICE_MALE_US_SLOW   = VOICE_MALE_US;
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
