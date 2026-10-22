@@ -612,6 +612,7 @@ ${transcript}`;
         [/\bTzahal\b/gi, 'Tza-hal'],
         [/\bkibutz\b/gi, 'kibootz'],
         [/\bIDF\b/g, 'I D F'],
+        [/\bKnesset\b/gi, 'K-nesset'],
       ];
       const applyPronunciationFixes = (text: string) =>
         PRONUNCIATION_FIXES.reduce((t, [re, rep]) => t.replace(re, rep), text);
