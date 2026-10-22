@@ -4039,7 +4039,9 @@ export default function App() {
                 const podLang = selectedPodcast.language || 'english';
                 const langHe = podLang === 'spanish' ? 'ספרדית' : podLang === 'french' ? 'צרפתית' : podLang === 'arabic' ? 'ערבית' : podLang === 'turkish' ? 'טורקית' : podLang === 'italian' ? 'איטלקית' : 'אנגלית';
                 const isItalianPod = podLang === 'italian';
-                const prompt = getSpeakingPrompt(langHe, selectedPodcast.level || '', selectedPodcast.title || '', podLang);
+                const rawTitle = selectedPodcast.title || '';
+                const podTopic = rawTitle.replace(/^(exploring|a (deep )?dive into|understanding|all about|the world of|introduction to|intro to|a look at|unpacking|discovering|let's talk about|talking about):?\s*/i, '').replace(/^"(.+)"$/, '$1');
+                const prompt = getSpeakingPrompt(langHe, selectedPodcast.level || '', podTopic, podLang);
                 return (
                   <div className="space-y-5">
                     <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
@@ -4769,7 +4771,9 @@ export default function App() {
                       ) : activeTab === 'speaking' ? (() => {
                         const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : language === 'italian' ? 'איטלקית' : 'אנגלית';
                         const isItalianPod = language === 'italian';
-                        const prompt = getSpeakingPrompt(langHe, level, generatedTitle || (isItalianPod ? 'the podcast' : 'הפודקאסט'), language);
+                        const rawTitle = subject.trim() || generatedTitle || '';
+                        const podTopic = rawTitle ? rawTitle.replace(/^(exploring|a (deep )?dive into|understanding|all about|the world of|introduction to|intro to|a look at|unpacking|discovering|let's talk about|talking about):?\s*/i, '').replace(/^"(.+)"$/, '$1') : (isItalianPod ? 'the podcast' : 'הפודקאסט');
+                        const prompt = getSpeakingPrompt(langHe, level, podTopic || (isItalianPod ? 'the podcast' : 'הפודקאסט'), language);
                         return (
                           <div className="space-y-5">
                             <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl space-y-2">
