@@ -4617,7 +4617,6 @@ export default function App() {
                           <span className="text-[10px] text-gray-400 w-7 tabular-nums">{formatTime(currentTime)}</span>
                           <input type="range" min="0" max={duration || 0} value={currentTime} onChange={handleSeek} className="flex-1 h-1 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
                           <span className="text-[10px] text-gray-400 w-7 tabular-nums">{formatTime(duration)}</span>
-                          <button onClick={() => { const rates = [1, 1.25, 1.5, 1.75, 2]; const next = rates[(rates.indexOf(playbackRate) + 1) % rates.length]; setPlaybackRate(next); if (audioRef.current) audioRef.current.playbackRate = next; }} className="px-2 py-1 rounded-lg text-[10px] font-bold text-indigo-500 bg-indigo-50 hover:bg-indigo-100 transition-all tabular-nums min-w-[36px] text-center shrink-0" title="Playback speed">{playbackRate}x</button>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
@@ -4631,6 +4630,7 @@ export default function App() {
                             </svg>
                           )}
                         </button>
+                        <button onClick={() => { const rates = [1, 1.25, 1.5, 1.75, 2]; const next = rates[(rates.indexOf(playbackRate) + 1) % rates.length]; setPlaybackRate(next); if (audioRef.current) audioRef.current.playbackRate = next; }} className="px-2 py-1.5 rounded-xl text-[10px] font-bold text-gray-500 hover:bg-gray-100 transition-all tabular-nums min-w-[36px] text-center" title="Playback speed">{playbackRate}x</button>
                         <a href={audioUrl} download={`Podcast-${generatedTitle.replace(/\s+/g, '-')}.wav`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Download">
                           <Download size={18} />
                         </a>
