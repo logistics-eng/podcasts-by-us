@@ -539,10 +539,10 @@ ${transcript}`;
       const host2Name = (speakerNames?.host2 || '') || scriptSpeakers[1] || 'Sam';
 
       // Voice constants
-      const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';   // two-host female (B1+)
-      const VOICE_MALE_US   = 'en-US-AndrewMultilingualNeural'; // two-host male (B1+)
-      const VOICE_FEMALE_US_SLOW = 'en-US-JennyNeural';         // two-host female (A1/A2)
-      const VOICE_MALE_US_SLOW   = 'en-US-GuyNeural';           // two-host male (A1/A2)
+      const VOICE_FEMALE_US = 'en-US-EmmaMultilingualNeural';
+      const VOICE_MALE_US   = 'en-US-AndrewMultilingualNeural';
+      const VOICE_FEMALE_US_SLOW = VOICE_FEMALE_US;
+      const VOICE_MALE_US_SLOW   = VOICE_MALE_US;
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
       const VOICE_FEMALE_ES = 'es-ES-ElviraNeural';
       const VOICE_MALE_ES   = 'es-ES-AlvaroNeural';
