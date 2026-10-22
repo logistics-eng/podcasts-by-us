@@ -670,7 +670,6 @@ ${transcript}`;
         const t = line.trim();
         if (!t) continue;
         if (t.startsWith('VOCABULARY')) break;
-        if (/^\d+\.\s/.test(t)) continue;
         if (speakerPattern.test(t)) {
           const colonIdx = t.indexOf(':');
           // Strip parentheticals like "Emma (laughs)" → "Emma"
