@@ -540,7 +540,7 @@ ${transcript}`;
 
       // Voice constants
       const VOICE_FEMALE_US = 'en-US-JennyNeural';
-      const VOICE_MALE_US   = 'en-US-TonyNeural';
+      const VOICE_MALE_US   = 'en-US-ChristopherNeural';
       const VOICE_FEMALE_US_SLOW = VOICE_FEMALE_US;
       const VOICE_MALE_US_SLOW   = VOICE_MALE_US;
       const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
