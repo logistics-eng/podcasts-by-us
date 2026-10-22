@@ -600,9 +600,8 @@ ${transcript}`;
         return isMale(speaker) ? VOICE_MALE_US : VOICE_FEMALE_US;
       };
 
-      // Speaking rate: 90% speed → 0.9, A1/A2 capped at 0.8
       const baseRate = (speechSpeed ?? 100) / 100;
-      const rate = (level === 'A1' || level === 'A2') ? Math.min(baseRate, 0.8) : baseRate;
+      const rate = baseRate;
 
       // Phonetic substitutions for names the English TTS mispronounces
       const PRONUNCIATION_FIXES: [RegExp, string][] = [
