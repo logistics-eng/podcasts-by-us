@@ -667,7 +667,7 @@ ${transcript}`;
       };
 
       // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
-      const speakerPattern = /^[؀-ۿa-zA-ZÀ-ÖØ-öø-ÿ0-9 ]{1,30}:/;
+      const speakerPattern = /^[؀-ۿa-zA-ZÀ-ÖØ-öø-ÿא-ת0-9 ]{1,30}:/;
       const makeEntry = (speaker: string, text: string) => {
         const voice = getVoice(speaker);
         return { voice, male: MALE_VOICES.has(voice), text };
@@ -705,6 +705,8 @@ ${transcript}`;
         ));
       } catch (edgeErr: any) {
         console.error('Edge TTS failed, falling back to OpenAI TTS:', edgeErr?.message || edgeErr);
+        // OpenAI TTS doesn't support Hebrew/Arabic scripts — don't attempt fallback
+        if (language === 'hebrew' || language === 'arabic') throw edgeErr;
         engine = 'openai';
         audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
       }
