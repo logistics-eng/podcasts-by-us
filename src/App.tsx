@@ -1907,7 +1907,7 @@ export default function App() {
   const [alphaMode, setAlphaMode] = useState<'grid' | 'quiz'>('grid');
   const [mode, setMode] = useState<'generate' | 'script'>('generate');
 
-  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish' | 'italian' | 'dutch'>('english');
+  const [language, setLanguage] = useState<'english' | 'spanish' | 'french' | 'arabic' | 'turkish' | 'italian' | 'dutch' | 'hebrew'>('english');
   const [showHebrew, setShowHebrew] = useState(false);
   const [hebrewTranscript, setHebrewTranscript] = useState('');
   const [isTranslatingHebrew, setIsTranslatingHebrew] = useState(false);
@@ -2694,8 +2694,10 @@ export default function App() {
     const ITALIAN_MALE = ['Marco', 'Luca', 'Matteo', 'Alessandro', 'Francesco'];
     const SPANISH_FEMALE = spanishDialect === 'argentina' ? ['Valentina', 'Sofía', 'Lucía', 'Martina', 'Florencia'] : ['Isabel', 'Carmen', 'Lucía', 'Ana', 'Elena'];
     const SPANISH_MALE = spanishDialect === 'argentina' ? ['Matías', 'Santiago', 'Nicolás', 'Tomás', 'Facundo'] : ['Alejandro', 'Carlos', 'Miguel', 'Javier', 'Pablo'];
-    const femalePool = language === 'turkish' ? TURKISH_FEMALE : language === 'arabic' ? ARABIC_FEMALE : language === 'french' ? FRENCH_FEMALE : language === 'spanish' ? SPANISH_FEMALE : language === 'italian' ? ITALIAN_FEMALE : FEMALE_NAMES;
-    const malePool = language === 'turkish' ? TURKISH_MALE : language === 'arabic' ? ARABIC_MALE : language === 'french' ? FRENCH_MALE : language === 'spanish' ? SPANISH_MALE : language === 'italian' ? ITALIAN_MALE : MALE_NAMES;
+    const HEBREW_FEMALE = ['נועה', 'מיה', 'שירה', 'תמר'];
+    const HEBREW_MALE = ['עומר', 'יואב', 'טל', 'איתן'];
+    const femalePool = language === 'turkish' ? TURKISH_FEMALE : language === 'arabic' ? ARABIC_FEMALE : language === 'french' ? FRENCH_FEMALE : language === 'spanish' ? SPANISH_FEMALE : language === 'italian' ? ITALIAN_FEMALE : language === 'hebrew' ? HEBREW_FEMALE : FEMALE_NAMES;
+    const malePool = language === 'turkish' ? TURKISH_MALE : language === 'arabic' ? ARABIC_MALE : language === 'french' ? FRENCH_MALE : language === 'spanish' ? SPANISH_MALE : language === 'italian' ? ITALIAN_MALE : language === 'hebrew' ? HEBREW_MALE : MALE_NAMES;
     const names = hostCount === 'two'
       ? { host1: pickRandom(femalePool), host2: pickRandom(malePool) }
       : { host1: pickRandom(femalePool), host2: '' };
@@ -4037,7 +4039,7 @@ export default function App() {
                 </div>
               ) : detailActiveTab === 'speaking' ? (() => {
                 const podLang = selectedPodcast.language || 'english';
-                const langHe = podLang === 'spanish' ? 'ספרדית' : podLang === 'french' ? 'צרפתית' : podLang === 'arabic' ? 'ערבית' : podLang === 'turkish' ? 'טורקית' : podLang === 'italian' ? 'איטלקית' : 'אנגלית';
+                const langHe = podLang === 'spanish' ? 'ספרדית' : podLang === 'french' ? 'צרפתית' : podLang === 'arabic' ? 'ערבית' : podLang === 'turkish' ? 'טורקית' : podLang === 'italian' ? 'איטלקית' : podLang === 'hebrew' ? 'עברית' : 'אנגלית';
                 const isItalianPod = podLang === 'italian';
                 const rawTitle = selectedPodcast.title || '';
                 const podTopic = rawTitle.replace(/^(exploring|a (deep )?dive into|understanding|all about|the world of|introduction to|intro to|a look at|unpacking|discovering|let's talk about|talking about):?\s*/i, '').replace(/^"(.+)"$/, '$1');
@@ -4184,6 +4186,7 @@ export default function App() {
                         { id: 'turkish', flag: '🇹🇷', label: 'Turkish' },
                         { id: 'italian', flag: '🇮🇹', label: 'Italian' },
                         { id: 'dutch',   flag: '🇳🇱', label: 'Dutch'   },
+                        { id: 'hebrew',  flag: '🇮🇱', label: 'Hebrew'  },
                       ].map(({ id, flag, label }) => (
                         <button key={id} onClick={() => setLanguage(id as typeof language)}
                           className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl text-xs font-bold transition-all border ${language === id ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}`}>
@@ -4769,7 +4772,7 @@ export default function App() {
                           </div>
                         </div>
                       ) : activeTab === 'speaking' ? (() => {
-                        const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : language === 'italian' ? 'איטלקית' : 'אנגלית';
+                        const langHe = language === 'spanish' ? 'ספרדית' : language === 'french' ? 'צרפתית' : language === 'arabic' ? 'ערבית' : language === 'turkish' ? 'טורקית' : language === 'italian' ? 'איטלקית' : language === 'hebrew' ? 'עברית' : 'אנגלית';
                         const isItalianPod = language === 'italian';
                         const rawTitle = subject.trim() || generatedTitle || '';
                         const podTopic = rawTitle ? rawTitle.replace(/^(exploring|a (deep )?dive into|understanding|all about|the world of|introduction to|intro to|a look at|unpacking|discovering|let's talk about|talking about):?\s*/i, '').replace(/^"(.+)"$/, '$1') : (isItalianPod ? 'the podcast' : 'הפודקאסט');
