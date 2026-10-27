@@ -62,7 +62,7 @@ async function ttsWithRetry<T>(fn: () => Promise<T>, maxRetries = 4, shouldStop?
       return await withTtsSlot(fn);
     } catch (e: any) {
       if (attempt >= maxRetries || shouldStop?.()) throw e;
-      await sleep(1000 * 2 ** attempt + Math.random() * 500);
+      await sleep(1500 * 2 ** attempt + Math.random() * 1000);
     }
   }
 }
@@ -694,19 +694,28 @@ ${transcript}`;
 
       let audioBuffers: Buffer[];
       let engine: 'edge' | 'openai' = 'edge';
+      const noOpenAiFallback = language === 'hebrew' || language === 'arabic';
+      // Sequential for Hebrew/Arabic (no fallback + rate-limit sensitive); parallel otherwise
+      const edgeRetries = noOpenAiFallback ? 5 : 2;
       let edgeFailed = false;
       try {
-        audioBuffers = await Promise.all(entries.map(t =>
-          ttsWithRetry(
-            () => { if (edgeFailed) throw new Error('Edge TTS aborted after another line failed'); return edgeTtsLine(t.voice, t.text); },
-            2,
-            () => edgeFailed,
-          ).catch(e => { edgeFailed = true; throw e; })
-        ));
+        if (noOpenAiFallback) {
+          audioBuffers = await mapLimit(entries, 2, t =>
+            ttsWithRetry(() => edgeTtsLine(t.voice, t.text), edgeRetries)
+          );
+        } else {
+          audioBuffers = await Promise.all(entries.map(t =>
+            ttsWithRetry(
+              () => { if (edgeFailed) throw new Error('Edge TTS aborted after another line failed'); return edgeTtsLine(t.voice, t.text); },
+              edgeRetries,
+              () => edgeFailed,
+            ).catch(e => { edgeFailed = true; throw e; })
+          ));
+        }
       } catch (edgeErr: any) {
         console.error('Edge TTS failed, falling back to OpenAI TTS:', edgeErr?.message || edgeErr);
         // OpenAI TTS doesn't support Hebrew/Arabic scripts — don't attempt fallback
-        if (language === 'hebrew' || language === 'arabic') throw edgeErr;
+        if (noOpenAiFallback) throw edgeErr;
         engine = 'openai';
         audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
       }
