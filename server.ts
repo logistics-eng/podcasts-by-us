@@ -721,6 +721,7 @@ ${transcript}`;
         console.error('Edge TTS failed, falling back to OpenAI TTS:', edgeErr?.message || edgeErr);
         // OpenAI TTS doesn't support Hebrew/Arabic scripts — don't attempt fallback
         if (noOpenAiFallback) throw edgeErr;
+        if (!process.env.OPENAI_API_KEY) throw edgeErr;
         engine = 'openai';
         audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
       }
