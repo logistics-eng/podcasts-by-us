@@ -113,7 +113,12 @@ async function initDb() {
 // Shared Gemini client defined on the server side
 // We set 'User-Agent' header to 'aistudio-build' in httpOptions for telemetry.
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let _openai: OpenAI | null = null;
+const openai = { audio: { speech: { create: (...args: any[]) => {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _openai.audio.speech.create(...args);
+}}}};
+
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
