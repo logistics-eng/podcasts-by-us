@@ -718,23 +718,30 @@ ${transcript}`;
           ));
         }
       } catch (edgeErr: any) {
-        console.error('Edge TTS failed, falling back to OpenAI TTS:', edgeErr?.message || edgeErr);
+        console.error('Edge TTS failed:', edgeErr?.message || edgeErr);
         // OpenAI TTS doesn't support Hebrew/Arabic scripts — don't attempt fallback
         if (noOpenAiFallback) throw edgeErr;
         if (!process.env.OPENAI_API_KEY) throw edgeErr;
-        engine = 'openai';
-        audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
+        try {
+          console.log('Falling back to OpenAI TTS...');
+          engine = 'openai';
+          audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
+          console.log('OpenAI TTS fallback succeeded');
+        } catch (openaiErr: any) {
+          console.error('OpenAI TTS fallback also failed:', openaiErr?.message || openaiErr);
+          throw openaiErr;
+        }
       }
       const combined = Buffer.concat(audioBuffers);
       res.set('X-TTS-Engine', engine);
       res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg', engine });
     } catch (error: any) {
-      console.error('Audio generation failed:', error);
+      console.error('Audio generation failed:', error?.message || error);
       const msg = error?.message || String(error);
-      if (error?.status || /Edge TTS|WebSocket|OpenAI/i.test(msg)) {
+      if (/Edge TTS|WebSocket|throttl|rate.?limit/i.test(msg)) {
         res.status(503).json({ error: 'The audio service is busy right now. Please try again in a minute.' });
       } else {
-        res.status(500).json({ error: msg });
+        res.status(503).json({ error: 'Audio generation failed. Please try again.' });
       }
     }
   });
