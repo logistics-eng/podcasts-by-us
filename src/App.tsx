@@ -3946,14 +3946,14 @@ export default function App() {
             {/* Tab row */}
             <div className="px-3 pt-3 pb-0 bg-gray-50/50 border-b border-gray-100">
               <div className="flex gap-1 overflow-x-auto scrollbar-none">
-                <button onClick={() => setDetailActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Transcript</button>
+                <button onClick={() => setDetailActiveTab('transcript')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'transcript' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Transcript</button>
                 {selectedPodcast.vocabulary && (
-                  <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Vocabulary</button>
+                  <button onClick={() => setDetailActiveTab('vocabulary')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'vocabulary' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Vocabulary</button>
                 )}
                 {selectedPodcast.grammar_tips && selectedPodcast.grammar_tips.length > 0 && (
-                  <button onClick={() => setDetailActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Grammar</button>
+                  <button onClick={() => setDetailActiveTab('grammar')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'grammar' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Grammar</button>
                 )}
-                <button onClick={() => setDetailActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Speaking</button>
+                <button onClick={() => setDetailActiveTab('speaking')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${detailActiveTab === 'speaking' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Speaking</button>
               </div>
             </div>
             {/* Action row */}
@@ -4645,14 +4645,14 @@ export default function App() {
                     {/* Tab row */}
                     <div className="px-3 pt-3 pb-0 bg-gray-50/50 border-b border-gray-100">
                       <div className="flex gap-1 overflow-x-auto scrollbar-none">
-                        <button onClick={() => setActiveTab('transcript')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'transcript' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Transcript</button>
+                        <button onClick={() => setActiveTab('transcript')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'transcript' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Transcript</button>
                         {vocabularyChart && (
-                          <button onClick={() => setActiveTab('vocabulary')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Vocabulary</button>
+                          <button onClick={() => setActiveTab('vocabulary')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'vocabulary' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Vocabulary</button>
                         )}
                         {mode === 'generate' && (
-                          <button onClick={() => setActiveTab('grammar')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'grammar' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Grammar</button>
+                          <button onClick={() => setActiveTab('grammar')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'grammar' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Grammar</button>
                         )}
-                        <button onClick={() => setActiveTab('speaking')} className={`px-4 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'speaking' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Speaking</button>
+                        <button onClick={() => setActiveTab('speaking')} className={`px-3 py-2 text-xs font-bold rounded-t-lg whitespace-nowrap transition-all border-b-2 ${activeTab === 'speaking' ? 'bg-white text-indigo-600 border-indigo-500 shadow-sm' : 'text-gray-400 border-transparent hover:text-gray-600'}`}>Speaking</button>
                       </div>
                     </div>
                     {/* Action row */}
