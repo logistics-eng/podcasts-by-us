@@ -4585,7 +4585,6 @@ export default function App() {
                     <>
                       <Mic size={48} className="mb-4 text-pink-200" />
                       <p className="text-lg font-medium">Your podcast will appear here</p>
-                      <p className="text-sm">Enter a subject and click generate to start</p>
                     </>
                   ) : (
                     <>
