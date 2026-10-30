@@ -619,7 +619,7 @@ ${transcript}`;
       };
 
       const PRONUNCIATION_FIXES: [RegExp, string][] = [
-        [/\bSagittarius\b/gi, 'Saj-ih-TAIR-ee-us'],
+        [/\bSagittarius\b/gi, 'Sajittairius'],
         [/\bAries\b/gi, 'AIR-eez'],
         [/\bKnesset\b/gi, 'Kanesset'],
       ];
