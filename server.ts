@@ -626,6 +626,25 @@ ${transcript}`;
       const fixPronunciation = (t: string) =>
         PRONUNCIATION_FIXES.reduce((s, [re, rep]) => s.replace(re, rep), t);
 
+      const azureTtsLine = async (male: boolean, text: string): Promise<Buffer> => {
+        const voice = language === 'arabic'
+          ? (male ? 'ar-SY-LaithNeural' : 'ar-SY-AmanyNeural')
+          : (male ? 'he-IL-AvriNeural'  : 'he-IL-HilaNeural');
+        const ssml = `<speak version='1.0' xml:lang='${language === 'arabic' ? 'ar-SY' : 'he-IL'}'><voice name='${voice}'><prosody rate='${Math.round((rate - 1) * 100)}%'>${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</prosody></voice></speak>`;
+        const region = process.env.AZURE_SPEECH_REGION || 'eastus';
+        const resp = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+          method: 'POST',
+          headers: {
+            'Ocp-Apim-Subscription-Key': process.env.AZURE_SPEECH_KEY!,
+            'Content-Type': 'application/ssml+xml',
+            'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+          },
+          body: ssml,
+        });
+        if (!resp.ok) throw new Error(`Azure TTS ${resp.status}: ${await resp.text()}`);
+        return Buffer.from(await resp.arrayBuffer());
+      };
+
       const openaiTtsLine = async (male: boolean, text: string): Promise<Buffer> => {
         const parts: Buffer[] = [];
         for (const input of splitForOpenAi(fixPronunciation(text))) {
@@ -660,9 +679,12 @@ ${transcript}`;
         }
       }
 
-      const audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
+      const useAzure = (language === 'hebrew' || language === 'arabic') && !!process.env.AZURE_SPEECH_KEY;
+      const audioBuffers = await mapLimit(entries, useAzure ? 2 : 4, t =>
+        useAzure ? azureTtsLine(t.male, t.text) : openaiTtsLine(t.male, t.text)
+      );
       const totalChars = entries.reduce((s, e) => s + e.text.length, 0);
-      logUsage('openai', 'openai-tts-1', totalChars, 0, `lang:${language}`);
+      logUsage(useAzure ? 'azure' : 'openai', useAzure ? 'azure-tts' : 'openai-tts-1', totalChars, 0, `lang:${language}`);
 
       const combined = Buffer.concat(audioBuffers);
       res.set('X-TTS-Engine', 'openai');
