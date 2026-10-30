@@ -4378,7 +4378,7 @@ export default function App() {
                   {sourceType === 'subject' ? (
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-800">Topic</label>
-                      <input autoFocus type="text" placeholder="e.g. The history of jazz, Quantum computing..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                      <textarea autoFocus placeholder="e.g. The history of jazz, Quantum computing..." className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none min-h-[60px]" rows={2} value={subject} onChange={(e) => setSubject(e.target.value)} />
                     </div>
                   ) : (
                     <div className="space-y-4">
