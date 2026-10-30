@@ -108,11 +108,54 @@ async function initDb() {
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS topic TEXT`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS worksheet TEXT`);
   await pool.query(`ALTER TABLE podcasts ADD COLUMN IF NOT EXISTS source_urls JSONB`);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS usage_log (
+      id SERIAL PRIMARY KEY,
+      ts TIMESTAMP DEFAULT NOW(),
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      input_units INTEGER DEFAULT 0,
+      output_units INTEGER DEFAULT 0,
+      cost_usd NUMERIC(10,6) DEFAULT 0,
+      note TEXT
+    )
+  `);
+}
+
+// Cost rates (USD per unit)
+const COST = {
+  'claude-haiku-4-5-in':  0.80  / 1_000_000,
+  'claude-haiku-4-5-out': 4.00  / 1_000_000,
+  'claude-sonnet-4-6-in': 3.00  / 1_000_000,
+  'claude-sonnet-4-6-out':15.00 / 1_000_000,
+  'openai-tts-1':         15.00 / 1_000_000, // per character
+};
+async function logUsage(provider: string, model: string, inputUnits: number, outputUnits: number, note?: string) {
+  try {
+    const inKey  = `${model}-in`  as keyof typeof COST;
+    const outKey = `${model}-out` as keyof typeof COST;
+    const ttsKey = model          as keyof typeof COST;
+    const cost = (COST[inKey] ?? COST[ttsKey] ?? 0) * inputUnits + (COST[outKey] ?? 0) * outputUnits;
+    await pool.query(
+      `INSERT INTO usage_log (provider, model, input_units, output_units, cost_usd, note) VALUES ($1,$2,$3,$4,$5,$6)`,
+      [provider, model, inputUnits, outputUnits, cost, note ?? null]
+    );
+  } catch { /* non-critical */ }
 }
 
 // Shared Gemini client defined on the server side
 // We set 'User-Agent' header to 'aistudio-build' in httpOptions for telemetry.
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = {
+  messages: {
+    create: async (params: any) => {
+      const msg = await _anthropic.messages.create(params);
+      const model = params.model as string;
+      logUsage('anthropic', model, msg.usage.input_tokens, msg.usage.output_tokens);
+      return msg;
+    }
+  }
+};
 let _openai: OpenAI | null = null;
 const openai = { audio: { speech: { create: (...args: any[]) => {
   if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -545,105 +588,24 @@ ${transcript}`;
       const host1Name = (speakerNames?.host1 || '') || scriptSpeakers[0] || 'Alex';
       const host2Name = (speakerNames?.host2 || '') || scriptSpeakers[1] || 'Sam';
 
-      // Voice constants
-      const VOICE_FEMALE_US = 'en-US-JennyNeural';
-      const VOICE_MALE_US   = 'en-US-ChristopherNeural';
-      const VOICE_FEMALE_US_SLOW = VOICE_FEMALE_US;
-      const VOICE_MALE_US_SLOW   = VOICE_MALE_US;
-      const VOICE_FEMALE_GB = 'en-GB-SoniaNeural';              // one-host (British)
-      const VOICE_FEMALE_ES = 'es-ES-ElviraNeural';
-      const VOICE_MALE_ES   = 'es-ES-AlvaroNeural';
-      const VOICE_FEMALE_AR = 'es-AR-ElenaNeural';
-      const VOICE_MALE_AR   = 'es-AR-TomasNeural';
-      const VOICE_FEMALE_FR = 'fr-FR-DeniseNeural';
-      const VOICE_MALE_FR   = 'fr-FR-HenriNeural';
-      const VOICE_FEMALE_AR_LEV = 'ar-SY-AmanyNeural';
-      const VOICE_MALE_AR_LEV   = 'ar-SY-LaithNeural';
-      const VOICE_FEMALE_TR = 'tr-TR-EmelNeural';
-      const VOICE_MALE_TR   = 'tr-TR-AhmetNeural';
-      const VOICE_FEMALE_IT = 'it-IT-ElsaNeural';
-      const VOICE_MALE_IT   = 'it-IT-DiegoNeural';
-      const VOICE_FEMALE_NL = 'nl-NL-ColetteNeural';
-      const VOICE_MALE_NL   = 'nl-NL-MaartenNeural';
-      const VOICE_FEMALE_HE = 'he-IL-HilaNeural';
-      const VOICE_MALE_HE   = 'he-IL-AvriNeural';
+      // OpenAI TTS voice mapping — two distinct voices per language for male/female
+      const getOaiVoice = (male: boolean): string => {
+        if (male) {
+          // Male voices: onyx (deep), echo (neutral), fable (expressive), ash
+          return language === 'english' ? 'onyx' : 'echo';
+        }
+        // Female voices: nova (warm), shimmer (soft), coral, alloy
+        return language === 'english' ? 'nova' : 'shimmer';
+      };
 
-      // Returns true if speaker is the SECOND (male) narrator
-      // Also treat any unrecognised speaker as male when it's not the first speaker
       const knownSpeakers = [host1Name, host2Name].filter(Boolean);
       const isMale = (speaker: string) => {
         if (knownSpeakers.length >= 2) return speaker === host2Name && speaker !== host1Name;
-        // Only one speaker name known — treat anything that isn't host1Name as male
         return speaker !== host1Name && speaker !== '';
       };
 
-      const getVoice = (speaker: string) => {
-        if (language === 'spanish') {
-          const femaleVoice = spanishDialect === 'argentina' ? VOICE_FEMALE_AR : VOICE_FEMALE_ES;
-          const maleVoice   = spanishDialect === 'argentina' ? VOICE_MALE_AR   : VOICE_MALE_ES;
-          if (hostCount === 'one') return femaleVoice;
-          return isMale(speaker) ? maleVoice : femaleVoice;
-        }
-        if (language === 'french') {
-          if (hostCount === 'one') return VOICE_FEMALE_FR;
-          return isMale(speaker) ? VOICE_MALE_FR : VOICE_FEMALE_FR;
-        }
-        if (language === 'arabic') {
-          if (hostCount === 'one') return VOICE_FEMALE_AR_LEV;
-          return isMale(speaker) ? VOICE_MALE_AR_LEV : VOICE_FEMALE_AR_LEV;
-        }
-        if (language === 'turkish') {
-          if (hostCount === 'one') return VOICE_FEMALE_TR;
-          return isMale(speaker) ? VOICE_MALE_TR : VOICE_FEMALE_TR;
-        }
-        if (language === 'italian') {
-          if (hostCount === 'one') return VOICE_FEMALE_IT;
-          return isMale(speaker) ? VOICE_MALE_IT : VOICE_FEMALE_IT;
-        }
-        if (language === 'dutch') {
-          if (hostCount === 'one') return VOICE_FEMALE_NL;
-          return isMale(speaker) ? VOICE_MALE_NL : VOICE_FEMALE_NL;
-        }
-        if (language === 'hebrew') {
-          if (hostCount === 'one') return VOICE_FEMALE_HE;
-          return isMale(speaker) ? VOICE_MALE_HE : VOICE_FEMALE_HE;
-        }
-        if (hostCount === 'one') return VOICE_FEMALE_GB;
-        if (level === 'A1' || level === 'A2') return isMale(speaker) ? VOICE_MALE_US_SLOW : VOICE_FEMALE_US_SLOW;
-        return isMale(speaker) ? VOICE_MALE_US : VOICE_FEMALE_US;
-      };
-
       const baseRate = (speechSpeed ?? 100) / 100;
-      const rate = baseRate;
-
-      // Phonetic substitutions for names the English TTS mispronounces
-      const PRONUNCIATION_FIXES: [RegExp, string][] = [
-        [/\bEli\b/g, 'Ellie'],          // "EE-lye" → "EH-lee"
-        [/\bMossad\b/g, 'Moh-sahd'],
-        [/\bNetanyahu\b/g, 'Netanyahu'], // usually fine; keep as fallback
-        [/\bTzahal\b/gi, 'Tza-hal'],
-        [/\bkibutz\b/gi, 'kibootz'],
-        [/\bIDF\b/g, 'I D F'],
-        [/\bKnesset\b/gi, 'Kanesset'],
-      ];
-      const applyPronunciationFixes = (text: string) =>
-        PRONUNCIATION_FIXES.reduce((t, [re, rep]) => t.replace(re, rep), text);
-
-      const edgeTtsLine = async (voice: string, text: string): Promise<Buffer> => {
-        const tts = new MsEdgeTTS();
-        await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-        const { audioStream } = await tts.toStream(applyPronunciationFixes(text), { rate });
-        return new Promise((resolve, reject) => {
-          const chunks: Buffer[] = [];
-          audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
-          audioStream.on('end', () => resolve(Buffer.concat(chunks)));
-          audioStream.on('error', reject);
-        });
-      };
-
-      // Fallback engine for when Microsoft's free Edge endpoint throttles this server's IP.
-      // Used for the WHOLE podcast (never mixed with Edge lines) so voices stay consistent.
-      const MALE_VOICES = new Set([VOICE_MALE_US, VOICE_MALE_US_SLOW, VOICE_MALE_ES, VOICE_MALE_AR, VOICE_MALE_FR, VOICE_MALE_AR_LEV, VOICE_MALE_TR, VOICE_MALE_IT, VOICE_MALE_NL, VOICE_MALE_HE]);
+      const rate = Math.min(4, Math.max(0.25, baseRate));
 
       const splitForOpenAi = (text: string, max = 4000): string[] => {
         if (text.length <= max) return [text];
@@ -656,15 +618,22 @@ ${transcript}`;
         return out.flatMap(c => c.length > max ? c.match(new RegExp(`.{1,${max}}`, 'gs')) || [] : [c]);
       };
 
+      const PRONUNCIATION_FIXES: [RegExp, string][] = [
+        [/\bSagittarius\b/gi, 'Saj-ih-TAIR-ee-us'],
+        [/\bKnesset\b/gi, 'Kanesset'],
+      ];
+      const fixPronunciation = (t: string) =>
+        PRONUNCIATION_FIXES.reduce((s, [re, rep]) => s.replace(re, rep), t);
+
       const openaiTtsLine = async (male: boolean, text: string): Promise<Buffer> => {
         const parts: Buffer[] = [];
-        for (const input of splitForOpenAi(applyPronunciationFixes(text))) {
+        for (const input of splitForOpenAi(fixPronunciation(text))) {
           const resp = await openai.audio.speech.create({
             model: 'tts-1',
-            voice: male ? 'onyx' : 'nova',
+            voice: getOaiVoice(male) as any,
             input,
             response_format: 'mp3',
-            speed: Math.min(4, Math.max(0.25, rate)),
+            speed: rate,
           });
           parts.push(Buffer.from(await resp.arrayBuffer()));
         }
@@ -673,68 +642,30 @@ ${transcript}`;
 
       // Strip VOCABULARY CHART and split into speaker lines, merging continuation lines
       const speakerPattern = /^[؀-ۿa-zA-ZÀ-ÖØ-öø-ÿא-ת0-9 ]{1,30}:/;
-      const makeEntry = (speaker: string, text: string) => {
-        const voice = getVoice(speaker);
-        return { voice, male: MALE_VOICES.has(voice), text };
-      };
-      const entries: { voice: string; male: boolean; text: string }[] = [];
+      const entries: { male: boolean; text: string }[] = [];
       for (const line of script.split('\n')) {
         const t = line.trim();
         if (!t) continue;
         if (t.startsWith('VOCABULARY')) break;
         if (speakerPattern.test(t)) {
           const colonIdx = t.indexOf(':');
-          // Strip parentheticals like "Emma (laughs)" → "Emma"
           const speaker = t.substring(0, colonIdx).trim().replace(/\s*\([^)]*\)\s*$/, '');
           const text = t.substring(colonIdx + 1).trim();
-          if (text) entries.push(makeEntry(speaker, text));
+          if (text) entries.push({ male: isMale(speaker), text });
         } else if (entries.length > 0) {
-          // Continuation line — append to last speaker's text
           entries[entries.length - 1].text += ' ' + t;
         } else {
-          // Plain text with no speaker prefix — treat as single speaker
-          entries.push(makeEntry('', t));
+          entries.push({ male: false, text: t });
         }
       }
 
-      let audioBuffers: Buffer[];
-      let engine: 'edge' | 'openai' = 'edge';
-      const noOpenAiFallback = language === 'hebrew' || language === 'arabic';
-      // Sequential for Hebrew/Arabic (no fallback + rate-limit sensitive); parallel otherwise
-      const edgeRetries = noOpenAiFallback ? 5 : 2;
-      let edgeFailed = false;
-      try {
-        if (noOpenAiFallback) {
-          audioBuffers = await mapLimit(entries, 2, t =>
-            ttsWithRetry(() => edgeTtsLine(t.voice, t.text), edgeRetries)
-          );
-        } else {
-          audioBuffers = await Promise.all(entries.map(t =>
-            ttsWithRetry(
-              () => { if (edgeFailed) throw new Error('Edge TTS aborted after another line failed'); return edgeTtsLine(t.voice, t.text); },
-              edgeRetries,
-              () => edgeFailed,
-            ).catch(e => { edgeFailed = true; throw e; })
-          ));
-        }
-      } catch (edgeErr: any) {
-        console.error('Edge TTS failed:', edgeErr?.message || edgeErr);
-        // OpenAI TTS doesn't support Hebrew/Arabic scripts — don't attempt fallback
-        if (noOpenAiFallback) throw edgeErr;
-        if (!process.env.OPENAI_API_KEY) throw edgeErr;
-        try {
-          console.log('Falling back to OpenAI TTS...');
-          engine = 'openai';
-          audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
-          console.log('OpenAI TTS fallback succeeded');
-        } catch (openaiErr: any) {
-          console.error('OpenAI TTS fallback also failed:', openaiErr?.message || openaiErr);
-          throw openaiErr;
-        }
-      }
+      const audioBuffers = await mapLimit(entries, 4, t => openaiTtsLine(t.male, t.text));
+      const totalChars = entries.reduce((s, e) => s + e.text.length, 0);
+      logUsage('openai', 'openai-tts-1', totalChars, 0, `lang:${language}`);
+
       const combined = Buffer.concat(audioBuffers);
-      res.set('X-TTS-Engine', engine);
-      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg', engine });
+      res.set('X-TTS-Engine', 'openai');
+      res.json({ base64Pcm: combined.toString('base64'), mimeType: 'audio/mpeg', engine: 'openai' });
     } catch (error: any) {
       console.error('Audio generation failed:', error?.message || error);
       const msg = error?.message || String(error);
@@ -892,6 +823,58 @@ Create a complete HTML worksheet. Requirements:
       res.json({ text });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Cost dashboard — protected by ADMIN_KEY query param
+  app.get('/usage', async (req, res) => {
+    if (req.query.key !== (process.env.ADMIN_KEY || 'pbu-admin')) {
+      return res.status(401).send('Unauthorized');
+    }
+    try {
+      const { rows } = await pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('month', ts), 'YYYY-MM') AS month,
+          provider, model,
+          SUM(input_units)::int  AS input_units,
+          SUM(output_units)::int AS output_units,
+          ROUND(SUM(cost_usd)::numeric, 4) AS cost_usd,
+          COUNT(*)::int AS calls
+        FROM usage_log
+        GROUP BY 1, 2, 3
+        ORDER BY 1 DESC, cost_usd DESC
+      `);
+      const months: Record<string, { total: number; rows: typeof rows }> = {};
+      for (const r of rows) {
+        if (!months[r.month]) months[r.month] = { total: 0, rows: [] };
+        months[r.month].total += parseFloat(r.cost_usd);
+        months[r.month].rows.push(r);
+      }
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PBU Cost Dashboard</title>
+<style>body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:0 1rem;color:#1a1a2e}
+h1{font-size:1.4rem;color:#6366f1}h2{font-size:1rem;margin-top:2rem;color:#4f46e5}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:.4rem .6rem;background:#f1f5f9;border-bottom:2px solid #e2e8f0}
+td{padding:.35rem .6rem;border-bottom:1px solid #f1f5f9}
+.total{font-weight:700;color:#6366f1}.provider{font-size:.75rem;color:#94a3b8}</style></head>
+<body><h1>PBU Cost Dashboard</h1>
+${Object.entries(months).map(([month, data]) => `
+<h2>${month} — <span class="total">$${data.total.toFixed(4)}</span></h2>
+<table><tr><th>Provider</th><th>Model</th><th>Calls</th><th>Input</th><th>Output</th><th>Cost</th></tr>
+${data.rows.map(r => `<tr>
+  <td><span class="provider">${r.provider}</span></td>
+  <td>${r.model}</td><td>${r.calls}</td>
+  <td>${Number(r.input_units).toLocaleString()}</td>
+  <td>${Number(r.output_units).toLocaleString()}</td>
+  <td>$${parseFloat(r.cost_usd).toFixed(4)}</td>
+</tr>`).join('')}
+</table>`).join('')}
+${Object.keys(months).length === 0 ? '<p>No usage data yet — data accumulates as podcasts are generated.</p>' : ''}
+</body></html>`;
+      res.send(html);
+    } catch (e: any) {
+      res.status(500).send(e.message);
     }
   });
 
