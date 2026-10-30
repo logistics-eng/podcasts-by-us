@@ -620,7 +620,7 @@ ${transcript}`;
 
       const PRONUNCIATION_FIXES: [RegExp, string][] = [
         [/\bSagittarius\b/gi, 'Sajittairius'],
-        [/\bAries\b/gi, 'AIR-eez'],
+        [/\bAries\b/gi, 'Aireez'],
         [/\bKnesset\b/gi, 'Kanesset'],
       ];
       const fixPronunciation = (t: string) =>
