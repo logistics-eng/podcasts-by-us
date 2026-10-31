@@ -885,11 +885,14 @@ Create a complete HTML worksheet. Requirements:
   // Image(s) → read-aloud: extract text from one or more images, then convert to audio
   app.post('/api/image-read-aloud', async (req, res) => {
     try {
-      const { images, language: lang = 'hebrew' } = req.body as {
-        images: { imageBase64: string; mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' }[];
+      const { images: imagesRaw, imageBase64, mediaType, language: lang = 'hebrew' } = req.body as {
+        images?: { imageBase64: string; mediaType: string }[];
+        imageBase64?: string; mediaType?: string; // legacy single-image format
         language?: string;
       };
-      if (!images?.length) return res.status(400).json({ error: 'No images provided.' });
+      // Accept both legacy single-image and new multi-image format
+      const images = imagesRaw?.length ? imagesRaw : (imageBase64 ? [{ imageBase64, mediaType: mediaType || 'image/jpeg' }] : []);
+      if (!images.length) return res.status(400).json({ error: 'No images provided.' });
 
       // Extract text from all images in one Claude call
       const content: any[] = images.flatMap(img => [
