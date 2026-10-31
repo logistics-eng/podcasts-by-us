@@ -4431,6 +4431,7 @@ export default function App() {
                                 />
                               </label>
                               {readAloudImages.length > 0 && (
+                                <div className="flex flex-col gap-2">
                                 <div className="flex gap-2">
                                   <button
                                     onClick={async () => {
@@ -4478,6 +4479,7 @@ export default function App() {
                                   >
                                     {isSummarizing ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Summarizing…' : 'מסכם…'}</> : <>📝 {language === 'english' || language === 'italian' ? 'Summary' : 'סיכום'}</>}
                                   </button>
+                                </div>
                                   <button
                                     onClick={async () => {
                                       setIsReadingAloud(true);
@@ -4501,7 +4503,7 @@ export default function App() {
                                       } finally { setIsReadingAloud(false); }
                                     }}
                                     disabled={isReadingAloud || isSummarizing}
-                                    className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                    className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
                                   >
                                     🎙 {language === 'english' || language === 'italian' ? 'Podcast' : 'פודקאסט'}
                                   </button>
