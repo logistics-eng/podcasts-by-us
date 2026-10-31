@@ -851,6 +851,74 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
+  // Image → read-aloud: extract text from image then convert to audio in one call
+  app.post('/api/image-read-aloud', async (req, res) => {
+    try {
+      const { imageBase64, mediaType, language: lang = 'hebrew' } = req.body as {
+        imageBase64: string;
+        mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+        language?: string;
+      };
+
+      // 1. Extract text via Claude Vision
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 4096,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+            { type: 'text', text: 'Extract all the text from this image exactly as written. Return only the extracted text with no commentary, headings, or formatting changes. Preserve line breaks.' },
+          ],
+        }],
+      });
+      const text = (msg.content[0] as any).text.trim();
+      if (!text || text.length < 3) {
+        return res.status(422).json({ error: 'No readable text found in the image.' });
+      }
+
+      // 2. Convert to speech
+      const useAzure = (lang === 'hebrew' || lang === 'arabic') && !!process.env.AZURE_SPEECH_KEY;
+      let audioBuffer: Buffer;
+
+      if (useAzure) {
+        const voice = lang === 'arabic' ? 'ar-SY-AmanyNeural' : 'he-IL-HilaNeural';
+        const ssml = `<speak version='1.0' xml:lang='${lang === 'arabic' ? 'ar-SY' : 'he-IL'}'><voice name='${voice}'>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</voice></speak>`;
+        const region = process.env.AZURE_SPEECH_REGION || 'eastus';
+        const ttsResp = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+          method: 'POST',
+          headers: {
+            'Ocp-Apim-Subscription-Key': process.env.AZURE_SPEECH_KEY!,
+            'Content-Type': 'application/ssml+xml',
+            'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+          },
+          body: ssml,
+        });
+        if (!ttsResp.ok) throw new Error(`Azure TTS ${ttsResp.status}`);
+        audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
+      } else {
+        const oaiVoice = lang === 'english' ? 'nova' : 'shimmer';
+        const chunks: Buffer[] = [];
+        for (const chunk of splitForOpenAi(text)) {
+          const resp = await openai.audio.speech.create({
+            model: 'tts-1',
+            voice: oaiVoice as any,
+            input: chunk,
+            response_format: 'mp3',
+          });
+          chunks.push(Buffer.from(await resp.arrayBuffer()));
+        }
+        audioBuffer = Buffer.concat(chunks);
+      }
+
+      logUsage(useAzure ? 'azure' : 'openai', useAzure ? 'azure-tts' : 'openai-tts-1', text.length, 0, `read-aloud:${lang}`);
+      res.json({ text, audioBase64: audioBuffer.toString('base64'), mimeType: 'audio/mpeg' });
+    } catch (error: any) {
+      console.error('image-read-aloud error:', error.message);
+      res.status(500).json({ error: 'Could not process image. Please try again.' });
+    }
+  });
+
   // Cost dashboard — protected by ADMIN_KEY query param
   app.get('/usage', async (req, res) => {
     if (req.query.key !== (process.env.ADMIN_KEY || 'pbu-admin')) {

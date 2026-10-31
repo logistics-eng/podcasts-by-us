@@ -1922,6 +1922,10 @@ export default function App() {
   const [sourceType, setSourceType] = useState<'subject' | 'article'>('subject');
   const [articleSourceType, setArticleSourceType] = useState<'text' | 'url' | 'image'>('text');
   const [isExtractingImage, setIsExtractingImage] = useState(false);
+  const [readAloudText, setReadAloudText] = useState('');
+  const [readAloudAudio, setReadAloudAudio] = useState('');
+  const [isReadingAloud, setIsReadingAloud] = useState(false);
+  const [readAloudOpen, setReadAloudOpen] = useState(false);
   const [articleText, setArticleText] = useState('');
   const [articleText2, setArticleText2] = useState('');
   const [articleUrl, setArticleUrl] = useState('');
@@ -4345,6 +4349,96 @@ export default function App() {
                       </div>
                       <ArrowLeft size={16} className="text-orange-700 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </button>
+                  )}
+
+                  {/* Read Image Aloud — Hebrew dyslexia feature */}
+                  {language === 'hebrew' && (
+                    <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden">
+                      <button
+                        onClick={() => { setReadAloudOpen(o => !o); setReadAloudText(''); setReadAloudAudio(''); }}
+                        className="w-full flex items-center justify-between px-4 py-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">📷</span>
+                          <div className="text-left">
+                            <p className="text-sm font-bold text-blue-900">קרא לי תמונה</p>
+                            <p className="text-xs text-blue-600">צלם טקסט — האפליקציה תקרא אותו בקול</p>
+                          </div>
+                        </div>
+                        <span className="text-blue-400 text-lg">{readAloudOpen ? '▲' : '▼'}</span>
+                      </button>
+                      {readAloudOpen && (
+                        <div className="px-4 pb-4 space-y-3 border-t border-blue-100">
+                          {!readAloudAudio ? (
+                            <>
+                              <label className={`mt-3 flex flex-col items-center justify-center gap-2 w-full py-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud ? 'border-blue-300 bg-blue-50/60' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
+                                <span className="text-3xl">{isReadingAloud ? '⏳' : '📸'}</span>
+                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? 'מעבד…' : 'לחץ להעלות תמונה'}</span>
+                                <span className="text-[10px] text-blue-400">JPG, PNG, WEBP</span>
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/webp,image/gif"
+                                  className="hidden"
+                                  disabled={isReadingAloud}
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setIsReadingAloud(true);
+                                    setReadAloudText('');
+                                    setReadAloudAudio('');
+                                    try {
+                                      const reader = new FileReader();
+                                      const base64 = await new Promise<string>((resolve, reject) => {
+                                        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(file);
+                                      });
+                                      const res = await fetch('/api/image-read-aloud', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ imageBase64: base64, mediaType: file.type, language: 'hebrew' }),
+                                      });
+                                      const data = await res.json();
+                                      if (data.audioBase64) {
+                                        setReadAloudText(data.text || '');
+                                        setReadAloudAudio(data.audioBase64);
+                                      } else {
+                                        alert(data.error || 'Could not read image. Please try a clearer photo.');
+                                      }
+                                    } catch {
+                                      alert('שגיאה בעיבוד התמונה. נסה שוב.');
+                                    } finally {
+                                      setIsReadingAloud(false);
+                                      e.target.value = '';
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </>
+                          ) : (
+                            <div className="mt-3 space-y-3">
+                              {readAloudText && (
+                                <div className="rounded-xl bg-white border border-blue-100 px-3 py-2 max-h-32 overflow-y-auto">
+                                  <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{readAloudText}</p>
+                                </div>
+                              )}
+                              <audio
+                                controls
+                                autoPlay
+                                className="w-full"
+                                src={`data:audio/mpeg;base64,${readAloudAudio}`}
+                              />
+                              <button
+                                onClick={() => { setReadAloudText(''); setReadAloudAudio(''); }}
+                                className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                              >
+                                📷 העלה תמונה חדשה
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {/* Podcast / Role Play toggle */}
