@@ -2698,12 +2698,15 @@ export default function App() {
     finally { setIsTransliterating(false); }
   };
 
-  const handleGenerate = async () => {
-    const isSubjectMode = sourceType === 'subject';
-    const isArticleUrlMode = !isSubjectMode && articleSourceType === 'url';
+  const handleGenerate = async (articleTextOverride?: string) => {
+    const effectiveArticleText = articleTextOverride ?? articleText;
+    const effectiveSourceType = articleTextOverride ? 'article' : sourceType;
+    const effectiveArticleSourceType = articleTextOverride ? 'text' : articleSourceType;
+    const isSubjectMode = effectiveSourceType === 'subject';
+    const isArticleUrlMode = !isSubjectMode && effectiveArticleSourceType === 'url';
 
     if (isSubjectMode && !subject.trim()) return;
-    if (!isSubjectMode && articleSourceType === 'text' && !articleText.trim()) return;
+    if (!isSubjectMode && effectiveArticleSourceType === 'text' && !effectiveArticleText.trim()) return;
     if (isArticleUrlMode && !articleUrl.trim()) return;
 
     const TURKISH_FEMALE = ['Elif', 'Zeynep', 'Ayşe', 'Fatma', 'Merve'];
@@ -2746,8 +2749,8 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subject, sourceType: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'subject' : sourceType,
-          contentMode, articleSourceType, articleText, articleText2,
+          subject, sourceType: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'subject' : effectiveSourceType,
+          contentMode, articleSourceType: effectiveArticleSourceType, articleText: effectiveArticleText, articleText2,
           articleUrl, articleUrl2, specificWords, length, level,
           hostCount: contentMode === 'roleplay' || contentMode === 'phonecall' ? 'two' : hostCount, speakerNames: names, language, spanishDialect,
         }),
@@ -4425,35 +4428,64 @@ export default function App() {
                                 />
                               </label>
                               {readAloudImages.length > 0 && (
-                                <button
-                                  onClick={async () => {
-                                    setIsReadingAloud(true);
-                                    setReadAloudText('');
-                                    setReadAloudAudio('');
-                                    try {
-                                      const res = await fetch('/api/image-read-aloud', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
-                                      });
-                                      const data = await res.json();
-                                      if (data.audioBase64) {
-                                        setReadAloudText(data.text || '');
-                                        setReadAloudAudio(data.audioBase64);
-                                      } else {
-                                        alert(data.error || 'Could not read image. Please try a clearer photo.');
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={async () => {
+                                      setIsReadingAloud(true);
+                                      setReadAloudText('');
+                                      setReadAloudAudio('');
+                                      try {
+                                        const res = await fetch('/api/image-read-aloud', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
+                                        });
+                                        const data = await res.json();
+                                        if (data.audioBase64) {
+                                          setReadAloudText(data.text || '');
+                                          setReadAloudAudio(data.audioBase64);
+                                        } else {
+                                          alert(data.error || 'Could not read image. Please try a clearer photo.');
+                                        }
+                                      } catch {
+                                        alert('שגיאה בעיבוד התמונה. נסה שוב.');
+                                      } finally {
+                                        setIsReadingAloud(false);
                                       }
-                                    } catch {
-                                      alert('שגיאה בעיבוד התמונה. נסה שוב.');
-                                    } finally {
-                                      setIsReadingAloud(false);
-                                    }
-                                  }}
-                                  disabled={isReadingAloud}
-                                  className="w-full py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                                >
-                                  {isReadingAloud ? <><span className="animate-spin">⏳</span> מעבד…</> : <>🔊 קרא {readAloudImages.length > 1 ? `${readAloudImages.length} תמונות` : 'תמונה'}</>}
-                                </button>
+                                    }}
+                                    disabled={isReadingAloud}
+                                    className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                  >
+                                    {isReadingAloud ? <><span className="animate-spin">⏳</span> מעבד…</> : <>🔊 קרא</>}
+                                  </button>
+                                  <button
+                                    onClick={async () => {
+                                      setIsReadingAloud(true);
+                                      try {
+                                        const res = await fetch('/api/image-read-aloud', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
+                                        });
+                                        const data = await res.json();
+                                        if (data.text) {
+                                          setReadAloudOpen(false);
+                                          await handleGenerate(data.text);
+                                        } else {
+                                          alert(data.error || 'Could not extract text from image.');
+                                        }
+                                      } catch {
+                                        alert('שגיאה בעיבוד התמונה. נסה שוב.');
+                                      } finally {
+                                        setIsReadingAloud(false);
+                                      }
+                                    }}
+                                    disabled={isReadingAloud}
+                                    className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                  >
+                                    🎙 פודקאסט
+                                  </button>
+                                </div>
                               )}
                             </>
                           ) : (
