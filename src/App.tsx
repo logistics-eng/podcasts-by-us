@@ -4382,8 +4382,8 @@ export default function App() {
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">📷</span>
                           <div className="text-left">
-                            <p className="text-sm font-bold text-blue-900">קרא לי תמונה</p>
-                            <p className="text-xs text-blue-600">צלם טקסט — האפליקציה תקרא אותו בקול</p>
+                            <p className="text-sm font-bold text-blue-900">{language === 'english' ? 'Read Image Aloud' : 'קרא לי תמונה'}</p>
+                            <p className="text-xs text-blue-600">{language === 'english' ? 'Upload a photo — the app will read the text aloud' : 'צלם טקסט — האפליקציה תקרא אותו בקול'}</p>
                           </div>
                         </div>
                         <span className="text-blue-400 text-lg">{readAloudOpen ? '▲' : '▼'}</span>
@@ -4405,7 +4405,7 @@ export default function App() {
                               )}
                               <label className={`mt-2 flex flex-col items-center justify-center gap-2 w-full py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud ? 'border-blue-300 bg-blue-50/60 pointer-events-none' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
                                 <span className="text-3xl">{isReadingAloud ? '⏳' : '📸'}</span>
-                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? 'מעבד…' : readAloudImages.length > 0 ? '+ הוסף תמונה נוספת' : 'לחץ להעלות תמונה'}</span>
+                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? (language === 'english' ? 'Processing…' : 'מעבד…') : readAloudImages.length > 0 ? (language === 'english' ? '+ Add another image' : '+ הוסף תמונה נוספת') : (language === 'english' ? 'Tap to upload image' : 'לחץ להעלות תמונה')}</span>
                                 <span className="text-[10px] text-blue-400">JPG, PNG, WEBP</span>
                                 <input
                                   type="file"
@@ -4448,7 +4448,7 @@ export default function App() {
                                           alert(data.error || 'Could not read image. Please try a clearer photo.');
                                         }
                                       } catch {
-                                        alert('שגיאה בעיבוד התמונה. נסה שוב.');
+                                        alert(language === 'english' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
                                       } finally {
                                         setIsReadingAloud(false);
                                       }
@@ -4456,7 +4456,7 @@ export default function App() {
                                     disabled={isReadingAloud}
                                     className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
                                   >
-                                    {isReadingAloud ? <><span className="animate-spin">⏳</span> מעבד…</> : <>🔊 קרא</>}
+                                    {isReadingAloud ? <><span className="animate-spin">⏳</span> {language === 'english' ? 'Processing…' : 'מעבד…'}</> : <>🔊 {language === 'english' ? 'Read' : 'קרא'}</>}
                                   </button>
                                   <button
                                     onClick={async () => {
@@ -4475,7 +4475,7 @@ export default function App() {
                                           alert(data.error || 'Could not extract text from image.');
                                         }
                                       } catch {
-                                        alert('שגיאה בעיבוד התמונה. נסה שוב.');
+                                        alert(language === 'english' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
                                       } finally {
                                         setIsReadingAloud(false);
                                       }
@@ -4483,7 +4483,7 @@ export default function App() {
                                     disabled={isReadingAloud}
                                     className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
                                   >
-                                    🎙 פודקאסט
+                                    🎙 {language === 'english' ? 'Podcast' : 'פודקאסט'}
                                   </button>
                                 </div>
                               )}
@@ -4501,13 +4501,13 @@ export default function App() {
                                 className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
                               >
                                 <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.855L0 24l6.335-1.505A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.72.884.936-3.613-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>
-                                שלח לוואטסאפ
+                                {language === 'english' ? 'Send to WhatsApp' : 'שלח לוואטסאפ'}
                               </button>
                               <button
                                 onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setReadAloudImages([]); }}
                                 className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                               >
-                                📷 התחל מחדש
+                                📷 {language === 'english' ? 'Start over' : 'התחל מחדש'}
                               </button>
                             </div>
                           )}
