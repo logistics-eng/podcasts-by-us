@@ -163,6 +163,17 @@ const openai = { audio: { speech: { create: (...args: any[]) => {
 }}}};
 
 
+const splitForOpenAi = (text: string, max = 4000): string[] => {
+  if (text.length <= max) return [text];
+  const out: string[] = [];
+  let cur = '';
+  for (const s of text.split(/(?<=[.!?؟])\s+/)) {
+    if (cur && (cur + ' ' + s).length > max) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s;
+  }
+  if (cur) out.push(cur);
+  return out.flatMap(c => c.length > max ? c.match(new RegExp(`.{1,${max}}`, 'gs')) || [] : [c]);
+};
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
@@ -609,17 +620,6 @@ ${transcript}`;
       const baseRate = (speechSpeed ?? 100) / 100;
       const rate = Math.min(4, Math.max(0.25, baseRate));
 
-      const splitForOpenAi = (text: string, max = 4000): string[] => {
-        if (text.length <= max) return [text];
-        const out: string[] = [];
-        let cur = '';
-        for (const s of text.split(/(?<=[.!?؟])\s+/)) {
-          if (cur && (cur + ' ' + s).length > max) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s;
-        }
-        if (cur) out.push(cur);
-        return out.flatMap(c => c.length > max ? c.match(new RegExp(`.{1,${max}}`, 'gs')) || [] : [c]);
-      };
-
       const PRONUNCIATION_FIXES: [RegExp, string][] = [
         [/\bSagittarius\b/gi, 'Sajittairius'],
         [/\bAries\b/gi, 'Aireez'],
@@ -851,71 +851,90 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
-  // Image → read-aloud: extract text from image then convert to audio in one call
+  // Shared TTS helper for read-aloud endpoints
+  const readAloudTts = async (text: string, lang: string): Promise<Buffer> => {
+    const useAzure = (lang === 'hebrew' || lang === 'arabic') && !!process.env.AZURE_SPEECH_KEY;
+    if (useAzure) {
+      const voice = lang === 'arabic' ? 'ar-SY-AmanyNeural' : 'he-IL-HilaNeural';
+      const ssml = `<speak version='1.0' xml:lang='${lang === 'arabic' ? 'ar-SY' : 'he-IL'}'><voice name='${voice}'>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</voice></speak>`;
+      const region = process.env.AZURE_SPEECH_REGION || 'eastus';
+      const ttsResp = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+        method: 'POST',
+        headers: {
+          'Ocp-Apim-Subscription-Key': process.env.AZURE_SPEECH_KEY!,
+          'Content-Type': 'application/ssml+xml',
+          'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+        },
+        body: ssml,
+      });
+      if (!ttsResp.ok) throw new Error(`Azure TTS ${ttsResp.status}`);
+      logUsage('azure', 'azure-tts', text.length, 0, `read-aloud:${lang}`);
+      return Buffer.from(await ttsResp.arrayBuffer());
+    } else {
+      const oaiVoice = lang === 'english' ? 'nova' : 'shimmer';
+      const chunks: Buffer[] = [];
+      for (const chunk of splitForOpenAi(text)) {
+        const resp = await openai.audio.speech.create({ model: 'tts-1', voice: oaiVoice as any, input: chunk, response_format: 'mp3' });
+        chunks.push(Buffer.from(await resp.arrayBuffer()));
+      }
+      logUsage('openai', 'openai-tts-1', text.length, 0, `read-aloud:${lang}`);
+      return Buffer.concat(chunks);
+    }
+  };
+
+  // Image(s) → read-aloud: extract text from one or more images, then convert to audio
   app.post('/api/image-read-aloud', async (req, res) => {
     try {
-      const { imageBase64, mediaType, language: lang = 'hebrew' } = req.body as {
-        imageBase64: string;
-        mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+      const { images, language: lang = 'hebrew' } = req.body as {
+        images: { imageBase64: string; mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' }[];
         language?: string;
       };
+      if (!images?.length) return res.status(400).json({ error: 'No images provided.' });
 
-      // 1. Extract text via Claude Vision
+      // Extract text from all images in one Claude call
+      const content: any[] = images.flatMap(img => [
+        { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.imageBase64 } },
+      ]);
+      content.push({ type: 'text', text: `Extract all the text from ${images.length > 1 ? 'these images in order' : 'this image'} exactly as written. Return only the extracted text with no commentary. Preserve line breaks. Separate text from different images with a blank line.` });
+
       const msg = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
         max_tokens: 4096,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
-            { type: 'text', text: 'Extract all the text from this image exactly as written. Return only the extracted text with no commentary, headings, or formatting changes. Preserve line breaks.' },
-          ],
-        }],
+        messages: [{ role: 'user', content }],
       });
       const text = (msg.content[0] as any).text.trim();
-      if (!text || text.length < 3) {
-        return res.status(422).json({ error: 'No readable text found in the image.' });
-      }
+      if (!text || text.length < 3) return res.status(422).json({ error: 'No readable text found in the image(s).' });
 
-      // 2. Convert to speech
-      const useAzure = (lang === 'hebrew' || lang === 'arabic') && !!process.env.AZURE_SPEECH_KEY;
-      let audioBuffer: Buffer;
-
-      if (useAzure) {
-        const voice = lang === 'arabic' ? 'ar-SY-AmanyNeural' : 'he-IL-HilaNeural';
-        const ssml = `<speak version='1.0' xml:lang='${lang === 'arabic' ? 'ar-SY' : 'he-IL'}'><voice name='${voice}'>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</voice></speak>`;
-        const region = process.env.AZURE_SPEECH_REGION || 'eastus';
-        const ttsResp = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
-          method: 'POST',
-          headers: {
-            'Ocp-Apim-Subscription-Key': process.env.AZURE_SPEECH_KEY!,
-            'Content-Type': 'application/ssml+xml',
-            'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
-          },
-          body: ssml,
-        });
-        if (!ttsResp.ok) throw new Error(`Azure TTS ${ttsResp.status}`);
-        audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
-      } else {
-        const oaiVoice = lang === 'english' ? 'nova' : 'shimmer';
-        const chunks: Buffer[] = [];
-        for (const chunk of splitForOpenAi(text)) {
-          const resp = await openai.audio.speech.create({
-            model: 'tts-1',
-            voice: oaiVoice as any,
-            input: chunk,
-            response_format: 'mp3',
-          });
-          chunks.push(Buffer.from(await resp.arrayBuffer()));
-        }
-        audioBuffer = Buffer.concat(chunks);
-      }
-
-      logUsage(useAzure ? 'azure' : 'openai', useAzure ? 'azure-tts' : 'openai-tts-1', text.length, 0, `read-aloud:${lang}`);
+      const audioBuffer = await readAloudTts(text, lang);
       res.json({ text, audioBase64: audioBuffer.toString('base64'), mimeType: 'audio/mpeg' });
     } catch (error: any) {
       console.error('image-read-aloud error:', error.message);
       res.status(500).json({ error: 'Could not process image. Please try again.' });
+    }
+  });
+
+  // Article URL → read-aloud: fetch article via Jina then convert to audio
+  app.post('/api/article-read-aloud', async (req, res) => {
+    try {
+      const { url, language: lang = 'english' } = req.body as { url: string; language?: string };
+      const jinaUrl = `https://r.jina.ai/${url}`;
+      const r = await fetch(jinaUrl, {
+        headers: {
+          'Accept': 'text/plain',
+          'X-Return-Format': 'text',
+          ...(process.env.JINA_API_KEY ? { 'Authorization': `Bearer ${process.env.JINA_API_KEY}` } : {}),
+        },
+      });
+      if (!r.ok) throw new Error(`Could not fetch article (${r.status})`);
+      const raw = await r.text();
+      if (raw.length < 100) throw new Error('Article content too short — the page may be blocked.');
+      // Trim to ~8000 chars to keep TTS cost reasonable
+      const text = raw.slice(0, 8000);
+      const audioBuffer = await readAloudTts(text, lang);
+      res.json({ text, audioBase64: audioBuffer.toString('base64'), mimeType: 'audio/mpeg' });
+    } catch (error: any) {
+      console.error('article-read-aloud error:', error.message);
+      res.status(500).json({ error: error.message || 'Could not read article. Please try again.' });
     }
   });
 

@@ -1926,6 +1926,11 @@ export default function App() {
   const [readAloudAudio, setReadAloudAudio] = useState('');
   const [isReadingAloud, setIsReadingAloud] = useState(false);
   const [readAloudOpen, setReadAloudOpen] = useState(false);
+  const [readAloudImages, setReadAloudImages] = useState<{imageBase64: string; mediaType: string; name: string}[]>([]);
+  const [articleReadMode, setArticleReadMode] = useState<'podcast' | 'read-aloud'>('podcast');
+  const [articleReadAloudAudio, setArticleReadAloudAudio] = useState('');
+  const [articleReadAloudText, setArticleReadAloudText] = useState('');
+  const [isArticleReadingAloud, setIsArticleReadingAloud] = useState(false);
   const [articleText, setArticleText] = useState('');
   const [articleText2, setArticleText2] = useState('');
   const [articleUrl, setArticleUrl] = useState('');
@@ -4371,32 +4376,52 @@ export default function App() {
                         <div className="px-4 pb-4 space-y-3 border-t border-blue-100">
                           {!readAloudAudio ? (
                             <>
-                              <label className={`mt-3 flex flex-col items-center justify-center gap-2 w-full py-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud ? 'border-blue-300 bg-blue-50/60' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
+                              {/* Queued images */}
+                              {readAloudImages.length > 0 && (
+                                <div className="mt-2 space-y-1">
+                                  {readAloudImages.map((img, i) => (
+                                    <div key={i} className="flex items-center justify-between bg-white rounded-lg border border-blue-100 px-3 py-1.5">
+                                      <span className="text-xs text-gray-600 truncate">📄 {img.name}</span>
+                                      <button onClick={() => setReadAloudImages(imgs => imgs.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-400 text-xs ml-2">✕</button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              <label className={`mt-2 flex flex-col items-center justify-center gap-2 w-full py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud ? 'border-blue-300 bg-blue-50/60 pointer-events-none' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
                                 <span className="text-3xl">{isReadingAloud ? '⏳' : '📸'}</span>
-                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? 'מעבד…' : 'לחץ להעלות תמונה'}</span>
+                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? 'מעבד…' : readAloudImages.length > 0 ? '+ הוסף תמונה נוספת' : 'לחץ להעלות תמונה'}</span>
                                 <span className="text-[10px] text-blue-400">JPG, PNG, WEBP</span>
                                 <input
                                   type="file"
                                   accept="image/jpeg,image/png,image/webp,image/gif"
+                                  multiple
                                   className="hidden"
                                   disabled={isReadingAloud}
                                   onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file) return;
+                                    const files = Array.from(e.target.files || []);
+                                    if (!files.length) return;
+                                    const newImgs = await Promise.all(files.map(file => new Promise<{imageBase64: string; mediaType: string; name: string}>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve({ imageBase64: (reader.result as string).split(',')[1], mediaType: file.type, name: file.name });
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    })));
+                                    setReadAloudImages(imgs => [...imgs, ...newImgs]);
+                                    e.target.value = '';
+                                  }}
+                                />
+                              </label>
+                              {readAloudImages.length > 0 && (
+                                <button
+                                  onClick={async () => {
                                     setIsReadingAloud(true);
                                     setReadAloudText('');
                                     setReadAloudAudio('');
                                     try {
-                                      const reader = new FileReader();
-                                      const base64 = await new Promise<string>((resolve, reject) => {
-                                        reader.onload = () => resolve((reader.result as string).split(',')[1]);
-                                        reader.onerror = reject;
-                                        reader.readAsDataURL(file);
-                                      });
                                       const res = await fetch('/api/image-read-aloud', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ imageBase64: base64, mediaType: file.type, language: 'hebrew' }),
+                                        body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
                                       });
                                       const data = await res.json();
                                       if (data.audioBase64) {
@@ -4409,11 +4434,14 @@ export default function App() {
                                       alert('שגיאה בעיבוד התמונה. נסה שוב.');
                                     } finally {
                                       setIsReadingAloud(false);
-                                      e.target.value = '';
                                     }
                                   }}
-                                />
-                              </label>
+                                  disabled={isReadingAloud}
+                                  className="w-full py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                                >
+                                  {isReadingAloud ? <><span className="animate-spin">⏳</span> מעבד…</> : <>🔊 קרא {readAloudImages.length > 1 ? `${readAloudImages.length} תמונות` : 'תמונה'}</>}
+                                </button>
+                              )}
                             </>
                           ) : (
                             <div className="mt-3 space-y-3">
@@ -4422,17 +4450,12 @@ export default function App() {
                                   <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{readAloudText}</p>
                                 </div>
                               )}
-                              <audio
-                                controls
-                                autoPlay
-                                className="w-full"
-                                src={`data:audio/mpeg;base64,${readAloudAudio}`}
-                              />
+                              <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${readAloudAudio}`} />
                               <button
-                                onClick={() => { setReadAloudText(''); setReadAloudAudio(''); }}
+                                onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setReadAloudImages([]); }}
                                 className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                               >
-                                📷 העלה תמונה חדשה
+                                📷 התחל מחדש
                               </button>
                             </div>
                           )}
@@ -4542,6 +4565,21 @@ export default function App() {
                             <input type="url" placeholder="https://example.com/article-2" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={articleUrl2} onChange={(e) => setArticleUrl2(e.target.value)} />
                           </div>
                           <p className="text-[10px] text-gray-400 italic px-1">Tip: Use direct links instead of shortened "share" links for better results.</p>
+                          <div className="flex p-1 bg-gray-100 rounded-xl">
+                            <button onClick={() => { setArticleReadMode('podcast'); setArticleReadAloudAudio(''); setArticleReadAloudText(''); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${articleReadMode === 'podcast' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎙 Make Podcast</button>
+                            <button onClick={() => { setArticleReadMode('read-aloud'); setArticleReadAloudAudio(''); setArticleReadAloudText(''); }} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${articleReadMode === 'read-aloud' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🔊 Read Aloud</button>
+                          </div>
+                          {articleReadAloudAudio && (
+                            <div className="space-y-2 pt-1">
+                              {articleReadAloudText && (
+                                <div className="rounded-xl bg-gray-50 border border-gray-100 px-3 py-2 max-h-28 overflow-y-auto">
+                                  <p className="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">{articleReadAloudText.slice(0, 600)}{articleReadAloudText.length > 600 ? '…' : ''}</p>
+                                </div>
+                              )}
+                              <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${articleReadAloudAudio}`} />
+                              <button onClick={() => { setArticleReadAloudAudio(''); setArticleReadAloudText(''); }} className="w-full py-1.5 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">✕ Clear</button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -4593,6 +4631,38 @@ export default function App() {
                   </div>
                 </div>
 
+                {sourceType === 'article' && articleSourceType === 'url' && articleReadMode === 'read-aloud' ? (
+                  <button
+                    onClick={async () => {
+                      if (!articleUrl.trim()) return;
+                      setIsArticleReadingAloud(true);
+                      setArticleReadAloudAudio('');
+                      setArticleReadAloudText('');
+                      try {
+                        const res = await fetch('/api/article-read-aloud', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ url: articleUrl.trim(), language }),
+                        });
+                        const data = await res.json();
+                        if (data.audioBase64) {
+                          setArticleReadAloudAudio(data.audioBase64);
+                          setArticleReadAloudText(data.text || '');
+                        } else {
+                          alert(data.error || 'Could not read article. Please try another URL.');
+                        }
+                      } catch {
+                        alert('Failed to read article. Please try again.');
+                      } finally {
+                        setIsArticleReadingAloud(false);
+                      }
+                    }}
+                    disabled={isArticleReadingAloud || !articleUrl.trim()}
+                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
+                  >
+                    {isArticleReadingAloud ? (<><Loader2 className="animate-spin" size={20} /><span>Reading article…</span></>) : (<><Volume2 size={20} />Read Article Aloud</>)}
+                  </button>
+                ) : (
                 <button
                   onClick={handleGenerate}
                   disabled={isGenerating || (contentMode === 'roleplay' || contentMode === 'phonecall' ? !subject.trim() : (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim())))}
@@ -4600,6 +4670,7 @@ export default function App() {
                 >
                   {isGenerating ? (<><Loader2 className="animate-spin" size={20} /><span>Generating...{genElapsed > 0 ? ` ${formatElapsed(genElapsed)}` : ''}</span></>) : (<><Volume2 size={20} />{contentMode === 'phonecall' ? 'Create Phone Call' : contentMode === 'roleplay' ? 'Create Role Play' : 'Create Podcast'}</>)}
                 </button>
+                )}
               </section>
             ) : (
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
