@@ -4372,8 +4372,8 @@ export default function App() {
                     </button>
                   )}
 
-                  {/* Read Image Aloud — Hebrew dyslexia feature */}
-                  {language === 'hebrew' && (
+                  {/* Read Image Aloud */}
+                  {(
                     <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden">
                       <button
                         onClick={() => { setReadAloudOpen(o => !o); setReadAloudText(''); setReadAloudAudio(''); }}
@@ -4438,7 +4438,7 @@ export default function App() {
                                         const res = await fetch('/api/image-read-aloud', {
                                           method: 'POST',
                                           headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
+                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
                                         });
                                         const data = await res.json();
                                         if (data.audioBase64) {
@@ -4465,7 +4465,7 @@ export default function App() {
                                         const res = await fetch('/api/image-read-aloud', {
                                           method: 'POST',
                                           headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language: 'hebrew' }),
+                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
                                         });
                                         const data = await res.json();
                                         if (data.text) {
