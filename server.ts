@@ -898,7 +898,11 @@ Create a complete HTML worksheet. Requirements:
       const content: any[] = images.flatMap(img => [
         { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.imageBase64 } },
       ]);
-      content.push({ type: 'text', text: `Extract all the text from ${images.length > 1 ? 'these images in order' : 'this image'} exactly as written. Return only the extracted text with no commentary. Preserve line breaks. Separate text from different images with a blank line.` });
+      content.push({ type: 'text', text: `Extract all the text from ${images.length > 1 ? 'these images in order' : 'this image'} and prepare it for natural text-to-speech reading. Rules:
+- If the image contains a question followed by multiple choice options (labeled A/B/C/D, 1/2/3/4, א/ב/ג/ד, or similar), format it as: first the question, then a natural spoken transition like "האפשרויות הן:" (if Hebrew) or "The options are:" (if English), then read each option on its own line with its label.
+- For any list or numbered items, add a brief pause cue by putting each item on its own line.
+- Otherwise, extract the text exactly as written.
+- Return only the prepared text, no commentary.` });
 
       const msg = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
