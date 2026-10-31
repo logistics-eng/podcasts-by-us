@@ -4393,132 +4393,127 @@ export default function App() {
                       </button>
                       {readAloudOpen && (
                         <div className="px-4 pb-4 space-y-3 border-t border-blue-100">
-                          {!readAloudAudio && !summaryAudio ? (
-                            <>
-                              {/* Queued images */}
-                              {readAloudImages.length > 0 && (
-                                <div className="mt-2 space-y-1">
-                                  {readAloudImages.map((img, i) => (
-                                    <div key={i} className="flex items-center justify-between bg-white rounded-lg border border-blue-100 px-3 py-1.5">
-                                      <span className="text-xs text-gray-600 truncate">📄 {img.name}</span>
-                                      <button onClick={() => setReadAloudImages(imgs => imgs.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-400 text-xs ml-2">✕</button>
-                                    </div>
-                                  ))}
+                          {/* Queued images */}
+                          {readAloudImages.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {readAloudImages.map((img, i) => (
+                                <div key={i} className="flex items-center justify-between bg-white rounded-lg border border-blue-100 px-3 py-1.5">
+                                  <span className="text-xs text-gray-600 truncate">📄 {img.name}</span>
+                                  <button onClick={() => setReadAloudImages(imgs => imgs.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-400 text-xs ml-2">✕</button>
                                 </div>
-                              )}
-                              <label className={`mt-2 flex flex-col items-center justify-center gap-2 w-full py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud ? 'border-blue-300 bg-blue-50/60 pointer-events-none' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
-                                <span className="text-3xl">{isReadingAloud ? '⏳' : '📸'}</span>
-                                <span className="text-sm font-bold text-blue-700">{isReadingAloud ? (language === 'english' || language === 'italian' ? 'Processing…' : 'מעבד…') : readAloudImages.length > 0 ? (language === 'english' || language === 'italian' ? '+ Add another image' : '+ הוסף תמונה נוספת') : (language === 'english' || language === 'italian' ? 'Tap to upload image' : 'לחץ להעלות תמונה')}</span>
-                                <span className="text-[10px] text-blue-400">JPG, PNG, WEBP</span>
-                                <input
-                                  type="file"
-                                  accept="image/jpeg,image/png,image/webp,image/gif"
-                                  multiple
-                                  className="hidden"
-                                  disabled={isReadingAloud}
-                                  onChange={async (e) => {
-                                    const files = Array.from(e.target.files || []);
-                                    if (!files.length) return;
-                                    const newImgs = await Promise.all(files.map(file => new Promise<{imageBase64: string; mediaType: string; name: string}>((resolve, reject) => {
-                                      const reader = new FileReader();
-                                      reader.onload = () => resolve({ imageBase64: (reader.result as string).split(',')[1], mediaType: file.type, name: file.name });
-                                      reader.onerror = reject;
-                                      reader.readAsDataURL(file);
-                                    })));
-                                    setReadAloudImages(imgs => [...imgs, ...newImgs]);
-                                    e.target.value = '';
+                              ))}
+                            </div>
+                          )}
+                          <label className={`mt-2 flex flex-col items-center justify-center gap-2 w-full py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${isReadingAloud || isSummarizing ? 'border-blue-300 bg-blue-50/60 pointer-events-none' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}>
+                            <span className="text-3xl">{isReadingAloud || isSummarizing ? '⏳' : '📸'}</span>
+                            <span className="text-sm font-bold text-blue-700">{isReadingAloud || isSummarizing ? (language === 'english' || language === 'italian' ? 'Processing…' : 'מעבד…') : readAloudImages.length > 0 ? (language === 'english' || language === 'italian' ? '+ Add another image' : '+ הוסף תמונה נוספת') : (language === 'english' || language === 'italian' ? 'Tap to upload image' : 'לחץ להעלות תמונה')}</span>
+                            <span className="text-[10px] text-blue-400">JPG, PNG, WEBP</span>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/gif"
+                              multiple
+                              className="hidden"
+                              disabled={isReadingAloud || isSummarizing}
+                              onChange={async (e) => {
+                                const files = Array.from(e.target.files || []);
+                                if (!files.length) return;
+                                const newImgs = await Promise.all(files.map(file => new Promise<{imageBase64: string; mediaType: string; name: string}>((resolve, reject) => {
+                                  const reader = new FileReader();
+                                  reader.onload = () => resolve({ imageBase64: (reader.result as string).split(',')[1], mediaType: file.type, name: file.name });
+                                  reader.onerror = reject;
+                                  reader.readAsDataURL(file);
+                                })));
+                                setReadAloudImages(imgs => [...imgs, ...newImgs]);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                          {readAloudImages.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={async () => {
+                                    setIsReadingAloud(true);
+                                    setReadAloudText(''); setReadAloudAudio('');
+                                    setSummaryText(''); setSummaryAudio('');
+                                    try {
+                                      const res = await fetch('/api/image-read-aloud', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
+                                      });
+                                      const data = await res.json();
+                                      if (data.audioBase64) { setReadAloudText(data.text || ''); setReadAloudAudio(data.audioBase64); }
+                                      else alert(data.error || 'Could not read image. Please try a clearer photo.');
+                                    } catch {
+                                      alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
+                                    } finally { setIsReadingAloud(false); }
                                   }}
-                                />
-                              </label>
-                              {readAloudImages.length > 0 && (
-                                <div className="flex flex-col gap-2">
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={async () => {
-                                      setIsReadingAloud(true);
-                                      setReadAloudText(''); setReadAloudAudio('');
-                                      setSummaryText(''); setSummaryAudio('');
-                                      try {
-                                        const res = await fetch('/api/image-read-aloud', {
-                                          method: 'POST',
-                                          headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
-                                        });
-                                        const data = await res.json();
-                                        if (data.audioBase64) { setReadAloudText(data.text || ''); setReadAloudAudio(data.audioBase64); }
-                                        else alert(data.error || 'Could not read image. Please try a clearer photo.');
-                                      } catch {
-                                        alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
-                                      } finally { setIsReadingAloud(false); }
-                                    }}
-                                    disabled={isReadingAloud || isSummarizing}
-                                    className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
-                                  >
-                                    {isReadingAloud ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Processing…' : 'מעבד…'}</> : <>🔊 {language === 'english' || language === 'italian' ? 'Read' : 'קרא'}</>}
-                                  </button>
-                                  <button
-                                    onClick={async () => {
-                                      setIsSummarizing(true);
-                                      setReadAloudText(''); setReadAloudAudio('');
-                                      setSummaryText(''); setSummaryAudio('');
-                                      try {
-                                        const res = await fetch('/api/image-summarize', {
-                                          method: 'POST',
-                                          headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
-                                        });
-                                        const data = await res.json();
-                                        if (data.audioBase64) { setSummaryText(data.summary || ''); setSummaryAudio(data.audioBase64); }
-                                        else alert(data.error || 'Could not summarize image.');
-                                      } catch {
-                                        alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
-                                      } finally { setIsSummarizing(false); }
-                                    }}
-                                    disabled={isReadingAloud || isSummarizing}
-                                    className="flex-1 py-3 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
-                                  >
-                                    {isSummarizing ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Summarizing…' : 'מסכם…'}</> : <>📝 {language === 'english' || language === 'italian' ? 'Summary' : 'סיכום'}</>}
-                                  </button>
-                                </div>
-                                  <button
-                                    onClick={async () => {
-                                      setIsReadingAloud(true);
-                                      setSummaryText(''); setSummaryAudio('');
-                                      try {
-                                        const res = await fetch('/api/extract-image-text', {
-                                          method: 'POST',
-                                          headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ imageBase64: readAloudImages[0].imageBase64, mediaType: readAloudImages[0].mediaType }),
-                                        });
-                                        const data = await res.json();
-                                        if (data.text) {
-                                          setArticleText(data.text);
-                                          setSourceType('article');
-                                          setArticleSourceType('text');
-                                          setReadAloudOpen(false);
-                                          setReadAloudImages([]);
-                                        } else alert(data.error || 'Could not extract text from image.');
-                                      } catch {
-                                        alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
-                                      } finally { setIsReadingAloud(false); }
-                                    }}
-                                    disabled={isReadingAloud || isSummarizing}
-                                    className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
-                                  >
-                                    🎙 {language === 'english' || language === 'italian' ? 'Podcast' : 'פודקאסט'}
-                                  </button>
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <div className="mt-3 space-y-3">
-                              {/* WhatsApp SVG reused below */}
-                              {(() => {
-                                const waIcon = <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.855L0 24l6.335-1.505A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.72.884.936-3.613-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>;
-                                const isEn = language === 'english' || language === 'italian';
-                                const waLabel = isEn ? 'Send to WhatsApp' : 'שלח לוואטסאפ';
-                                const restartLabel = isEn ? 'Start over' : 'התחל מחדש';
-                                if (summaryAudio) return (
+                                  disabled={isReadingAloud || isSummarizing}
+                                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                >
+                                  {isReadingAloud ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Processing…' : 'מעבד…'}</> : <>🔊 {language === 'english' || language === 'italian' ? 'Read' : 'קרא'}</>}
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    setIsSummarizing(true);
+                                    setReadAloudText(''); setReadAloudAudio('');
+                                    setSummaryText(''); setSummaryAudio('');
+                                    try {
+                                      const res = await fetch('/api/image-summarize', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
+                                      });
+                                      const data = await res.json();
+                                      if (data.audioBase64) { setSummaryText(data.summary || ''); setSummaryAudio(data.audioBase64); }
+                                      else alert(data.error || 'Could not summarize image.');
+                                    } catch {
+                                      alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
+                                    } finally { setIsSummarizing(false); }
+                                  }}
+                                  disabled={isReadingAloud || isSummarizing}
+                                  className="flex-1 py-3 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                >
+                                  {isSummarizing ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Summarizing…' : 'מסכם…'}</> : <>📝 {language === 'english' || language === 'italian' ? 'Summary' : 'סיכום'}</>}
+                                </button>
+                              </div>
+                              <button
+                                onClick={async () => {
+                                  setIsReadingAloud(true);
+                                  setSummaryText(''); setSummaryAudio('');
+                                  try {
+                                    const res = await fetch('/api/extract-image-text', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ imageBase64: readAloudImages[0].imageBase64, mediaType: readAloudImages[0].mediaType }),
+                                    });
+                                    const data = await res.json();
+                                    if (data.text) {
+                                      setArticleText(data.text);
+                                      setSourceType('article');
+                                      setArticleSourceType('text');
+                                      setReadAloudOpen(false);
+                                    } else alert(data.error || 'Could not extract text from image.');
+                                  } catch {
+                                    alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
+                                  } finally { setIsReadingAloud(false); }
+                                }}
+                                disabled={isReadingAloud || isSummarizing}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                              >
+                                🎙 {language === 'english' || language === 'italian' ? 'Podcast' : 'פודקאסט'}
+                              </button>
+                            </div>
+                          )}
+                          {/* Results shown below buttons — images stay loaded for further actions */}
+                          {(readAloudAudio || summaryAudio) && (() => {
+                            const waIcon = <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.855L0 24l6.335-1.505A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.72.884.936-3.613-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>;
+                            const isEn = language === 'english' || language === 'italian';
+                            const waLabel = isEn ? 'Send to WhatsApp' : 'שלח לוואטסאפ';
+                            return (
+                              <div className="mt-1 space-y-3 border-t border-blue-100 pt-3">
+                                {summaryAudio && (
                                   <>
                                     {summaryText && (
                                       <div className="rounded-xl bg-purple-50 border border-purple-100 px-3 py-2 max-h-40 overflow-y-auto">
@@ -4529,26 +4524,27 @@ export default function App() {
                                     <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${summaryAudio}`} />
                                     <div className="flex gap-2">
                                       <button onClick={() => shareAudioToWhatsApp(summaryAudio, isEn ? 'summary' : 'סיכום')} className="flex-1 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1">{waIcon} {waLabel}</button>
-                                      <button onClick={() => { const blob = new Blob([summaryText], {type:'text/plain'}); const url = `https://wa.me/?text=${encodeURIComponent(summaryText)}`; window.open(url, '_blank'); }} className="flex-1 py-2.5 bg-green-400 hover:bg-green-500 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1">{waIcon} {isEn ? 'Text' : 'טקסט'}</button>
+                                      <button onClick={() => { const url = `https://wa.me/?text=${encodeURIComponent(summaryText)}`; window.open(url, '_blank'); }} className="flex-1 py-2.5 bg-green-400 hover:bg-green-500 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1">{waIcon} {isEn ? 'Text' : 'טקסט'}</button>
                                     </div>
-                                    <button onClick={() => { setSummaryText(''); setSummaryAudio(''); setReadAloudImages([]); }} className="w-full py-2 text-xs font-bold text-purple-600 hover:text-purple-800 transition-colors">📷 {restartLabel}</button>
+                                    <button onClick={() => { setSummaryText(''); setSummaryAudio(''); }} className="w-full py-2 text-xs font-bold text-purple-600 hover:text-purple-800 transition-colors">✕ {isEn ? 'Clear summary' : 'נקה סיכום'}</button>
                                   </>
-                                );
-                                return (
+                                )}
+                                {readAloudAudio && (
                                   <>
                                     {readAloudText && (
                                       <div className="rounded-xl bg-white border border-blue-100 px-3 py-2 max-h-32 overflow-y-auto">
                                         <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{readAloudText}</p>
                                       </div>
                                     )}
-                                    <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${readAloudAudio}`} />
+                                    <audio controls autoPlay={!summaryAudio} className="w-full" src={`data:audio/mpeg;base64,${readAloudAudio}`} />
                                     <button onClick={() => shareAudioToWhatsApp(readAloudAudio, isEn ? 'reading' : 'קריאה')} className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">{waIcon} {waLabel}</button>
-                                    <button onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setReadAloudImages([]); }} className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">📷 {restartLabel}</button>
+                                    <button onClick={() => { setReadAloudText(''); setReadAloudAudio(''); }} className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">✕ {isEn ? 'Clear reading' : 'נקה קריאה'}</button>
                                   </>
-                                );
-                              })()}
-                            </div>
-                          )}
+                                )}
+                                <button onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setSummaryText(''); setSummaryAudio(''); setReadAloudImages([]); }} className="w-full py-2 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">📷 {isEn ? 'New photo' : 'תמונה חדשה'}</button>
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
                     </div>
