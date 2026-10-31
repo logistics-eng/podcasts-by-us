@@ -4483,14 +4483,19 @@ export default function App() {
                                       setIsReadingAloud(true);
                                       setSummaryText(''); setSummaryAudio('');
                                       try {
-                                        const res = await fetch('/api/image-read-aloud', {
+                                        const res = await fetch('/api/extract-image-text', {
                                           method: 'POST',
                                           headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
+                                          body: JSON.stringify({ imageBase64: readAloudImages[0].imageBase64, mediaType: readAloudImages[0].mediaType }),
                                         });
                                         const data = await res.json();
-                                        if (data.text) { setReadAloudOpen(false); await handleGenerate(data.text); }
-                                        else alert(data.error || 'Could not extract text from image.');
+                                        if (data.text) {
+                                          setArticleText(data.text);
+                                          setSourceType('article');
+                                          setArticleSourceType('text');
+                                          setReadAloudOpen(false);
+                                          setReadAloudImages([]);
+                                        } else alert(data.error || 'Could not extract text from image.');
                                       } catch {
                                         alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
                                       } finally { setIsReadingAloud(false); }
