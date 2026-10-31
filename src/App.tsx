@@ -1927,6 +1927,9 @@ export default function App() {
   const [isReadingAloud, setIsReadingAloud] = useState(false);
   const [readAloudOpen, setReadAloudOpen] = useState(false);
   const [readAloudImages, setReadAloudImages] = useState<{imageBase64: string; mediaType: string; name: string}[]>([]);
+  const [summaryText, setSummaryText] = useState('');
+  const [summaryAudio, setSummaryAudio] = useState('');
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const [articleReadMode, setArticleReadMode] = useState<'podcast' | 'read-aloud'>('podcast');
   const [articleReadAloudAudio, setArticleReadAloudAudio] = useState('');
   const [articleReadAloudText, setArticleReadAloudText] = useState('');
@@ -4390,7 +4393,7 @@ export default function App() {
                       </button>
                       {readAloudOpen && (
                         <div className="px-4 pb-4 space-y-3 border-t border-blue-100">
-                          {!readAloudAudio ? (
+                          {!readAloudAudio && !summaryAudio ? (
                             <>
                               {/* Queued images */}
                               {readAloudImages.length > 0 && (
@@ -4432,8 +4435,8 @@ export default function App() {
                                   <button
                                     onClick={async () => {
                                       setIsReadingAloud(true);
-                                      setReadAloudText('');
-                                      setReadAloudAudio('');
+                                      setReadAloudText(''); setReadAloudAudio('');
+                                      setSummaryText(''); setSummaryAudio('');
                                       try {
                                         const res = await fetch('/api/image-read-aloud', {
                                           method: 'POST',
@@ -4441,26 +4444,44 @@ export default function App() {
                                           body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
                                         });
                                         const data = await res.json();
-                                        if (data.audioBase64) {
-                                          setReadAloudText(data.text || '');
-                                          setReadAloudAudio(data.audioBase64);
-                                        } else {
-                                          alert(data.error || 'Could not read image. Please try a clearer photo.');
-                                        }
+                                        if (data.audioBase64) { setReadAloudText(data.text || ''); setReadAloudAudio(data.audioBase64); }
+                                        else alert(data.error || 'Could not read image. Please try a clearer photo.');
                                       } catch {
                                         alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
-                                      } finally {
-                                        setIsReadingAloud(false);
-                                      }
+                                      } finally { setIsReadingAloud(false); }
                                     }}
-                                    disabled={isReadingAloud}
+                                    disabled={isReadingAloud || isSummarizing}
                                     className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
                                   >
                                     {isReadingAloud ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Processing…' : 'מעבד…'}</> : <>🔊 {language === 'english' || language === 'italian' ? 'Read' : 'קרא'}</>}
                                   </button>
                                   <button
                                     onClick={async () => {
+                                      setIsSummarizing(true);
+                                      setReadAloudText(''); setReadAloudAudio('');
+                                      setSummaryText(''); setSummaryAudio('');
+                                      try {
+                                        const res = await fetch('/api/image-summarize', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
+                                        });
+                                        const data = await res.json();
+                                        if (data.audioBase64) { setSummaryText(data.summary || ''); setSummaryAudio(data.audioBase64); }
+                                        else alert(data.error || 'Could not summarize image.');
+                                      } catch {
+                                        alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
+                                      } finally { setIsSummarizing(false); }
+                                    }}
+                                    disabled={isReadingAloud || isSummarizing}
+                                    className="flex-1 py-3 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
+                                  >
+                                    {isSummarizing ? <><span className="animate-spin">⏳</span> {language === 'english' || language === 'italian' ? 'Summarizing…' : 'מסכם…'}</> : <>📝 {language === 'english' || language === 'italian' ? 'Summary' : 'סיכום'}</>}
+                                  </button>
+                                  <button
+                                    onClick={async () => {
                                       setIsReadingAloud(true);
+                                      setSummaryText(''); setSummaryAudio('');
                                       try {
                                         const res = await fetch('/api/image-read-aloud', {
                                           method: 'POST',
@@ -4468,19 +4489,13 @@ export default function App() {
                                           body: JSON.stringify({ images: readAloudImages.map(({imageBase64, mediaType}) => ({imageBase64, mediaType})), language }),
                                         });
                                         const data = await res.json();
-                                        if (data.text) {
-                                          setReadAloudOpen(false);
-                                          await handleGenerate(data.text);
-                                        } else {
-                                          alert(data.error || 'Could not extract text from image.');
-                                        }
+                                        if (data.text) { setReadAloudOpen(false); await handleGenerate(data.text); }
+                                        else alert(data.error || 'Could not extract text from image.');
                                       } catch {
                                         alert(language === 'english' || language === 'italian' ? 'Error processing image. Please try again.' : 'שגיאה בעיבוד התמונה. נסה שוב.');
-                                      } finally {
-                                        setIsReadingAloud(false);
-                                      }
+                                      } finally { setIsReadingAloud(false); }
                                     }}
-                                    disabled={isReadingAloud}
+                                    disabled={isReadingAloud || isSummarizing}
                                     className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1"
                                   >
                                     🎙 {language === 'english' || language === 'italian' ? 'Podcast' : 'פודקאסט'}
@@ -4490,25 +4505,41 @@ export default function App() {
                             </>
                           ) : (
                             <div className="mt-3 space-y-3">
-                              {readAloudText && (
-                                <div className="rounded-xl bg-white border border-blue-100 px-3 py-2 max-h-32 overflow-y-auto">
-                                  <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{readAloudText}</p>
-                                </div>
-                              )}
-                              <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${readAloudAudio}`} />
-                              <button
-                                onClick={() => shareAudioToWhatsApp(readAloudAudio, 'קריאה')}
-                                className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
-                              >
-                                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.855L0 24l6.335-1.505A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.72.884.936-3.613-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>
-                                {language === 'english' || language === 'italian' ? 'Send to WhatsApp' : 'שלח לוואטסאפ'}
-                              </button>
-                              <button
-                                onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setReadAloudImages([]); }}
-                                className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
-                              >
-                                📷 {language === 'english' || language === 'italian' ? 'Start over' : 'התחל מחדש'}
-                              </button>
+                              {/* WhatsApp SVG reused below */}
+                              {(() => {
+                                const waIcon = <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.855L0 24l6.335-1.505A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.72.884.936-3.613-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>;
+                                const isEn = language === 'english' || language === 'italian';
+                                const waLabel = isEn ? 'Send to WhatsApp' : 'שלח לוואטסאפ';
+                                const restartLabel = isEn ? 'Start over' : 'התחל מחדש';
+                                if (summaryAudio) return (
+                                  <>
+                                    {summaryText && (
+                                      <div className="rounded-xl bg-purple-50 border border-purple-100 px-3 py-2 max-h-40 overflow-y-auto">
+                                        <p className="text-xs font-bold text-purple-700 mb-1">{isEn ? '📝 Summary' : '📝 סיכום'}</p>
+                                        <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">{summaryText}</p>
+                                      </div>
+                                    )}
+                                    <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${summaryAudio}`} />
+                                    <div className="flex gap-2">
+                                      <button onClick={() => shareAudioToWhatsApp(summaryAudio, isEn ? 'summary' : 'סיכום')} className="flex-1 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1">{waIcon} {waLabel}</button>
+                                      <button onClick={() => { const blob = new Blob([summaryText], {type:'text/plain'}); const url = `https://wa.me/?text=${encodeURIComponent(summaryText)}`; window.open(url, '_blank'); }} className="flex-1 py-2.5 bg-green-400 hover:bg-green-500 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1">{waIcon} {isEn ? 'Text' : 'טקסט'}</button>
+                                    </div>
+                                    <button onClick={() => { setSummaryText(''); setSummaryAudio(''); setReadAloudImages([]); }} className="w-full py-2 text-xs font-bold text-purple-600 hover:text-purple-800 transition-colors">📷 {restartLabel}</button>
+                                  </>
+                                );
+                                return (
+                                  <>
+                                    {readAloudText && (
+                                      <div className="rounded-xl bg-white border border-blue-100 px-3 py-2 max-h-32 overflow-y-auto">
+                                        <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{readAloudText}</p>
+                                      </div>
+                                    )}
+                                    <audio controls autoPlay className="w-full" src={`data:audio/mpeg;base64,${readAloudAudio}`} />
+                                    <button onClick={() => shareAudioToWhatsApp(readAloudAudio, isEn ? 'reading' : 'קריאה')} className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">{waIcon} {waLabel}</button>
+                                    <button onClick={() => { setReadAloudText(''); setReadAloudAudio(''); setReadAloudImages([]); }} className="w-full py-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">📷 {restartLabel}</button>
+                                  </>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>

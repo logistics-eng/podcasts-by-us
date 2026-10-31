@@ -945,6 +945,39 @@ Create a complete HTML worksheet. Requirements:
     }
   });
 
+  // Image(s) → summarize: extract text, summarize via Claude, convert summary to audio
+  app.post('/api/image-summarize', async (req, res) => {
+    try {
+      const { images, language: lang = 'english' } = req.body as {
+        images: { imageBase64: string; mediaType: string }[];
+        language?: string;
+      };
+      if (!images?.length) return res.status(400).json({ error: 'No images provided.' });
+
+      const langName = lang === 'hebrew' ? 'Hebrew' : lang === 'arabic' ? 'Arabic' : lang === 'french' ? 'French' : lang === 'spanish' ? 'Spanish' : lang === 'italian' ? 'Italian' : lang === 'turkish' ? 'Turkish' : lang === 'dutch' ? 'Dutch' : 'English';
+
+      // Extract + summarize in one Claude call
+      const content: any[] = images.map(img => ({
+        type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.imageBase64 },
+      }));
+      content.push({ type: 'text', text: `Read all the text in ${images.length > 1 ? 'these images' : 'this image'} and write a clear, concise summary in ${langName} suitable for a student. Structure it as 3–5 key points using simple language. Start directly with the key points — no preamble. Write in ${langName} only.` });
+
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content }],
+      });
+      const summary = (msg.content[0] as any).text.trim();
+      if (!summary) return res.status(422).json({ error: 'Could not summarize the image content.' });
+
+      const audioBuffer = await readAloudTts(summary, lang);
+      res.json({ summary, audioBase64: audioBuffer.toString('base64'), mimeType: 'audio/mpeg' });
+    } catch (error: any) {
+      console.error('image-summarize error:', error.message);
+      res.status(500).json({ error: 'Could not summarize image. Please try again.' });
+    }
+  });
+
   // Cost dashboard — protected by ADMIN_KEY query param
   app.get('/usage', async (req, res) => {
     if (req.query.key !== (process.env.ADMIN_KEY || 'pbu-admin')) {
