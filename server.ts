@@ -345,17 +345,19 @@ async function startServer() {
       } else if (articleSourceType === 'url') {
         // Fetch URL content server-side and pass as text to Claude
         const fetchArticle = async (url: string): Promise<string> => {
-          const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-          if (!r.ok) throw new Error(`Could not fetch URL (${r.status}): ${url}`);
-          const html = await r.text();
-          // Strip HTML tags and collapse whitespace
-          return html
-            .replace(/<script[\s\S]*?<\/script>/gi, '')
-            .replace(/<style[\s\S]*?<\/style>/gi, '')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s{2,}/g, ' ')
-            .trim()
-            .slice(0, 12000);
+          // Use Jina Reader to extract clean article text — handles BBC, paywalls, cookie walls
+          const jinaUrl = `https://r.jina.ai/${url}`;
+          const r = await fetch(jinaUrl, {
+            headers: {
+              'Accept': 'text/plain',
+              'X-Return-Format': 'text',
+              ...(process.env.JINA_API_KEY ? { 'Authorization': `Bearer ${process.env.JINA_API_KEY}` } : {}),
+            },
+          });
+          if (!r.ok) throw new Error(`Could not fetch article (${r.status}): ${url}`);
+          const text = await r.text();
+          if (text.length < 100) throw new Error(`Article content too short — the page may be blocked: ${url}`);
+          return text.slice(0, 12000);
         };
 
         let fetchedText1 = '';
