@@ -4757,7 +4757,7 @@ export default function App() {
                   </button>
                 ) : (
                 <button
-                  onClick={handleGenerate}
+                  onClick={() => handleGenerate()}
                   disabled={isGenerating || (contentMode === 'roleplay' || contentMode === 'phonecall' ? !subject.trim() : (sourceType === 'subject' ? !subject.trim() : (articleSourceType === 'text' ? !articleText.trim() : !articleUrl.trim())))}
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100"
                 >
