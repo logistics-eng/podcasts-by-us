@@ -604,17 +604,20 @@ ${transcript}`;
       // OpenAI TTS voice mapping — two distinct voices per language for male/female
       const getOaiVoice = (male: boolean): string => {
         if (male) {
-          // Male voices: onyx (deep), echo (neutral), fable (expressive), ash
           return language === 'english' ? 'onyx' : 'echo';
         }
-        // Female voices: nova (warm), shimmer (soft), coral, alloy
-        return language === 'english' ? 'nova' : 'shimmer';
+        // alloy: clean neutral female, less reverb than nova
+        return language === 'english' ? 'alloy' : 'shimmer';
       };
 
       const knownSpeakers = [host1Name, host2Name].filter(Boolean);
+      // Single narrator: always female voice (consistent, no flipping).
+      // Two narrators: host1=female, host2=male — matched by name, never by fallback.
       const isMale = (speaker: string) => {
-        if (knownSpeakers.length >= 2) return speaker === host2Name && speaker !== host1Name;
-        return speaker !== host1Name && speaker !== '';
+        if (hostCount !== 'two') return false;
+        return knownSpeakers.length >= 2
+          ? speaker.trim() === host2Name.trim()
+          : false;
       };
 
       const baseRate = (speechSpeed ?? 100) / 100;
